@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <strong>31 vibe modes</strong> • <strong>72 achievements</strong> • <strong>15 levels</strong> • <strong>16 tools</strong>
+  <strong>36 vibe modes</strong> • <strong>72 achievements</strong> • <strong>15 levels</strong> • <strong>16 tools</strong>
 </p>
 
 <p align="center">
@@ -19,7 +19,7 @@
 ## ✨ Features
 
 - **64 providers** — 33 no-key, 18 free tier, 8 paid, 5 local
-- **31 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, and more
+- **36 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, Cyberpunk, and more
 - **72 achievements** — XP, combos, streaks, daily challenges, titles
 - **15 levels** — Initiate → Apotheosis
 - **16 built-in tools** — 9 coding + 6 action + 6 new (web_fetch, git_status, env_info, todo, diff_view, memory)
@@ -66,7 +66,7 @@ cat error.log | aix "what's wrong with this?"
 
 ---
 
-## 🎭 31 Vibe Modes
+## 🎭 36 Vibe Modes
 
 | Vibe | Emoji | Description |
 |------|-------|-------------|
@@ -101,6 +101,11 @@ cat error.log | aix "what's wrong with this?"
 | `memelord` | 🐸 | Much code, very wow |
 | `kawaii` | 🌸 | Super cute, pastel, adorable code! |
 | `retro` | 👾 | 8-bit, pixel art, old school |
+| `cyberpunk` | 🦾 | Neon-soaked streets, chrome, rebellion |
+| `underwater` | 🐙 | Deep sea coding beneath the waves |
+| `space` | 🚀 | Final frontier, cosmic coding |
+| `jungle` | 🌴 | Wild code in the untamed jungle |
+| `winter` | ❄️ | Frozen code, ice algorithms, snowflakes |
 
 ---
 

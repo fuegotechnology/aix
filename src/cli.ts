@@ -46,7 +46,7 @@ ${bold(cyan('OPTIONS'))}
   ${bold('--providers')}                  List all providers
   ${bold('-p, --provider <id>')}          Use a specific provider
   ${bold('-m, --model <name>')}           Set model (also via AIX_MODEL env)
-  ${bold('--vibe <id>')}                  Set vibe mode (default, hacker, pirate, wizard, zen, fire, gamer, noir, creative, bro, robot, shakespeare, cowboy, anime, chef, scientist, medieval, surfer, philosopher, rapper, beach, vampire, alien, yoda, mobster, disco, synthwave, goth, memelord, kawaii, retro)
+  ${bold('--vibe <id>')}                  Set vibe mode (default, hacker, pirate, wizard, zen, fire, gamer, noir, creative, bro, robot, shakespeare, cowboy, anime, chef, scientist, medieval, surfer, philosopher, rapper, beach, vampire, alien, yoda, mobster, disco, synthwave, goth, memelord, kawaii, retro, cyberpunk, underwater, space, jungle, winter)
   ${bold('--no-tools')}                   Disable tool use
   ${bold('-e, --exec <prompt>')}          One-shot mode
   ${bold('--max-turns <n>')}              Max agent turns (default: 20)
@@ -93,6 +93,11 @@ ${bold(cyan('VIBES'))} 🎭
   ${bold('memelord')}    🐸  Meme Lord — much code, very wow
   ${bold('kawaii')}      🌸  Kawaii — super cute, pastel, adorable code!
   ${bold('retro')}       👾  Retro — 8-bit, pixel art, old school
+  ${bold('cyberpunk')}  🦾  Cyberpunk — neon-soaked streets, chrome
+  ${bold('underwater')} 🐙  Underwater — deep sea coding
+  ${bold('space')}      🚀  Space — final frontier, cosmic coding
+  ${bold('jungle')}     🌴  Jungle — wild code in the untamed
+  ${bold('winter')}     ❄️  Winter — frozen code, snowflakes
 
 ${bold(cyan('INTERACTIVE COMMANDS'))}
   ${bold('/exit')}, ${bold('/quit')}             Exit aix
