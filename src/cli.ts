@@ -140,15 +140,9 @@ ${bold(cyan('ENVIRONMENT VARIABLES'))}
 ${bold(cyan('FREE PROVIDERS'))} ${brightGreen(`(${freeNoKeyCount} no-key providers!)`)}
   ${brightGreen('pollinations')}    No key — GPT-4o, DeepSeek, Gemini, Qwen
   ${brightGreen('llm7')}            No key — GPT-4o, Gemini, DeepSeek
-  ${brightGreen('g4f')}             No key — GPT-4o, Haiku
-  ${brightGreen('freechat')}        No key — GPT-4o Mini, Llama
-  ${brightGreen('shard')}           No key — GPT-4o Mini, DeepSeek
-  ${brightGreen('darkai')}          No key — GPT-4o, DeepSeek
-  ${brightGreen('freegpt')}         No key — GPT-4o Mini, Llama, DeepSeek
-  ${brightGreen('infinity')}        No key — GPT-4o Mini, Llama
-  ${brightGreen('skyline')}         No key — GPT-4o Mini, DeepSeek, Qwen
-  ${brightGreen('chatany')}         No key — GPT-4o Mini, DeepSeek
-  ${dim('... and more! Run aix --providers to see all')}
+  ${brightGreen('bazaarlink')}      No key — Auto Free (zero-cost inference)
+  ${brightGreen('ovhcloud')}        No key — Llama 3.3 70B, Mistral, Qwen Coder
+  ${dim('... plus 18 free-tier providers and 6 local! Run aix --providers to see all')}
 
 ${bold(cyan('EXAMPLES'))}
   ${dim('# Zero setup — completely free')}

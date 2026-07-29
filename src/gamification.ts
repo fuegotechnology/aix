@@ -157,7 +157,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   // ── Special ──
   { id: 'free_only', name: 'Free Spirit', description: 'Use only free providers for 50 messages', emoji: '🆓', condition: s => s.totalMessages >= 50 && Object.keys(s.providerUsage).every(p => {
-    const freeIds = ['pollinations','llm7','g4f','freechat','shard','aichat','openaiProxy','chatany','freegpt','aiproxy','darkai','nexra','chatgptfree','yuai','zeroone','zephyr','dolphin','topmost','infinity','skyline','oivoodoo','luckyai','aurora','neonai','fluxai','helixai','cortexai','prismai','quantumai','eclipseai','bazaarlink','cloudflare','ovhcloud','ollama','lmstudio','jan','vllm','llamacpp']
+    const freeIds = ['pollinations','llm7','bazaarlink','ovhcloud','gemini','groq','cerebras','deepseek','mistral','cohere','nvidia','githubmodels','huggingface','siliconflow','chutes','glhf','together','fireworks','opencodezen','kilocode','zhipu','alibabastudio','ollama','lmstudio','jan','vllm','llamacpp']
     return freeIds.includes(p)
   }), xp: 100, category: 'special' },
   { id: 'million_tokens', name: 'Million Token Club', description: 'Process 1M+ tokens', emoji: '🎰', condition: s => (s.totalTokensIn + s.totalTokensOut) >= 1000000, xp: 200, category: 'special' },

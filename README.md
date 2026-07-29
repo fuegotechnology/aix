@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>64 AI providers</strong> — <strong>33 completely free</strong> with no API key, no signup, no credit card.
+  <strong>35 AI providers</strong> — <strong>4 completely free</strong> with no API key, no signup, no credit card.
 </p>
 
 <p align="center">
@@ -18,7 +18,7 @@
 
 ## ✨ Features
 
-- **64 providers** — 33 no-key, 18 free tier, 8 paid, 5 local
+- **35 providers** — 4 no-key, 18 free tier, 7 paid, 6 local — all DNS-verified real
 - **36 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, Cyberpunk, and more
 - **75 achievements** — XP, combos, streaks, daily challenges, titles
 - **15 levels** — Initiate → Apotheosis
@@ -37,13 +37,13 @@
 
 ## 🚀 Quick Start
 
-### Zero Setup (33 Free, No Key Providers!)
+### Zero Setup (4 Free, No Key Providers!)
 
 ```bash
 aix "explain this codebase"           # Pollinations — works immediately
 aix -p llm7 "write hello world"       # LLM7 — also no key
-aix -p darkai "fix the bug"           # DarkAI — no key
-aix -p g4f "optimize this function"   # G4F — no key
+aix -p bazaarlink "fix the bug"       # BazaarLink — zero-cost inference
+aix -p ovhcloud "optimize this"       # OVHcloud — EU-hosted, 2 RPM
 ```
 
 ### With Vibes! 🎭
@@ -225,47 +225,18 @@ Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes
 
 ---
 
-## 🆓 Free Providers
+## 🆓 Providers (All Verified Real)
 
-### No API Key Needed (33 providers!)
+### No API Key Needed (4 providers)
 
-| ID | Name | Top Models |
-|----|------|------------|
-| `pollinations` | Pollinations AI | GPT-4o, DeepSeek, Gemini, Qwen |
-| `llm7` | LLM7.io | GPT-4o, Gemini 2.5 Flash |
-| `g4f` | G4F Proxy | GPT-4o, GPT-4o Mini |
-| `freechat` | FreeChat | GPT-4o Mini, Llama 3.3 70B |
-| `shard` | Shard AI | GPT-4o Mini, DeepSeek |
-| `aichat` | AIChat | GPT-4o Mini, DeepSeek, Llama |
-| `openaiProxy` | OpenAI Proxy | GPT-4o Mini |
-| `chatany` | ChatAny | GPT-4o Mini, DeepSeek |
-| `freegpt` | FreeGPT | GPT-4o Mini, Llama, DeepSeek |
-| `aiproxy` | AI Proxy | GPT-4o Mini |
-| `darkai` | DarkAI | GPT-4o, DeepSeek |
-| `nexra` | Nexra | GPT-4o Mini |
-| `chatgptfree` | ChatGPT Free | GPT-4o Mini |
-| `yuai` | YuAI | GPT-4o Mini, DeepSeek, Llama |
-| `zeroone` | 01.ai | Yi Large, Yi Medium |
-| `zephyr` | Zephyr AI | Zephyr 7B |
-| `dolphin` | Dolphin AI | Dolphin Mixtral, Dolphin Llama |
-| `topmost` | TopMost AI | GPT-4o Mini, DeepSeek |
-| `infinity` | Infinity AI | GPT-4o Mini, Llama |
-| `skyline` | Skyline AI | GPT-4o Mini, DeepSeek, Qwen |
-| `oivoodoo` | OiVoodoo AI | GPT-4o Mini, DeepSeek |
-| `luckyai` | Lucky AI | GPT-4o Mini, DeepSeek |
-| `aurora` | Aurora AI | GPT-4o Mini, Llama |
-| `neonai` | NeonAI | GPT-4o Mini, DeepSeek, Qwen |
-| `fluxai` | FluxAI | GPT-4o Mini |
-| `helixai` | HelixAI | DeepSeek, GPT-4o Mini, Llama |
-| `cortexai` | CortexAI | GPT-4o Mini, DeepSeek |
-| `prismai` | PrismAI | GPT-4o Mini, DeepSeek |
-| `quantumai` | QuantumAI | GPT-4o Mini, DeepSeek, Qwen |
-| `eclipseai` | EclipseAI | GPT-4o Mini, Llama |
-| `bazaarlink` | BazaarLink | Auto Free (zero-cost inference) |
-| `cloudflare` | Cloudflare Workers AI | GPT-OSS 120B, Llama 3.3 70B |
-| `ovhcloud` | OVHcloud AI Endpoints | Llama 3.3 70B, Mistral Small, Qwen Coder |
+| ID | Name | Top Models | Description |
+|----|------|------------|-------------|
+| `pollinations` | Pollinations AI | GPT-4o, DeepSeek, Gemini, Qwen | Free AI gateway — no key needed |
+| `llm7` | LLM7.io | GPT-4o, Gemini 2.5 Flash, DeepSeek | Free AI gateway — 30 RPM anonymous |
+| `bazaarlink` | BazaarLink | Auto Free | Zero-cost inference with auto:free model |
+| `ovhcloud` | OVHcloud AI Endpoints | Llama 3.3 70B, Mistral Small, Qwen Coder | EU-hosted, 2 RPM anonymous access |
 
-### Free API Key (No Credit Card)
+### Free API Key (18 providers — no credit card)
 
 | ID | Name | Key Env |
 |----|------|---------|
@@ -287,6 +258,29 @@ Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes
 | `kilocode` | Kilo Code | KILO_API_KEY |
 | `zhipu` | Z.ai (Zhipu AI) | ZHIPU_API_KEY |
 | `alibabastudio` | Alibaba Cloud Model Studio | ALIBABA_API_KEY |
+
+### Paid Cloud (7 providers)
+
+| ID | Name | Key Env |
+|----|------|---------|
+| `openai` | OpenAI | OPENAI_API_KEY |
+| `xai` | xAI (Grok) | XAI_API_KEY |
+| `openrouter` | OpenRouter | OPENROUTER_API_KEY |
+| `perplexity` | Perplexity | PERPLEXITY_API_KEY |
+| `sambanova` | SambaNova | SAMBANOVA_API_KEY |
+| `replicate` | Replicate | REPLICATE_API_TOKEN |
+| `novita` | Novita AI | NOVITA_API_KEY |
+
+### Local / Self-Hosted (6 providers — always free)
+
+| ID | Name | Description |
+|----|------|-------------|
+| `ollama` | Ollama | Run LLMs locally. 100+ models. One-command install. |
+| `lmstudio` | LM Studio | Desktop app for local models. Beautiful GUI. |
+| `jan` | Jan.ai | Open-source local AI assistant. Privacy-first. |
+| `vllm` | vLLM | High-throughput local inference engine. |
+| `llamacpp` | llama.cpp Server | Lightweight C++ inference server. GGUF format. |
+| `custom` | Custom endpoint | Connect to any OpenAI-compatible API. |
 
 ---
 
