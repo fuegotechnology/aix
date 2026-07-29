@@ -1,7 +1,7 @@
 import { resolve, join } from 'path'
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs'
 import { homedir } from 'os'
-import { providers, getProvider, detectProvider, getApiKey, resolveModel, FREE_PROVIDER_IDS, FREE_NO_KEY_IDS, getFallbackProvider } from './providers.js'
+import { providers, getProvider, detectProvider, getApiKey, resolveModel, FREE_PROVIDER_IDS, FREE_NO_KEY_IDS, BETA_PROVIDER_IDS, getFallbackProvider } from './providers.js'
 import type { Provider } from './providers.js'
 import { runAgent, type AgentChunk, type Message } from './agent.js'
 import { buildSystemPrompt } from './system-prompt.js'
@@ -16,7 +16,7 @@ import {
 } from './gamification.js'
 import type { Stats } from './gamification.js'
 import {
-  bold, dim, red, green, yellow, cyan, gray, magenta, brightCyan, brightGreen,
+  bold, dim, red, green, yellow, cyan, gray, magenta, brightCyan, brightGreen, brightYellow,
   providerBadge, toolBadge, successLine, errorLine, infoLine, warningLine,
   divider, keyValue,
   Spinner, renderMarkdown, printBanner, printTokens, printTurnInfo, prompt,
@@ -60,6 +60,7 @@ ${bold(cyan('OPTIONS'))}
   ${bold('--health')}                     Check which free providers are working
   ${bold('--config')}                     View current configuration
   ${bold('--best')}                       Auto-select the fastest free provider
+  ${bold('--beta')}                       Enable beta providers (community/proxy endpoints)
 
 ${bold(cyan('VIBES'))} 🎭
   ${bold('default')}     🎯  Professional — clean, focused
@@ -167,29 +168,36 @@ ${bold(cyan('EXAMPLES'))}
 `)
 }
 
-function printProviders(): void {
-  const freeNoKey = providers.filter(p => p.free && !p.local && !p.apiKeyEnv)
-  const freeTier = providers.filter(p => p.free && !p.local && p.apiKeyEnv)
-  const paid = providers.filter(p => !p.free && !p.local)
-  const local = providers.filter(p => p.local)
+function printProviders(showBeta = false): void {
+  const stableProviders = providers.filter(p => !p.beta)
+  const beta = providers.filter(p => p.beta)
+  const freeNoKey = stableProviders.filter(p => p.free && !p.local && !p.apiKeyEnv)
+  const freeTier = stableProviders.filter(p => p.free && !p.local && p.apiKeyEnv)
+  const paid = stableProviders.filter(p => !p.free && !p.local)
+  const local = stableProviders.filter(p => p.local)
 
   const printGroup = (title: string, list: Provider[], emoji: string) => {
     console.log(`\n${bold(cyan(title))} ${dim(`(${list.length} providers)`)}`)
     console.log(divider('─', 70))
     for (const p of list) {
       const key = p.apiKeyEnv ? gray(`(${p.apiKeyEnv})`) : gray('(no key needed)')
-      console.log(`  ${bold(p.id.padEnd(16))} ${p.name.padEnd(22)} ${key}`)
+      const betaTag = p.beta ? yellow(' [BETA]') : ''
+      console.log(`  ${bold(p.id.padEnd(16))} ${p.name.padEnd(22)} ${key}${betaTag}`)
       if (p.description) {
         console.log(`  ${''.padEnd(16)} ${dim(p.description.slice(0, 60))}`)
       }
     }
   }
 
+  const total = stableProviders.length + (showBeta ? beta.length : 0)
   console.log()
-  console.log(`  ${bold(`◆ aix — Supported Providers`)} ${dim(`(${providers.length} total)`)}`)
-  console.log(`  ${brightGreen(`${freeNoKey.length} completely free (no key) │ ${freeTier.length} free tier │ ${paid.length} paid │ ${local.length} local`)}`)
+  console.log(`  ${bold(`◆ aix — Supported Providers`)} ${dim(`(${total} total)`)}`)
+  console.log(`  ${brightGreen(`${freeNoKey.length} completely free (no key) │ ${freeTier.length} free tier │ ${paid.length} paid │ ${local.length} local`)}${showBeta ? brightYellow(` │ ${beta.length} beta`) : dim(` │ ${beta.length} beta (use --beta)`)}`)
   printGroup(`🆓 FREE — No API Key Needed (just works!)`, freeNoKey, '🆓')
   printGroup(`🆓 FREE — Free API Key (no credit card)`, freeTier, '🆓')
+  if (showBeta && beta.length > 0) {
+    printGroup(`🧪 BETA — Community/Proxy Endpoints (may be intermittent)`, beta, '🧪')
+  }
   printGroup(`💳 PAID — Requires Payment`, paid, '💳')
   printGroup(`🏠 LOCAL — Self-Hosted (always free)`, local, '🏠')
 
@@ -238,7 +246,7 @@ function printVibes(): void {
   console.log()
 }
 
-async function runInteractive(provider: Provider, cwd: string, noTools: boolean, verbose: boolean, vibe: Vibe): Promise<void> {
+async function runInteractive(provider: Provider, cwd: string, noTools: boolean, verbose: boolean, vibe: Vibe, showBeta = false): Promise<void> {
   const model = resolveModel(provider)
   const apiKey = getApiKey(provider)
   printBanner(provider.name, model, cwd)
@@ -312,7 +320,7 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
           rl.prompt()
           return
         case '/providers':
-          printProviders()
+          printProviders(showBeta)
           rl.prompt()
           return
         case '/model':
@@ -983,7 +991,11 @@ function main(): void {
   let showHealth = false
   let showConfig = false
   let useBest = false
+  let useBeta = false
   let positional: string[] = []
+
+  // Pre-pass: detect --beta before other flags that might exit early
+  if (args.includes('--beta')) useBeta = true
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i]
@@ -997,7 +1009,7 @@ function main(): void {
         console.log(process.env.AIX_VERSION || '1.0.0')
         process.exit(0)
       case '--providers':
-        printProviders()
+        printProviders(useBeta)
         process.exit(0)
       case '-p':
       case '--provider':
@@ -1018,6 +1030,9 @@ function main(): void {
         break
       case '--quiet':
         quiet = true
+        break
+      case '--beta':
+        useBeta = true
         break
       case '-e':
       case '--exec':
@@ -1135,6 +1150,11 @@ function main(): void {
       console.error(`Run ${bold('aix --providers')} to see available providers`)
       process.exit(1)
     }
+    if (p.beta && !useBeta) {
+      console.error(yellow(`${p.name} is a beta provider. Use --beta to enable beta providers.`))
+      console.error(dim(`Beta providers are community/proxy endpoints that may be intermittent.`))
+      process.exit(1)
+    }
     provider = p
   } else if (useBest) {
     const best = getBestProvider()
@@ -1192,7 +1212,7 @@ function main(): void {
   if (oneShotPrompt) {
     runOneShot(provider, cwd, oneShotPrompt, noTools, verbose, vibe)
   } else {
-    runInteractive(provider, cwd, noTools, verbose, vibe)
+    runInteractive(provider, cwd, noTools, verbose, vibe, useBeta)
   }
 }
 

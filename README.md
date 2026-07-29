@@ -1,17 +1,17 @@
 <p align="center">
-  <strong>◆ aix</strong> — AI coding assistant for your terminal
+  <strong>◆ aix v2 beta</strong> — AI coding assistant for your terminal
 </p>
 
 <p align="center">
-  <strong>40 AI providers</strong> — <strong>4 completely free</strong> with no API key, no signup, no credit card.
+  <strong>60 AI providers</strong> — <strong>4 completely free</strong> with no API key, no signup, no credit card.
 </p>
 
 <p align="center">
-  <strong>40 vibe modes</strong> • <strong>80 achievements</strong> • <strong>15 levels</strong> • <strong>24 tools</strong>
+  <strong>40 vibe modes</strong> • <strong>80 achievements</strong> • <strong>15 levels</strong> • <strong>24 tools</strong> • <strong>20 beta providers</strong>
 </p>
 
 <p align="center">
-  <code>npm install -g aix</code>
+  <code>npm install -g aix-ai@2.0.0-beta.1</code>
 </p>
 
 ---
@@ -19,6 +19,7 @@
 ## ✨ Features
 
 - **40 providers** — 4 no-key, 23 free tier, 7 paid, 6 local — all DNS-verified real
+- **20 beta providers** — Community/proxy/scraper endpoints, enable with `--beta`
 - **40 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, Cyberpunk, and more
 - **80 achievements** — XP, combos, streaks, daily challenges, titles
 - **15 levels** — Initiate → Apotheosis
@@ -291,6 +292,38 @@ Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes
 | `llamacpp` | llama.cpp Server | Lightweight C++ inference server. GGUF format. |
 | `custom` | Custom endpoint | Connect to any OpenAI-compatible API. |
 
+### 🧪 Beta Providers (20 community/proxy endpoints)
+
+Enable with `--beta` flag. These are community-run reverse proxies, scrapers, and proxy endpoints. They may be intermittent or unreliable.
+
+```bash
+aix --beta --providers          # List all providers including beta
+aix --beta -p g4f "hello"       # Use G4F beta provider
+```
+
+| ID | Name | Description |
+|----|------|-------------|
+| `g4f` | G4F (gpt4free) | The main gpt4free open-source scraping and inference framework |
+| `freechat` | FreeChat | Web interface scraping proxy via Pawan |
+| `shard` | Shard AI | Distributed community API endpoint project |
+| `aichat` | AIChat | Public chatbot interface reverse proxy |
+| `openaiProxy` | OpenAI Proxy | Vercel/Cloudflare deployment mirror routing to free tiers |
+| `chatany` | ChatAny | Shared anonymous access mirror endpoint |
+| `freegpt` | FreeGPT | Reverse-engineered endpoint consuming the public web chatbot tiers |
+| `aiproxy` | AI Proxy | Hobbyist sandbox URLs for zero-setup generation testing |
+| `darkai` | DarkAI | Backend scraper module serving open-source weights |
+| `nexra` | Nexra | Multi-model endpoint scraper popular for automated integrations |
+| `chatgptfree` | ChatGPT Free | Public proxy relay for login-free web models |
+| `yuai` | YuAI | Niche unauthenticated chat interface scraper |
+| `zeroone` | 01.ai | Open web endpoint optimized for fast localized models |
+| `zephyr` | Zephyr AI | Public demo endpoint running specialized open fine-tunes |
+| `dolphin` | Dolphin AI | Publicly hosted infrastructure for unhinged open-source models |
+| `topmost` | TopMost AI | Community-contributed load balancer proxy |
+| `infinity` | Infinity AI | Rotating reverse-proxy endpoint designed for high availability |
+| `skyline` | Skyline AI | Community-run fallback router to bypass standard API walls |
+| `freeai` | Free.ai | Free.ai — 30K tokens/day free, OpenAI-compatible |
+| `freetheai` | FreeTheAI | FreeTheAI — GLM/GPT models, OpenAI-compatible, free tier |
+
 ---
 
 ## 🛠 Usage
@@ -365,6 +398,7 @@ node dist/cli.js --vibe vampire "debug this ancient code"
 | `--stats` | Show stats and achievements |
 | `--reset-stats` | Reset all stats |
 | `--fallback` | Auto-fallback to another free provider on failure |
+| `--beta` | Enable beta providers (community/proxy endpoints) |
 
 ### Interactive Commands
 

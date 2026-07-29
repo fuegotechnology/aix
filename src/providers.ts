@@ -20,6 +20,7 @@ export interface Provider {
   description?: string
   website?: string
   category?: string
+  beta?: boolean
 }
 
 const providers: Provider[] = [
@@ -522,6 +523,202 @@ const providers: Provider[] = [
   },
 
   // ╔════════════════════════════════════════════════════════════════════╗
+  // ║  BETA — Community / proxy / scraper endpoints (v2 beta)            ║
+  // ║  These may be intermittent. Use --beta flag to enable.            ║
+  // ╚════════════════════════════════════════════════════════════════════╝
+  {
+    id: 'g4f', name: 'G4F (gpt4free)', baseURL: 'https://g4f.space/v1', apiKeyEnv: 'G4F_API_KEY',
+    defaultModel: 'gpt-4o', freeModels: ['gpt-4o', 'gpt-4o-mini', 'gpt-oss-120b'], free: true, local: false,
+    description: 'The main gpt4free open-source scraping and inference framework. Community proxy.',
+    website: 'https://g4f.dev', category: 'beta', beta: true,
+    models: [
+      { id: 'gpt-4o', name: 'GPT-4o', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-oss-120b', name: 'GPT-OSS 120B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'freechat', name: 'FreeChat', baseURL: 'https://api.pawan.krd/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo'], free: true, local: false,
+    description: 'Web interface scraping proxy. Shared anonymous access.',
+    website: 'https://pawan.krd', category: 'beta', beta: true,
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'shard', name: 'Shard AI', baseURL: 'https://api.shard-ai.xyz/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini', 'deepseek-chat'], free: true, local: false,
+    description: 'Distributed community API endpoint project.',
+    website: 'https://shard-ai.xyz', category: 'beta', beta: true,
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'aichat', name: 'AIChat', baseURL: 'https://api.aichat.one/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini', 'deepseek-chat', 'llama-3.3-70b'], free: true, local: false,
+    description: 'Public chatbot interface reverse proxy.',
+    website: 'https://aichat.one', category: 'beta', beta: true,
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'openaiProxy', name: 'OpenAI Proxy', baseURL: 'https://api.openai-proxy.org/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini'], free: true, local: false,
+    description: 'Vercel/Cloudflare deployment mirror routing to free tiers.',
+    website: 'https://openai-proxy.org', category: 'beta', beta: true,
+    models: [{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false }],
+  },
+  {
+    id: 'chatany', name: 'ChatAny', baseURL: 'https://api.chatany.tech/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini', 'deepseek-chat'], free: true, local: false,
+    description: 'Shared anonymous access mirror endpoint.',
+    website: 'https://chatany.tech', category: 'beta', beta: true,
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'freegpt', name: 'FreeGPT', baseURL: 'https://api.freegpt.org/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini', 'llama-3.3-70b', 'deepseek-chat'], free: true, local: false,
+    description: 'Reverse-engineered endpoint consuming the public web chatbot tiers.',
+    website: 'https://freegpt.org', category: 'beta', beta: true,
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'aiproxy', name: 'AI Proxy', baseURL: 'https://api.aiproxy.io/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini'], free: true, local: false,
+    description: 'Hobbyist sandbox URLs for zero-setup generation testing.',
+    website: 'https://aiproxy.io', category: 'beta', beta: true,
+    models: [{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false }],
+  },
+  {
+    id: 'darkai', name: 'DarkAI', baseURL: 'https://api.darkai.pro/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o', freeModels: ['gpt-4o', 'deepseek-chat'], free: true, local: false,
+    description: 'Backend scraper module serving open-source weights.',
+    website: 'https://darkai.pro', category: 'beta', beta: true,
+    models: [
+      { id: 'gpt-4o', name: 'GPT-4o', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'nexra', name: 'Nexra', baseURL: 'https://api.nexra.4ir.pro/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini'], free: true, local: false,
+    description: 'Multi-model endpoint scraper popular for automated integrations.',
+    website: 'https://nexra.4ir.pro', category: 'beta', beta: true,
+    models: [{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false }],
+  },
+  {
+    id: 'chatgptfree', name: 'ChatGPT Free', baseURL: 'https://api.chatgptfree.info/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini'], free: true, local: false,
+    description: 'Public proxy relay for login-free web models.',
+    website: 'https://chatgptfree.info', category: 'beta', beta: true,
+    models: [{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false }],
+  },
+  {
+    id: 'yuai', name: 'YuAI', baseURL: 'https://api.yuai.ai/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini', 'deepseek-chat', 'llama-3.3-70b'], free: true, local: false,
+    description: 'Niche unauthenticated chat interface scraper.',
+    website: 'https://yuai.ai', category: 'beta', beta: true,
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'zeroone', name: '01.ai', baseURL: 'https://api.01.ai/v1', apiKeyEnv: null,
+    defaultModel: 'yi-large', freeModels: ['yi-large', 'yi-medium'], free: true, local: false,
+    description: 'Open web endpoint optimized for fast localized models.',
+    website: 'https://01.ai', category: 'beta', beta: true,
+    models: [
+      { id: 'yi-large', name: 'Yi Large', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'yi-medium', name: 'Yi Medium', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'zephyr', name: 'Zephyr AI', baseURL: 'https://api.zephyr.ai/v1', apiKeyEnv: null,
+    defaultModel: 'zephyr-7b', freeModels: ['zephyr-7b'], free: true, local: false,
+    description: 'Public demo endpoint running specialized open fine-tunes.',
+    website: 'https://zephyr.ai', category: 'beta', beta: true,
+    models: [{ id: 'zephyr-7b', name: 'Zephyr 7B', contextK: 8, free: true, supportsTools: true, supportsVision: false }],
+  },
+  {
+    id: 'dolphin', name: 'Dolphin AI', baseURL: 'https://api.dolphin-ai.tech/v1', apiKeyEnv: null,
+    defaultModel: 'dolphin-mixtral', freeModels: ['dolphin-mixtral', 'dolphin-llama'], free: true, local: false,
+    description: 'Publicly hosted infrastructure for unhinged open-source models.',
+    website: 'https://dolphin-ai.tech', category: 'beta', beta: true,
+    models: [
+      { id: 'dolphin-mixtral', name: 'Dolphin Mixtral', contextK: 32, free: true, supportsTools: true, supportsVision: false },
+      { id: 'dolphin-llama', name: 'Dolphin Llama', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'topmost', name: 'TopMost AI', baseURL: 'https://api.topmost-ai.com/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini', 'deepseek-chat'], free: true, local: false,
+    description: 'Community-contributed load balancer proxy.',
+    website: 'https://topmost-ai.com', category: 'beta', beta: true,
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'infinity', name: 'Infinity AI', baseURL: 'https://api.infinity-ai.dev/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini', 'llama-3.3-70b'], free: true, local: false,
+    description: 'Rotating reverse-proxy endpoint designed for high availability.',
+    website: 'https://infinity-ai.dev', category: 'beta', beta: true,
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'skyline', name: 'Skyline AI', baseURL: 'https://api.skyline-ai.net/v1', apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini', freeModels: ['gpt-4o-mini', 'deepseek-chat', 'qwen-2.5-72b'], free: true, local: false,
+    description: 'Community-run fallback router to bypass standard API walls.',
+    website: 'https://skyline-ai.net', category: 'beta', beta: true,
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'qwen-2.5-72b', name: 'Qwen 2.5 72B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'freeai', name: 'Free.ai', baseURL: 'https://api.free.ai/v1', apiKeyEnv: 'FREEAI_API_KEY',
+    defaultModel: 'qwen7b', freeModels: ['qwen7b', 'mistral-7b', 'phi-3'], free: true, local: false,
+    description: 'Free AI gateway. 30K tokens/day free. OpenAI-compatible.',
+    website: 'https://free.ai', category: 'beta', beta: true,
+    models: [
+      { id: 'qwen7b', name: 'Qwen 2.5 7B', contextK: 32, free: true, supportsTools: true, supportsVision: false },
+      { id: 'mistral-7b', name: 'Mistral 7B', contextK: 32, free: true, supportsTools: true, supportsVision: false },
+      { id: 'phi-3', name: 'Phi-3', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'freetheai', name: 'FreeTheAI', baseURL: 'https://api.freetheai.xyz/v1', apiKeyEnv: 'FREETHEAI_API_KEY',
+    defaultModel: 'glm/glm-5.1', freeModels: ['glm/glm-5.1', 'eve/gpt-4o-mini'], free: true, local: false,
+    description: 'Free AI gateway. GLM, GPT models. OpenAI-compatible. Free tier.',
+    website: 'https://freetheai.xyz', category: 'beta', beta: true,
+    models: [
+      { id: 'glm/glm-5.1', name: 'GLM 5.1', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'eve/gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+
+  // ╔════════════════════════════════════════════════════════════════════╗
   // ║  PAID CLOUD — Requires payment method                              ║
   // ╚════════════════════════════════════════════════════════════════════╝
   {
@@ -866,6 +1063,7 @@ export function resolveModel(provider: Provider): string {
 export const FREE_PROVIDER_IDS = providers.filter(p => p.free).map(p => p.id)
 export const FREE_NO_KEY_IDS = providers.filter(p => p.free && !p.local && !p.apiKeyEnv).map(p => p.id)
 export const LOCAL_PROVIDER_IDS = providers.filter(p => p.local).map(p => p.id)
+export const BETA_PROVIDER_IDS = providers.filter(p => p.beta).map(p => p.id)
 
 export function getFallbackProvider(excludeIds: string[]): Provider | null {
   const fallbackOrder = ['pollinations', 'llm7', 'bazaarlink', 'ovhcloud']
