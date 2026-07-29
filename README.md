@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <strong>40 vibe modes</strong> • <strong>80 achievements</strong> • <strong>15 levels</strong> • <strong>24 tools</strong> • <strong>20 beta providers</strong>
+  <strong>40 vibe modes</strong> • <strong>83 achievements</strong> • <strong>15 levels</strong> • <strong>24 tools</strong> • <strong>20 beta providers</strong>
 </p>
 
 <p align="center">
@@ -21,13 +21,13 @@
 - **40 providers** — 4 no-key, 23 free tier, 7 paid, 6 local — all DNS-verified real
 - **20 beta providers** — Community/proxy/scraper endpoints, enable with `--beta`
 - **40 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, Cyberpunk, and more
-- **80 achievements** — XP, combos, streaks, daily challenges, titles
+- **83 achievements** — XP, combos, streaks, daily challenges, session resume
 - **15 levels** — Initiate → Apotheosis
 - **24 built-in tools** — 12 coding + 6 action + code_review + summarize + project_map
 - **Combo system** — Chain messages for XP multipliers up to 2x
 - **Daily challenges** — Fresh challenge every day with bonus XP
 - **18 titles** — Unlock and equip titles like "Hacker", "Vibe Master", "God"
-- **Session save/load** — Save and resume conversations
+- **Session save/load** — Auto-save sessions, resume with `--continue` or `--session`
 - **Smart fallback** — Auto-switch to another free provider if one fails
 - **Pipe support** — Pipe input from stdin: `echo "hello" | aix`
 - **Streaming** — Real-time streaming with tool call visualization
@@ -224,9 +224,9 @@ Unlock and equip titles: `/title <id>`
 | Session Master | 🧘 | Complete 100+ sessions |
 | XP Millionaire | 💰 | Earn 100,000+ XP |
 
-### 75 Achievements
+### 83 Achievements
 
-Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes, Combos, Levels, Daily, Special, Secret
+Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes, Combos, Levels, Daily, Special, Sessions, Secret
 
 ---
 
@@ -326,6 +326,47 @@ aix --beta -p g4f "hello"       # Use G4F beta provider
 
 ---
 
+## 📋 Sessions
+
+Sessions are automatically saved so you can continue conversations later.
+
+### CLI Flags
+
+| Flag | Description |
+|------|-------------|
+| `aix --continue` | Resume the last session |
+| `aix --session <id>` | Resume a specific session by ID or name |
+| `aix --sessions` | List all saved sessions |
+
+### Interactive Commands
+
+| Command | Description |
+|---------|-------------|
+| `/save` | Save current session |
+| `/resume` | Resume the last session |
+| `/resume <id>` | Resume a specific session |
+| `/sessions` | List all saved sessions |
+| `/sessions info` | Show current session info |
+| `/sessions delete <id>` | Delete a session |
+| `/sessions rename <id> <name>` | Rename a session |
+
+### Auto-Save
+
+Sessions are automatically saved after every message and on exit. You can always pick up where you left off:
+
+```bash
+# Start a conversation
+aix
+
+# Come back later and continue
+aix --continue
+
+# Resume a specific session
+aix --session my-project
+```
+
+---
+
 ## 🛠 Usage
 
 ### How to Use aix
@@ -398,6 +439,9 @@ node dist/cli.js --vibe vampire "debug this ancient code"
 | `--stats` | Show stats and achievements |
 | `--reset-stats` | Reset all stats |
 | `--fallback` | Auto-fallback to another free provider on failure |
+| `--session <id>` | Resume a specific session |
+| `-c, --continue` | Resume the last session |
+| `--sessions` | List all saved sessions |
 | `--beta` | Enable beta providers (community/proxy endpoints) |
 
 ### Interactive Commands
@@ -418,7 +462,8 @@ node dist/cli.js --vibe vampire "debug this ancient code"
 | `/retry` | Retry last message |
 | `/compact` | Compact history |
 | `/save` | Save current session |
-| `/load` | Load a saved session |
+| `/resume [id]` | Resume a session (last if no id) |
+| `/sessions` | List/manage sessions |
 | `/fallback` | Switch to another free provider |
 
 ---

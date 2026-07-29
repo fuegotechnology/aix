@@ -49,6 +49,8 @@ export interface Stats {
   // Quests
   activeQuests: string[]
   completedQuests: string[]
+  // Session resume
+  sessionsResumed: number
 }
 
 export interface Level {
@@ -226,6 +228,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'midnight_coder', name: 'Midnight Coder', description: 'Code between midnight and 3am', emoji: '🌙', condition: s => s.totalMessages >= 1, xp: 25, secret: true, category: 'secret' },
   { id: 'fifty_sessions', name: 'Session Veteran', description: 'Complete 50 sessions', emoji: '🎖️', condition: s => s.totalSessions >= 50, xp: 100, category: 'special' },
   { id: 'hundred_sessions', name: 'Session Legend', description: 'Complete 100 sessions', emoji: '🏅', condition: s => s.totalSessions >= 100, xp: 250, category: 'special' },
+  { id: 'session_resume', name: 'Continuity', description: 'Resume a saved session', emoji: '🔄', condition: s => s.sessionsResumed >= 1, xp: 15, category: 'special' },
+  { id: 'session_resume_5', name: 'Persistent', description: 'Resume 5 sessions', emoji: '🔁', condition: s => s.sessionsResumed >= 5, xp: 50, category: 'special' },
+  { id: 'session_resume_20', name: 'Never Forget', description: 'Resume 20 sessions', emoji: '🧠', condition: s => s.sessionsResumed >= 20, xp: 150, category: 'special' },
 ]
 
 export const TITLES: { id: string; name: string; emoji: string; condition: (s: Stats) => boolean }[] = [
@@ -296,6 +301,7 @@ export function loadStats(): Stats {
       powerUpActive: null, powerUpExpires: 0,
       weeklyChallenge: null, weeklyChallengeDate: null, weeklyChallengeProgress: 0, weeklyChallengeCompleted: false,
       activeQuests: [], completedQuests: [],
+      sessionsResumed: 0,
     }
   }
   try {
@@ -322,6 +328,7 @@ export function loadStats(): Stats {
     s.weeklyChallengeCompleted = s.weeklyChallengeCompleted || false
     s.activeQuests = s.activeQuests || []
     s.completedQuests = s.completedQuests || []
+    s.sessionsResumed = s.sessionsResumed || 0
     return s
   } catch {
     return {
@@ -337,6 +344,7 @@ export function loadStats(): Stats {
       powerUpActive: null, powerUpExpires: 0,
       weeklyChallenge: null, weeklyChallengeDate: null, weeklyChallengeProgress: 0, weeklyChallengeCompleted: false,
       activeQuests: [], completedQuests: [],
+      sessionsResumed: 0,
     }
   }
 }

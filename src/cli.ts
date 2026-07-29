@@ -25,6 +25,11 @@ import {
 import { loadConfig, saveConfig, renderConfig, type AixConfig } from './config.js'
 import { checkAllNoKeyProviders, renderHealthResults, getBestProvider } from './health.js'
 import { activatePowerUp, renderPowerUps, renderMacros, saveExport, POWER_UPS, getTimeGreeting } from './advanced.js'
+import {
+  createSession, saveSession, loadSession, listSessions, deleteSession, renameSession,
+  getLastSession, findSession, renderSessionList, renderSessionInfo, renderSessionResumed,
+  renderSessionSaved, type SessionData, type SessionSummary,
+} from './session.js'
 
 const AIX_DIR = resolve(homedir(), '.aix')
 const SESSIONS_DIR = join(AIX_DIR, 'sessions')
@@ -61,6 +66,9 @@ ${bold(cyan('OPTIONS'))}
   ${bold('--config')}                     View current configuration
   ${bold('--best')}                       Auto-select the fastest free provider
   ${bold('--beta')}                       Enable beta providers (community/proxy endpoints)
+  ${bold('--session <id>')}              Resume a saved session by ID or name
+  ${bold('-c, --continue')}              Resume the last session
+  ${bold('--sessions')}                  List all saved sessions
 
 ${bold(cyan('VIBES'))} 🎭
   ${bold('default')}     🎯  Professional — clean, focused
@@ -123,7 +131,9 @@ ${bold(cyan('INTERACTIVE COMMANDS'))}
   ${bold('/daily')}                      Show daily challenge
   ${bold('/title')}                      Set your title
   ${bold('/save')}                       Save current session
-  ${bold('/load')}                       Load a saved session
+  ${bold('/load')}                       Load a saved session (deprecated: use /resume)
+  ${bold('/resume [id]')}                Resume a session (last if no id)
+  ${bold('/sessions [subcmd]')}          List/manage sessions (delete, rename)
   ${bold('/fallback')}                   Switch to a different free provider
   ${bold('/config')}                     View/edit configuration
   ${bold('/health')}                     Check provider health
@@ -165,6 +175,11 @@ ${bold(cyan('EXAMPLES'))}
 
   ${dim('# Local models')}
   aix -p ollama "what is this project?"
+
+  ${dim('# Sessions — resume conversations')}
+  aix --continue                       # Resume last session
+  aix --session 20260729               # Resume by partial ID
+  aix --sessions                        # List all saved sessions
 `)
 }
 
@@ -246,7 +261,7 @@ function printVibes(): void {
   console.log()
 }
 
-async function runInteractive(provider: Provider, cwd: string, noTools: boolean, verbose: boolean, vibe: Vibe, showBeta = false): Promise<void> {
+async function runInteractive(provider: Provider, cwd: string, noTools: boolean, verbose: boolean, vibe: Vibe, showBeta = false, resumeSession?: SessionData): Promise<void> {
   const model = resolveModel(provider)
   const apiKey = getApiKey(provider)
   printBanner(provider.name, model, cwd)
@@ -276,10 +291,30 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
   if (weeklyDisplay) console.log(weeklyDisplay)
   console.log()
 
-  const history: Message[] = []
+  // ─── Session setup ─────────────────────────────────────────────
+  let session: SessionData
+  if (resumeSession) {
+    session = resumeSession
+    // Provider/model/vibe are already restored by main() via flags,
+    // but also set currentModel/currentVibe from session
+    console.log(renderSessionResumed(session))
+    console.log()
+    // Track session resume in stats
+    stats.sessionsResumed = (stats.sessionsResumed || 0) + 1
+    saveStats(stats)
+  } else {
+    session = createSession({
+      provider: provider.id,
+      model,
+      vibe: vibe.id,
+      cwd,
+    })
+  }
+
+  const history: Message[] = resumeSession ? [...resumeSession.history] : []
   let currentProvider = provider
-  let currentModel = model
-  let currentVibe = vibe
+  let currentModel = resumeSession ? resumeSession.meta.model : model
+  let currentVibe = resumeSession ? getVibe(resumeSession.meta.vibe) : vibe
   let lastUserMessage = ''
   const readline = await import('readline')
   const rl = readline.createInterface({
@@ -451,62 +486,115 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
           return
         case '/save':
           try {
-            mkdirSync(SESSIONS_DIR, { recursive: true })
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-            const saveFile = join(SESSIONS_DIR, `session-${timestamp}.json`)
-            const saveData = {
-              savedAt: new Date().toISOString(),
-              provider: currentProvider.id,
-              model: currentModel,
-              vibe: currentVibe.id,
-              history,
-              messages: history.length,
-            }
-            writeFileSync(saveFile, JSON.stringify(saveData, null, 2), 'utf-8')
-            console.log(successLine(`Session saved to ${saveFile}`))
+            session.meta.provider = currentProvider.id
+            session.meta.model = currentModel
+            session.meta.vibe = currentVibe.id
+            session.meta.cwd = cwd
+            session.history = history
+            session.meta.messageCount = history.length
+            session.meta.totalTokensIn = stats.totalTokensIn
+            session.meta.totalTokensOut = stats.totalTokensOut
+            saveSession(session)
+            console.log(renderSessionSaved(session))
           } catch (err: any) {
             console.log(errorLine(`Failed to save session: ${err.message}`))
           }
           rl.prompt()
           return
         case '/load':
+        case '/resume':
           try {
-            if (!existsSync(SESSIONS_DIR)) {
-              console.log(infoLine('No saved sessions found'))
-              rl.prompt()
-              return
-            }
-            const { readdirSync } = await import('fs')
-            const files = readdirSync(SESSIONS_DIR).filter(f => f.endsWith('.json')).sort().reverse()
-            if (files.length === 0) {
-              console.log(infoLine('No saved sessions found'))
-              rl.prompt()
-              return
-            }
-            const loadFile = arg ? join(SESSIONS_DIR, arg) : join(SESSIONS_DIR, files[0])
-            if (!existsSync(loadFile)) {
-              console.log(errorLine(`Session file not found: ${loadFile}`))
-              rl.prompt()
-              return
-            }
-            const data = JSON.parse(readFileSync(loadFile, 'utf-8'))
-            if (data.history) {
+            if (arg) {
+              // Resume specific session by ID or name
+              const found = findSession(arg)
+              if (!found) {
+                console.log(errorLine(`Session not found: ${arg}`))
+                console.log(dim('Use /sessions to list available sessions'))
+                rl.prompt()
+                return
+              }
+              // Load the found session
               history.length = 0
-              history.push(...data.history)
+              history.push(...found.history)
+              session = found
+              if (found.meta.provider) {
+                const p = getProvider(found.meta.provider)
+                if (p) currentProvider = p
+              }
+              if (found.meta.model) currentModel = found.meta.model
+              if (found.meta.vibe) {
+                const v = getVibe(found.meta.vibe)
+                currentVibe = v
+                rl.setPrompt(`${currentVibe.colors.prompt}${currentVibe.emoji} ❯${'\x1b[0m'} `)
+              }
+              console.log(renderSessionResumed(session))
+            } else {
+              // Resume last session
+              const last = getLastSession()
+              if (!last) {
+                console.log(infoLine('No saved sessions found'))
+                rl.prompt()
+                return
+              }
+              history.length = 0
+              history.push(...last.history)
+              session = last
+              if (last.meta.provider) {
+                const p = getProvider(last.meta.provider)
+                if (p) currentProvider = p
+              }
+              if (last.meta.model) currentModel = last.meta.model
+              if (last.meta.vibe) {
+                const v = getVibe(last.meta.vibe)
+                currentVibe = v
+                rl.setPrompt(`${currentVibe.colors.prompt}${currentVibe.emoji} ❯${'\x1b[0m'} `)
+              }
+              console.log(renderSessionResumed(session))
             }
-            if (data.provider) {
-              const p = getProvider(data.provider)
-              if (p) currentProvider = p
-            }
-            if (data.model) currentModel = data.model
-            if (data.vibe) {
-              const v = getVibe(data.vibe)
-              currentVibe = v
-              rl.setPrompt(`${currentVibe.colors.prompt}${currentVibe.emoji} ❯${'\x1b[0m'} `)
-            }
-            console.log(successLine(`Session loaded from ${loadFile} (${history.length} messages)`))
+            // Track session resume in stats
+            stats.sessionsResumed = (stats.sessionsResumed || 0) + 1
+            saveStats(stats)
           } catch (err: any) {
             console.log(errorLine(`Failed to load session: ${err.message}`))
+          }
+          rl.prompt()
+          return
+        case '/sessions':
+          if (!arg) {
+            // List all sessions
+            const sessions = listSessions()
+            console.log(renderSessionList(sessions))
+          } else if (arg.startsWith('delete ')) {
+            const id = arg.split(' ').slice(1).join(' ')
+            if (deleteSession(id)) {
+              console.log(successLine(`Session ${id} deleted`))
+            } else {
+              console.log(errorLine(`Session not found: ${id}`))
+            }
+          } else if (arg.startsWith('rename ')) {
+            const parts = arg.split(' ')
+            const id = parts[1]
+            const newName = parts.slice(2).join(' ')
+            if (!newName) {
+              console.log(errorLine('Usage: /sessions rename <id> <new name>'))
+            } else if (renameSession(id, newName)) {
+              console.log(successLine(`Session renamed to "${newName}"`))
+            } else {
+              console.log(errorLine(`Session not found: ${id}`))
+            }
+          } else if (arg === 'info') {
+            console.log(renderSessionInfo(session))
+          } else if (arg.startsWith('info ')) {
+            const id = arg.split(' ').slice(1).join(' ')
+            const found = findSession(id)
+            if (found) {
+              console.log(renderSessionInfo(found))
+            } else {
+              console.log(errorLine(`Session not found: ${id}`))
+            }
+          } else {
+            console.log(errorLine(`Unknown /sessions subcommand: ${arg}`))
+            console.log(dim('Available: delete <id>, rename <id> <name>, info [id]'))
           }
           rl.prompt()
           return
@@ -831,10 +919,33 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
       history.splice(0, history.length - 40)
     }
 
+    // Auto-save session
+    session.history = history
+    session.meta.provider = currentProvider.id
+    session.meta.model = currentModel
+    session.meta.vibe = currentVibe.id
+    session.meta.cwd = cwd
+    session.meta.totalTokensIn = stats.totalTokensIn
+    session.meta.totalTokensOut = stats.totalTokensOut
+    if (session.meta.autoSave) {
+      try { saveSession(session) } catch { /* silent */ }
+    }
+
     rl.prompt()
   })
 
   rl.on('close', () => {
+    // Auto-save session on exit
+    session.history = history
+    session.meta.provider = currentProvider.id
+    session.meta.model = currentModel
+    session.meta.vibe = currentVibe.id
+    session.meta.cwd = cwd
+    session.meta.totalTokensIn = stats.totalTokensIn
+    session.meta.totalTokensOut = stats.totalTokensOut
+    if (session.meta.autoSave) {
+      try { saveSession(session) } catch { /* silent */ }
+    }
     saveStats(stats)
     process.exit(0)
   })
@@ -992,10 +1103,14 @@ function main(): void {
   let showConfig = false
   let useBest = false
   let useBeta = false
+  let sessionFlag: string | undefined
+  let continueSession = false
+  let showSessions = false
   let positional: string[] = []
 
-  // Pre-pass: detect --beta before other flags that might exit early
+  // Pre-pass: detect flags before other flags that might exit early
   if (args.includes('--beta')) useBeta = true
+  if (args.includes('--continue') || args.includes('-c')) continueSession = true
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i]
@@ -1073,6 +1188,16 @@ function main(): void {
       case '--best':
         useBest = true
         break
+      case '--session':
+        sessionFlag = args[++i]
+        break
+      case '-c':
+      case '--continue':
+        continueSession = true
+        break
+      case '--sessions':
+        showSessions = true
+        break
       default:
         if (arg.startsWith('-')) {
           console.error(errorLine(`Unknown option: ${arg}`))
@@ -1117,14 +1242,15 @@ function main(): void {
     process.exit(0)
   }
 
+  if (showSessions) {
+    const sessions = listSessions()
+    console.log(renderSessionList(sessions))
+    process.exit(0)
+  }
+
   // If no exec flag but positional args, treat as one-shot
   if (!oneShotPrompt && positional.length > 0) {
     oneShotPrompt = positional.join(' ')
-  }
-
-  // Set model env if specified
-  if (modelFlag) {
-    process.env.AIX_MODEL = modelFlag
   }
 
   // Set max turns from env
@@ -1137,7 +1263,49 @@ function main(): void {
     noTools = true
   }
 
-  // Resolve vibe
+  // ─── Session resume ─────────────────────────────────────────────
+  let resumeSession: SessionData | undefined
+
+  if (sessionFlag || continueSession) {
+    let found: SessionData | null = null
+
+    if (sessionFlag) {
+      found = findSession(sessionFlag)
+      if (!found) {
+        console.error(errorLine(`Session not found: ${sessionFlag}`))
+        console.error(dim('Use aix --sessions to list available sessions'))
+        process.exit(1)
+      }
+    } else {
+      // --continue: resume last session
+      found = getLastSession()
+      if (!found) {
+        console.error(errorLine('No saved sessions to resume'))
+        process.exit(1)
+      }
+    }
+
+    resumeSession = found
+
+    // Override provider/model/vibe from session if not explicitly set
+    if (!providerFlag && found.meta.provider) {
+      const p = getProvider(found.meta.provider)
+      if (p) providerFlag = p.id
+    }
+    if (!modelFlag && found.meta.model) {
+      modelFlag = found.meta.model
+    }
+    if (!vibeFlag && found.meta.vibe) {
+      vibeFlag = found.meta.vibe
+    }
+  }
+
+  // Set model env if specified (after session resume so session model is picked up)
+  if (modelFlag) {
+    process.env.AIX_MODEL = modelFlag
+  }
+
+  // Resolve vibe (after session resume so session vibe is picked up)
   const vibeId = vibeFlag || process.env.AIX_VIBE || 'default'
   const vibe = getVibe(vibeId)
 
@@ -1212,7 +1380,7 @@ function main(): void {
   if (oneShotPrompt) {
     runOneShot(provider, cwd, oneShotPrompt, noTools, verbose, vibe)
   } else {
-    runInteractive(provider, cwd, noTools, verbose, vibe, useBeta)
+    runInteractive(provider, cwd, noTools, verbose, vibe, useBeta, resumeSession)
   }
 }
 
