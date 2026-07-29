@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  Works with <strong>30+ AI providers</strong> — many completely free, no credit card required.
+  Works with <strong>47 AI providers</strong> — <strong>20 completely free</strong> with no API key, no signup, no credit card.
 </p>
 
 <p align="center">
@@ -19,51 +19,124 @@
 
 ## ✨ Features
 
-- **30+ providers** — OpenAI, Gemini, Groq, DeepSeek, Mistral, Ollama, and many more
-- **Completely free** — Pollinations and LLM7 work with zero setup, no API key
-- **9 built-in tools** — Read, write, edit files, run bash, search, tree, diagnose
-- **Streaming** — Real-time streaming responses with tool call visualization
-- **Multi-turn** — Full conversation history with automatic context management
-- **Auto tool use** — The AI decides when to use tools, you just ask
-- **Project awareness** — Auto-detects your project type, framework, and test setup
-- **Local models** — Works with Ollama, LM Studio, vLLM, llama.cpp, and more
-- **Zero dependencies** — Only Node.js builtins + glob. No chalk, no axios, no bloat
-- **Privacy** — Your code stays local. Use local models for complete privacy
+- **47 providers** — 20 no-key, 14 free tier, 8 paid, 5 local
+- **9 built-in tools** — Read, write, edit, bash, search, tree, diagnose, glob, list
+- **10 vibe modes** — Hacker, Pirate, Wizard, Zen, Fire, Gamer, Noir, Creative, Bro
+- **Gamification** — XP, levels, achievements, streaks, stats tracking
+- **Streaming** — Real-time streaming with tool call visualization
+- **Multi-turn** — Full conversation history with auto context management
+- **Auto tool use** — AI decides when to use tools
+- **Project awareness** — Auto-detects language, framework, test setup
+- **Zero dependencies** — Only Node.js builtins + glob
+- **Privacy** — Local models for complete privacy
 
 ---
 
 ## 🚀 Quick Start
 
-### Zero Setup (Free, No API Key)
+### Zero Setup (20 Free, No Key Providers!)
 
 ```bash
-# Pollinations — works immediately, no key needed
+# Pollinations — works immediately
 aix "explain this codebase"
 
 # LLM7 — also works with no key
 aix -p llm7 "write a hello world in rust"
+
+# G4F — free GPT-4o access
+aix -p g4f "optimize this function"
+
+# DarkAI — free, no limits
+aix -p darkai "fix the bug"
+```
+
+### With Vibes! 🎭
+
+```bash
+aix --vibe hacker "hack the mainframe"
+aix --vibe pirate "find the treasure in this code"
+aix --vibe wizard "cast a spell on this bug"
+aix --vibe fire "LET'S GOOOO"
+aix --vibe gamer "boss fight: fix this test"
 ```
 
 ### Free API Key (No Credit Card)
 
 ```bash
-# Google Gemini — free key from aistudio.google.com
 export GEMINI_API_KEY=your-key
-aix "optimize this function"
-
-# Groq — ultra-fast, free key from groq.com
-export GROQ_API_KEY=your-key
-aix -p groq "fix the bug in main.ts"
-
-# Use environment shortcuts
-AIX_USE_GEMINI=1 aix "explain this code"
+aix "explain this code"
 ```
 
-### Local Models
+---
+
+## 🎭 Vibe Modes
+
+| Vibe | Emoji | Description |
+|------|-------|-------------|
+| `default` | 🎯 | Professional — clean, focused coding |
+| `hacker` | 🤘 | Green-on-black, l33t speak, matrix vibes |
+| `pirate` | 🏴‍☠️ | Arrr, matey! Code like a swashbuckler! |
+| `wizard` | 🧙 | Mystical coding wisdom and ancient scrolls |
+| `zen` | 🧘 | Calm, minimal, peaceful |
+| `fire` | 🔥 | Hyped, energetic, maximum enthusiasm! |
+| `gamer` | 🎮 | XP, quests, boss fights, gaming terms |
+| `noir` | 🕵️ | Dark, gritty detective vibes |
+| `creative` | 🎨 | Colorful, enthusiastic, full of ideas |
+| `bro` | 😎 | Casual, chill, bro energy |
+
+Switch vibes anytime with `/vibe <id>` in interactive mode.
+
+---
+
+## 🏆 Gamification
+
+aix tracks your progress with XP, levels, and achievements!
+
+### Levels
+
+| Level | Name | XP Required | Emoji |
+|-------|------|-------------|-------|
+| 1 | Initiate | 0 | 🌱 |
+| 2 | Apprentice | 50 | 📖 |
+| 3 | Coder | 150 | 💻 |
+| 4 | Hacker | 350 | ⚡ |
+| 5 | Architect | 700 | 🏗️ |
+| 6 | Expert | 1,200 | 🏆 |
+| 7 | Master | 2,000 | 👑 |
+| 8 | Grandmaster | 3,500 | 💎 |
+| 9 | Transcendent | 5,500 | 🌟 |
+| 10 | aix Ascended | 10,000 | 🔮 |
+
+### XP System
+
+| Action | XP |
+|--------|-----|
+| Send a message | +5 XP |
+| Use a tool | +3 XP |
+| Edit a file | +5 XP |
+| Run a bash command | +2 XP |
+
+### Achievements (33 total)
+
+- **First Contact** 👋 — Send your first message
+- **Tool Master** ⚙️ — Use 50 tools
+- **Code Sculptor** 🎨 — Edit 50 files
+- **Shell Wizard** 🧙 — Run 50 bash commands
+- **Week Warrior** ⚔️ — 7-day streak
+- **Unstoppable** 🌟 — 100-day streak
+- **Provider Connoisseur** 🎯 — Use 10 different providers
+- **Vibe Chameleon** 🦎 — Try every vibe
+- **Free Spirit** 🆓 — Use only free providers for 50 messages
+- **Million Token Club** 🎰 — Process 1M+ tokens
+- **Night Owl** 🦉 — Use aix after midnight (secret!)
+- ...and 22 more!
+
+### Stats Commands
 
 ```bash
-# Ollama — 100% private, runs on your machine
-aix -p ollama "what is this project?"
+aix --stats          # Show your stats and achievements
+/achievements        # In interactive mode
+/stats               # In interactive mode
 ```
 
 ---
@@ -78,26 +151,51 @@ Requires Node.js 18+.
 
 ---
 
-## 🆓 Free Tier Providers
+## 🆓 Free Providers
 
-These providers offer free API keys with no credit card required:
+### No API Key Needed (20 providers!)
 
-| Provider | Key Env | Top Models | Get Key |
-|----------|---------|------------|---------|
-| **Pollinations** | None | GPT-4o, DeepSeek, Gemini | No key needed |
-| **LLM7** | None | GPT-4o, Gemini 2.5 Flash | No key needed |
-| **Google Gemini** | `GEMINI_API_KEY` | gemini-2.5-pro (1M ctx), gemini-2.5-flash | [aistudio.google.com](https://aistudio.google.com) |
-| **Groq** | `GROQ_API_KEY` | llama-3.3-70b, mixtral-8x7b | [groq.com](https://console.groq.com) |
-| **Cerebras** | `CEREBRAS_API_KEY` | llama-4-scout, llama-3.3-70b, qwen-3-32b | [cloud.cerebras.ai](https://cloud.cerebras.ai) |
-| **DeepSeek** | `DEEPSEEK_API_KEY` | deepseek-chat (V3), deepseek-reasoner (R1) | [platform.deepseek.com](https://platform.deepseek.com) |
-| **Mistral** | `MISTRAL_API_KEY` | mistral-small-latest, codestral | [console.mistral.ai](https://console.mistral.ai) |
-| **Cohere** | `COHERE_API_KEY` | command-r, command-r-plus | [dashboard.cohere.com](https://dashboard.cohere.com) |
-| **NVIDIA NIM** | `NVIDIA_API_KEY` | llama-3.3-70b, nemotron-ultra-253b | [build.nvidia.com](https://build.nvidia.com) |
-| **GitHub Models** | `GITHUB_TOKEN` | gpt-4o-mini, phi-4, llama-3.3, deepseek-r1 | [github.com](https://github.com/marketplace/models) |
-| **HuggingFace** | `HF_TOKEN` | llama-3.3-70b, qwen-2.5-72b, deepseek-v3 | [huggingface.co](https://huggingface.co) |
-| **SiliconFlow** | `SILICONFLOW_API_KEY` | qwen-2.5-72b, deepseek-v3, deepseek-r1 | [siliconflow.cn](https://siliconflow.cn) |
-| **Chutes** | `CHUTES_API_KEY` | deepseek-v3, qwen-2.5-72b | [chutes.ai](https://chutes.ai) |
-| **GLHF** | `GLHF_API_KEY` | llama-3.3-70b | [glhf.chat](https://glhf.chat) |
+| ID | Name | Top Models |
+|----|------|------------|
+| `pollinations` | Pollinations AI | GPT-4o, DeepSeek, Gemini, Qwen |
+| `llm7` | LLM7.io | GPT-4o, Gemini 2.5 Flash |
+| `g4f` | G4F Proxy | GPT-4o, GPT-4o Mini |
+| `freechat` | FreeChat | GPT-4o Mini, Llama 3.3 70B |
+| `shard` | Shard AI | GPT-4o Mini, DeepSeek |
+| `aichat` | AIChat | GPT-4o Mini, DeepSeek, Llama |
+| `openaiProxy` | OpenAI Proxy | GPT-4o Mini |
+| `chatany` | ChatAny | GPT-4o Mini, DeepSeek |
+| `freegpt` | FreeGPT | GPT-4o Mini, Llama, DeepSeek |
+| `aiproxy` | AI Proxy | GPT-4o Mini |
+| `darkai` | DarkAI | GPT-4o, DeepSeek |
+| `nexra` | Nexra | GPT-4o Mini |
+| `chatgptfree` | ChatGPT Free | GPT-4o Mini |
+| `yuai` | YuAI | GPT-4o Mini, DeepSeek, Llama |
+| `zeroone` | 01.ai | Yi Large, Yi Medium |
+| `zephyr` | Zephyr AI | Zephyr 7B |
+| `dolphin` | Dolphin AI | Dolphin Mixtral, Dolphin Llama |
+| `topmost` | TopMost AI | GPT-4o Mini, DeepSeek |
+| `infinity` | Infinity AI | GPT-4o Mini, Llama |
+| `skyline` | Skyline AI | GPT-4o Mini, DeepSeek, Qwen |
+
+### Free API Key (No Credit Card)
+
+| ID | Name | Key Env | Top Models |
+|----|------|---------|------------|
+| `gemini` | Google Gemini | GEMINI_API_KEY | gemini-2.5-pro (1M ctx) |
+| `groq` | Groq | GROQ_API_KEY | llama-3.3-70b, mixtral |
+| `cerebras` | Cerebras | CEREBRAS_API_KEY | llama-4-scout, qwen-3-32b |
+| `deepseek` | DeepSeek | DEEPSEEK_API_KEY | deepseek-chat (V3) |
+| `mistral` | Mistral AI | MISTRAL_API_KEY | mistral-small, codestral |
+| `cohere` | Cohere | COHERE_API_KEY | command-r |
+| `nvidia` | NVIDIA NIM | NVIDIA_API_KEY | llama-3.3-70b, nemotron |
+| `githubmodels` | GitHub Models | GITHUB_TOKEN | gpt-4o-mini, phi-4 |
+| `huggingface` | HuggingFace | HF_TOKEN | llama-3.3-70b, qwen-2.5-72b |
+| `siliconflow` | SiliconFlow | SILICONFLOW_API_KEY | qwen-2.5-72b, deepseek-v3 |
+| `chutes` | Chutes AI | CHUTES_API_KEY | deepseek-v3, qwen-2.5-72b |
+| `glhf` | GLHF | GLHF_API_KEY | llama-3.3-70b |
+| `together` | Together AI | TOGETHER_API_KEY | llama-3.3-70b (free $5 credit) |
+| `fireworks` | Fireworks AI | FIREWORKS_API_KEY | llama-3.3-70b (free credits) |
 
 ---
 
@@ -106,17 +204,18 @@ These providers offer free API keys with no credit card required:
 ### Interactive Mode
 
 ```bash
-aix                          # Start interactive (auto-detects provider)
-aix -p gemini                # Start with Gemini
-aix -p groq -m llama-3.3-70b-versatile  # Specific provider + model
+aix                          # Start interactive
+aix -p gemini                # With Gemini
+aix --vibe hacker            # Hacker mode!
+aix -p pollinations --vibe pirate  # Free + pirate vibes!
 ```
 
 ### One-Shot Mode
 
 ```bash
-aix "explain this codebase"                    # Positional prompt
-aix -e "fix the bug in main.ts"                # Explicit one-shot
-aix -p pollinations "write a fibonacci in go"  # Free, no key
+aix "explain this codebase"
+aix -p llm7 "write a fibonacci in go"
+aix --vibe wizard -e "cast a spell on this bug"
 ```
 
 ### All Options
@@ -128,12 +227,15 @@ aix -p pollinations "write a fibonacci in go"  # Free, no key
 | `--providers` | List all providers |
 | `-p, --provider <id>` | Use a specific provider |
 | `-m, --model <name>` | Set model name |
-| `--no-tools` | Disable tool use (plain chat) |
+| `--vibe <id>` | Set vibe mode |
+| `--no-tools` | Disable tool use |
 | `-e, --exec <prompt>` | One-shot mode |
 | `--max-turns <n>` | Max agent turns (default: 20) |
 | `--temperature <n>` | Set temperature (0.0 - 2.0) |
 | `--verbose` | Show detailed tool output |
-| `--quiet` | Minimal output (errors only) |
+| `--quiet` | Minimal output |
+| `--stats` | Show your stats and achievements |
+| `--reset-stats` | Reset all stats |
 
 ### Interactive Commands
 
@@ -145,185 +247,79 @@ aix -p pollinations "write a fibonacci in go"  # Free, no key
 | `/providers` | List providers |
 | `/model <name>` | Switch model |
 | `/provider <id>` | Switch provider |
+| `/vibe <id>` | Switch vibe mode |
+| `/vibes` | List all vibes |
+| `/stats` | Show your stats |
+| `/achievements` | Show achievements |
 | `/history` | Show message count |
-| `/context` | Show project context |
 | `/tools` | List available tools |
 | `/retry` | Retry last message |
-| `/compact` | Compact conversation history |
+| `/compact` | Compact history |
+| `/context` | Show project context |
 
 ---
 
-## 🔧 Built-in Tools
-
-aix has 9 built-in coding tools that the AI can use automatically:
+## 🔧 Built-in Tools (9)
 
 | Tool | Description |
 |------|-------------|
-| **read_file** | Read file contents with line numbers. Supports line ranges. |
-| **write_file** | Create or overwrite files. Creates parent directories. |
-| **edit_file** | Find and replace exact text. Precise, targeted edits. |
-| **bash** | Run shell commands. Tests, git, installs, anything. |
-| **list_files** | List files and directories with glob patterns and sizes. |
-| **search_files** | Search across files with regex. Find usages, patterns, imports. |
-| **glob_find** | Find files matching a glob pattern. Quick file discovery. |
-| **tree** | Display directory tree structure. Understand project layout. |
-| **diagnose** | Run project diagnostics. Check deps, types, lint, tests. |
-
----
-
-## 🔑 Environment Variables
-
-### Core Configuration
-
-| Variable | Description |
-|----------|-------------|
-| `AIX_PROVIDER` | Provider id to use |
-| `AIX_MODEL` | Model name override |
-| `AIX_BASE_URL` | Custom endpoint base URL |
-| `AIX_API_KEY` | Custom endpoint API key |
-| `AIX_MAX_TURNS` | Max agent turns (default: 20) |
-| `AIX_NO_TOOLS` | Set to "1" to disable tools |
-| `AIX_SYSTEM_PROMPT` | Custom system prompt file |
-
-### Quick-Select Providers
-
-Set any of these to `1` to quickly select a provider:
-
-| Variable | Provider |
-|----------|----------|
-| `AIX_USE_POLLINATIONS` | Pollinations AI |
-| `AIX_USE_LLM7` | LLM7.io |
-| `AIX_USE_GEMINI` | Google Gemini |
-| `AIX_USE_GROQ` | Groq |
-| `AIX_USE_MISTRAL` | Mistral AI |
-| `AIX_USE_CEREBRAS` | Cerebras |
-| `AIX_USE_DEEPSEEK` | DeepSeek |
-| `AIX_USE_COHERE` | Cohere |
-| `AIX_USE_NVIDIA` | NVIDIA NIM |
-| `AIX_USE_GITHUBMODELS` | GitHub Models |
-| `AIX_USE_HUGGINGFACE` | HuggingFace |
-| `AIX_USE_SILICONFLOW` | SiliconFlow |
-| `AIX_USE_CHUTES` | Chutes AI |
-| `AIX_USE_GLHF` | GLHF |
-| `AIX_USE_OPENAI` | OpenAI |
-| `AIX_USE_XAI` | xAI (Grok) |
-| `AIX_USE_OPENROUTER` | OpenRouter |
-| `AIX_USE_PERPLEXITY` | Perplexity |
-| `AIX_USE_TOGETHER` | Together AI |
-| `AIX_USE_FIREWORKS` | Fireworks AI |
-| `AIX_USE_SAMBANOVA` | SambaNova |
-| `AIX_USE_REPLICATE` | Replicate |
-| `AIX_USE_NOVITA` | Novita AI |
-| `AIX_USE_OLLAMA` | Ollama |
-| `AIX_USE_LMSTUDIO` | LM Studio |
-| `AIX_USE_JAN` | Jan.ai |
-| `AIX_USE_VLLM` | vLLM |
-| `AIX_USE_LLAMACPP` | llama.cpp Server |
-| `AIX_USE_CUSTOM` | Custom endpoint |
-
-### API Keys
-
-| Variable | Provider |
-|----------|----------|
-| `GEMINI_API_KEY` | Google Gemini |
-| `GROQ_API_KEY` | Groq |
-| `DEEPSEEK_API_KEY` | DeepSeek |
-| `MISTRAL_API_KEY` | Mistral AI |
-| `OPENAI_API_KEY` | OpenAI |
-| `CEREBRAS_API_KEY` | Cerebras |
-| `GITHUB_TOKEN` | GitHub Models |
-| `HF_TOKEN` | HuggingFace |
-| `SILICONFLOW_API_KEY` | SiliconFlow |
-| `OPENROUTER_API_KEY` | OpenRouter |
-| `XAI_API_KEY` | xAI (Grok) |
-| `PERPLEXITY_API_KEY` | Perplexity |
-| `TOGETHER_API_KEY` | Together AI |
-| `FIREWORKS_API_KEY` | Fireworks AI |
-| `SAMBANOVA_API_KEY` | SambaNova |
-| `COHERE_API_KEY` | Cohere |
-| `NVIDIA_API_KEY` | NVIDIA NIM |
-| `REPLICATE_API_TOKEN` | Replicate |
-| `NOVITA_API_KEY` | Novita AI |
-
-### Local Hosts
-
-| Variable | Default | Provider |
-|----------|---------|----------|
-| `OLLAMA_HOST` | localhost:11434 | Ollama |
-| `LMSTUDIO_HOST` | localhost:1234 | LM Studio |
-| `JAN_HOST` | localhost:1337 | Jan.ai |
-| `VLLM_HOST` | localhost:8000 | vLLM |
-| `LLAMACPP_HOST` | localhost:8080 | llama.cpp |
+| **read_file** | Read file contents with line numbers |
+| **write_file** | Create or overwrite files |
+| **edit_file** | Find and replace exact text |
+| **bash** | Run shell commands |
+| **list_files** | List files and directories |
+| **search_files** | Search across files with regex |
+| **glob_find** | Find files matching a pattern |
+| **tree** | Display directory tree |
+| **diagnose** | Run project diagnostics |
 
 ---
 
 ## 🌍 All Providers
 
-### Free — No API Key Needed
-
-| ID | Name | Default Model | Description |
-|----|------|---------------|-------------|
-| `pollinations` | Pollinations AI | openai-large | Free AI gateway. Routes to GPT-4o, Mistral, DeepSeek, Gemini. |
-| `llm7` | LLM7.io | gpt-4o | Free AI gateway. GPT-4o, Gemini, DeepSeek. |
-
-### Free — Free API Key (No Credit Card)
-
-| ID | Name | Key Env | Default Model | Description |
-|----|------|---------|---------------|-------------|
-| `gemini` | Google Gemini | GEMINI_API_KEY | gemini-2.5-pro | State-of-the-art with up to 2M context. |
-| `groq` | Groq | GROQ_API_KEY | llama-3.3-70b-versatile | Ultra-fast inference. Best for speed. |
-| `mistral` | Mistral AI | MISTRAL_API_KEY | mistral-large-latest | Strong coding and reasoning. |
-| `cerebras` | Cerebras | CEREBRAS_API_KEY | llama-3.3-70b | Fastest inference via wafer-scale engine. |
-| `deepseek` | DeepSeek | DEEPSEEK_API_KEY | deepseek-chat | Top-tier open models. Very affordable. |
-| `cohere` | Cohere | COHERE_API_KEY | command-r-plus-08-2024 | Enterprise-focused with strong RAG. |
-| `nvidia` | NVIDIA NIM | NVIDIA_API_KEY | meta/llama-3.3-70b-instruct | Llama, Nemotron, and more. |
-| `githubmodels` | GitHub Models | GITHUB_TOKEN | gpt-4o | Free AI via GitHub. Use your token. |
-| `huggingface` | HuggingFace | HF_TOKEN | meta-llama/Llama-3.3-70B-Instruct | 1000s of open models. |
-| `siliconflow` | SiliconFlow | SILICONFLOW_API_KEY | Qwen/Qwen2.5-72B-Instruct | Fast inference for open-source models. |
-| `chutes` | Chutes AI | CHUTES_API_KEY | deepseek-ai/DeepSeek-V3-0324 | Free inference for open-source models. |
-| `glhf` | GLHF | GLHF_API_KEY | hf:meta-llama/Llama-3.3-70B-Instruct | Free LLM gateway. |
-
 ### Paid
 
-| ID | Name | Key Env | Default Model |
-|----|------|---------|---------------|
-| `openai` | OpenAI | OPENAI_API_KEY | gpt-4o |
-| `xai` | xAI (Grok) | XAI_API_KEY | grok-3 |
-| `openrouter` | OpenRouter | OPENROUTER_API_KEY | meta-llama/llama-3.3-70b-instruct |
-| `perplexity` | Perplexity | PERPLEXITY_API_KEY | sonar-pro |
-| `together` | Together AI | TOGETHER_API_KEY | meta-llama/Llama-3.3-70B-Instruct-Turbo |
-| `fireworks` | Fireworks AI | FIREWORKS_API_KEY | llama-v3p3-70b-instruct |
-| `sambanova` | SambaNova | SAMBANOVA_API_KEY | Meta-Llama-3.3-70B-Instruct |
-| `replicate` | Replicate | REPLICATE_API_TOKEN | meta/llama-3.3-70b-instruct |
-| `novita` | Novita AI | NOVITA_API_KEY | deepseek/deepseek-v3-0324 |
+| ID | Name | Key Env |
+|----|------|---------|
+| `openai` | OpenAI | OPENAI_API_KEY |
+| `xai` | xAI (Grok) | XAI_API_KEY |
+| `openrouter` | OpenRouter | OPENROUTER_API_KEY |
+| `perplexity` | Perplexity | PERPLEXITY_API_KEY |
+| `sambanova` | SambaNova | SAMBANOVA_API_KEY |
+| `replicate` | Replicate | REPLICATE_API_TOKEN |
+| `novita` | Novita AI | NOVITA_API_KEY |
 
 ### Local / Self-Hosted
 
-| ID | Name | Default Model | Description |
-|----|------|---------------|-------------|
-| `ollama` | Ollama | llama3.3 | 100+ models. One-command install. |
-| `lmstudio` | LM Studio | local-model | Beautiful GUI for local models. |
-| `jan` | Jan.ai | local-model | Open-source, privacy-first. |
-| `vllm` | vLLM | served-model | High-throughput inference engine. |
-| `llamacpp` | llama.cpp Server | served-model | Lightweight C++ inference. |
-| `custom` | Custom endpoint | custom-model | Any OpenAI-compatible API. |
+| ID | Name | Default Model |
+|----|------|---------------|
+| `ollama` | Ollama | llama3.3 |
+| `lmstudio` | LM Studio | local-model |
+| `jan` | Jan.ai | local-model |
+| `vllm` | vLLM | served-model |
+| `llamacpp` | llama.cpp Server | served-model |
+| `custom` | Custom endpoint | custom-model |
 
 ---
 
-## 🧠 Smart System Prompt
+## 🔑 Environment Variables
 
-aix builds a comprehensive system prompt that includes:
+| Variable | Description |
+|----------|-------------|
+| `AIX_PROVIDER` | Provider id to use |
+| `AIX_MODEL` | Model name override |
+| `AIX_VIBE` | Vibe mode (default, hacker, pirate, etc.) |
+| `AIX_BASE_URL` | Custom endpoint base URL |
+| `AIX_API_KEY` | Custom endpoint API key |
+| `AIX_MAX_TURNS` | Max agent turns (default: 20) |
+| `AIX_NO_TOOLS` | Set to "1" to disable tools |
+| `AIX_USE_<PROVIDER>` | Quick-select provider |
 
-- **Tool descriptions** — Detailed instructions for all 9 tools
-- **Working style guidelines** — Read before editing, prefer edit_file, run tests
-- **Safety guidelines** — Never delete files without asking, don't commit secrets
-- **Project instructions** — Automatically loaded from `AIX.md`, `.aix/instructions.md`, or `.cursorrules`
-- **Project context** — Auto-detects language, framework, test runner, and dependencies
-- **Current date** — Always knows today's date
+---
 
-### Project Instructions
+## 🧠 Project Instructions
 
-Create an `AIX.md` file in your project root to give aix project-specific instructions:
+Create `AIX.md` in your project root:
 
 ```markdown
 # AIX.md
@@ -331,61 +327,9 @@ Create an `AIX.md` file in your project root to give aix project-specific instru
 - This project uses TypeScript with strict mode
 - Always run `npm test` after making changes
 - Follow the existing code style
-- Use Vitest for testing
-- Never modify the database schema without asking
 ```
 
-You can also use `.aix/instructions.md` or `.cursorrules` — aix checks for these files in order.
-
----
-
-## 📖 What It Can Do
-
-### File Operations
-- **Read** — View any file with line numbers and line ranges
-- **Write** — Create new files with automatic directory creation
-- **Edit** — Find and replace text precisely, with multiple-match detection
-- **Search** — Regex search across your entire codebase
-- **Tree** — Visualize your project structure
-- **Glob** — Find files by pattern
-
-### Code Intelligence
-- **Bash** — Run any shell command: tests, git, installs, builds
-- **Diagnose** — Check for missing dependencies, TypeScript errors, lint issues
-- **Multi-turn** — Maintain context across conversations
-- **Auto tool use** — The AI decides when to read, edit, or run commands
-
-### Safety
-- **No destructive commands** — Blocks `rm -rf /` and similar
-- **Edit validation** — Detects multiple matches, warns before ambiguous edits
-- **Timeout protection** — All commands have configurable timeouts
-- **History bounding** — Keeps conversation history at 40 messages max
-
----
-
-## 🏗 Architecture
-
-```
-aix/
-├── src/
-│   ├── cli.ts          # CLI entry point, arg parsing, interactive/one-shot modes
-│   ├── providers.ts    # 30+ provider definitions, detection, key resolution
-│   ├── llm.ts          # Streaming OpenAI Chat Completions client
-│   ├── tools.ts        # 9 built-in coding tools
-│   ├── agent.ts        # Agent loop: model → tools → model
-│   ├── ui.ts           # Terminal UI with ANSI colors, spinner, markdown
-│   └── system-prompt.ts # Smart system prompt builder
-├── scripts/
-│   └── bundle.mjs      # esbuild bundler
-├── package.json
-├── tsconfig.json
-└── README.md
-```
-
-- **Zero external deps** — Only Node.js builtins + `glob`
-- **Streaming-first** — Real-time SSE streaming with tool call accumulation
-- **OpenAI-compatible** — Works with any provider that supports the OpenAI API
-- **Single binary** — esbuild bundles everything into one file
+Also supports `.aix/instructions.md` and `.cursorrules`.
 
 ---
 

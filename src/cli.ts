@@ -1,8 +1,16 @@
 import { resolve } from 'path'
-import { providers, getProvider, detectProvider, getApiKey, resolveModel, FREE_PROVIDER_IDS } from './providers.js'
+import { providers, getProvider, detectProvider, getApiKey, resolveModel, FREE_PROVIDER_IDS, FREE_NO_KEY_IDS } from './providers.js'
 import type { Provider } from './providers.js'
 import { runAgent, type AgentChunk, type Message } from './agent.js'
 import { buildSystemPrompt } from './system-prompt.js'
+import { getVibe, getVibeNames, VIBES } from './vibes.js'
+import type { Vibe } from './vibes.js'
+import {
+  loadStats, saveStats, updateStreak, addXp, checkNewAchievements,
+  getLevelForXp, renderXpBar, renderStats, renderAchievementUnlock, renderLevelUp,
+  LEVELS, ACHIEVEMENTS,
+} from './gamification.js'
+import type { Stats } from './gamification.js'
 import {
   bold, dim, red, green, yellow, cyan, gray, magenta, brightCyan, brightGreen,
   providerBadge, toolBadge, successLine, errorLine, infoLine, warningLine,
@@ -12,6 +20,7 @@ import {
 
 function printHelp(): void {
   const version = process.env.AIX_VERSION || '1.0.0'
+  const freeNoKeyCount = FREE_NO_KEY_IDS.length
   console.log(`
 ${bold(`◆ aix v${version}`)} — AI coding assistant for your terminal
 
@@ -26,12 +35,28 @@ ${bold(cyan('OPTIONS'))}
   ${bold('--providers')}                  List all providers
   ${bold('-p, --provider <id>')}          Use a specific provider
   ${bold('-m, --model <name>')}           Set model (also via AIX_MODEL env)
+  ${bold('--vibe <id>')}                  Set vibe mode (default, hacker, pirate, wizard, zen, fire, gamer, noir, creative, bro)
   ${bold('--no-tools')}                   Disable tool use
   ${bold('-e, --exec <prompt>')}          One-shot mode
   ${bold('--max-turns <n>')}              Max agent turns (default: 20)
   ${bold('--temperature <n>')}            Set temperature (0.0 - 2.0)
   ${bold('--verbose')}                    Show detailed tool output
   ${bold('--quiet')}                      Minimal output (errors only)
+  ${bold('--stats')}                      Show your stats and achievements
+  ${bold('--leaderboard')}                Show XP leaderboard
+  ${bold('--reset-stats')}                Reset all stats
+
+${bold(cyan('VIBES'))} 🎭
+  ${bold('default')}     🎯  Professional — clean, focused
+  ${bold('hacker')}      🤘  Hacker — green-on-black, l33t
+  ${bold('pirate')}      🏴‍☠️  Pirate — arrr, matey!
+  ${bold('wizard')}      🧙  Wizard — mystical coding wisdom
+  ${bold('zen')}         🧘  Zen — calm, minimal, peaceful
+  ${bold('fire')}        🔥  Fire — hyped, energetic!
+  ${bold('gamer')}       🎮  Gamer — XP, quests, boss fights
+  ${bold('noir')}        🕵️  Noir — dark, gritty detective
+  ${bold('creative')}    🎨  Creative — colorful, enthusiastic
+  ${bold('bro')}         😎  Bro — casual, chill energy
 
 ${bold(cyan('INTERACTIVE COMMANDS'))}
   ${bold('/exit')}, ${bold('/quit')}             Exit aix
@@ -40,66 +65,54 @@ ${bold(cyan('INTERACTIVE COMMANDS'))}
   ${bold('/providers')}                  List providers
   ${bold('/model <name>')}               Switch model
   ${bold('/provider <id>')}              Switch provider
+  ${bold('/vibe <id>')}                  Switch vibe mode
+  ${bold('/vibes')}                      List all vibes
   ${bold('/history')}                    Show conversation history
   ${bold('/context')}                    Show project context
   ${bold('/tools')}                      List available tools
   ${bold('/retry')}                      Retry last message
   ${bold('/compact')}                    Compact conversation history
+  ${bold('/stats')}                      Show your stats
+  ${bold('/achievements')}              Show achievements
 
 ${bold(cyan('ENVIRONMENT VARIABLES'))}
   ${bold('AIX_PROVIDER')}                Provider id to use
   ${bold('AIX_MODEL')}                   Model name override
+  ${bold('AIX_VIBE')}                    Vibe mode (default, hacker, pirate, etc.)
   ${bold('AIX_BASE_URL')}                Custom endpoint base URL
   ${bold('AIX_API_KEY')}                 Custom endpoint API key
   ${bold('AIX_MAX_TURNS')}               Max agent turns (default: 20)
-  ${bold('AIX_SYSTEM_PROMPT')}           Custom system prompt file
   ${bold('AIX_NO_TOOLS')}                Set to "1" to disable tools
-  ${bold('AIX_USE_<PROVIDER>')}          Quick-select provider (e.g. AIX_USE_GEMINI=1)
 
-${bold(cyan('FREE PROVIDERS (no credit card)'))}
-  ${brightGreen('pollinations')}       No key needed — just works
-  ${brightGreen('llm7')}               No key needed — just works
-  ${brightGreen('gemini')}             Free API key from Google AI Studio
-  ${brightGreen('groq')}               Free API key from groq.com
-  ${brightGreen('cerebras')}           Free API key from cloud.cerebras.ai
-  ${brightGreen('deepseek')}           Free API key from platform.deepseek.com
-  ${brightGreen('mistral')}            Free API key from console.mistral.ai
-  ${brightGreen('cohere')}             Free API key from dashboard.cohere.com
-  ${brightGreen('nvidia')}             Free API key from build.nvidia.com
-  ${brightGreen('githubmodels')}       Use your GitHub token
-  ${brightGreen('huggingface')}        Free API key from huggingface.co
-  ${brightGreen('siliconflow')}        Free API key from siliconflow.cn
-  ${brightGreen('chutes')}             Free API key from chutes.ai
-  ${brightGreen('glhf')}               Free API key from glhf.chat
+${bold(cyan('FREE PROVIDERS'))} ${brightGreen(`(${freeNoKeyCount} no-key providers!)`)}
+  ${brightGreen('pollinations')}    No key — GPT-4o, DeepSeek, Gemini, Qwen
+  ${brightGreen('llm7')}            No key — GPT-4o, Gemini, DeepSeek
+  ${brightGreen('g4f')}             No key — GPT-4o, Haiku
+  ${brightGreen('freechat')}        No key — GPT-4o Mini, Llama
+  ${brightGreen('shard')}           No key — GPT-4o Mini, DeepSeek
+  ${brightGreen('darkai')}          No key — GPT-4o, DeepSeek
+  ${brightGreen('freegpt')}         No key — GPT-4o Mini, Llama, DeepSeek
+  ${brightGreen('infinity')}        No key — GPT-4o Mini, Llama
+  ${brightGreen('skyline')}         No key — GPT-4o Mini, DeepSeek, Qwen
+  ${brightGreen('chatany')}         No key — GPT-4o Mini, DeepSeek
+  ${dim('... and more! Run aix --providers to see all')}
 
 ${bold(cyan('EXAMPLES'))}
-  ${dim('# Start interactive (auto-detects provider)')}
-  aix
-
-  ${dim('# One-shot question')}
-  aix "explain this codebase"
-
-  ${dim('# Completely free, no setup')}
+  ${dim('# Zero setup — completely free')}
   aix -p pollinations "hello"
-  aix -p llm7 "write a hello world in rust"
+  aix -p llm7 "write a hello world"
 
-  ${dim('# Use a specific provider and model')}
-  aix -p groq -m llama-3.3-70b-versatile "fix the bug"
-  aix -p gemini -m gemini-2.5-pro "optimize this function"
+  ${dim('# With vibes!')}
+  aix --vibe hacker "hack the mainframe"
+  aix --vibe pirate "find the treasure in this code"
+  aix --vibe wizard "cast a spell on this bug"
 
-  ${dim('# Use environment variables')}
+  ${dim('# Free API key')}
   AIX_USE_GEMINI=1 aix "explain this code"
-  AIX_PROVIDER=groq AIX_MODEL=mixtral-8x7b-32768 aix
+  aix -p groq -m llama-3.3-70b-versatile "fix the bug"
 
   ${dim('# Local models')}
   aix -p ollama "what is this project?"
-  aix -p lmstudio "refactor this code"
-  aix -p vllm "write tests"
-
-  ${dim('# Advanced options')}
-  aix --max-turns 5 --temperature 0.2 "be precise"
-  aix --no-tools "just chat with me"
-  aix --verbose "fix all the bugs"
 `)
 }
 
@@ -109,62 +122,102 @@ function printProviders(): void {
   const paid = providers.filter(p => !p.free && !p.local)
   const local = providers.filter(p => p.local)
 
-  const printGroup = (title: string, list: Provider[]) => {
-    console.log(`\n${bold(cyan(title))}`)
+  const printGroup = (title: string, list: Provider[], emoji: string) => {
+    console.log(`\n${bold(cyan(title))} ${dim(`(${list.length} providers)`)}`)
     console.log(divider('─', 70))
     for (const p of list) {
       const key = p.apiKeyEnv ? gray(`(${p.apiKeyEnv})`) : gray('(no key needed)')
-      const model = dim(p.defaultModel)
-      const desc = p.description ? dim(`  ${p.description.slice(0, 50)}`) : ''
       console.log(`  ${bold(p.id.padEnd(16))} ${p.name.padEnd(22)} ${key}`)
       if (p.description) {
         console.log(`  ${''.padEnd(16)} ${dim(p.description.slice(0, 60))}`)
-      }
-      if (p.models.length > 0 && p.models.length <= 8) {
-        const modelList = p.models.map(m => {
-          const freeTag = m.free ? brightGreen('✓') : ' '
-          const toolsTag = m.supportsTools ? '🔧' : '  '
-          return `${freeTag} ${toolsTag} ${m.id}`
-        }).join(dim(' │ '))
-        console.log(`  ${''.padEnd(16)} ${dim('models:')} ${modelList}`)
       }
     }
   }
 
   console.log()
-  console.log(`  ${bold('◆ aix — Supported Providers')} ${dim(`(${providers.length} providers)`)}`)
-  console.log()
-  printGroup('🆓 FREE — No API Key Needed', freeNoKey)
-  printGroup('🆓 FREE — Free API Key (no credit card)', freeTier)
-  printGroup('💳 PAID — Requires Payment', paid)
-  printGroup('🏠 LOCAL — Self-Hosted (always free)', local)
+  console.log(`  ${bold(`◆ aix — Supported Providers`)} ${dim(`(${providers.length} total)`)}`)
+  console.log(`  ${brightGreen(`${freeNoKey.length} completely free (no key) │ ${freeTier.length} free tier │ ${paid.length} paid │ ${local.length} local`)}`)
+  printGroup(`🆓 FREE — No API Key Needed (just works!)`, freeNoKey, '🆓')
+  printGroup(`🆓 FREE — Free API Key (no credit card)`, freeTier, '🆓')
+  printGroup(`💳 PAID — Requires Payment`, paid, '💳')
+  printGroup(`🏠 LOCAL — Self-Hosted (always free)`, local, '🏠')
 
   console.log()
   console.log(`  ${bold('Quick Start')}`)
   console.log()
   console.log(`  ${brightGreen('No setup:')}   aix -p pollinations "hello"`)
+  console.log(`  ${brightGreen('Vibes:')}     aix --vibe hacker "explain this code"`)
   console.log(`  ${brightGreen('Free key:')}    AIX_USE_GEMINI=1 aix "explain this code"`)
   console.log(`  ${brightGreen('Local:')}      aix -p ollama "what is this project?"`)
-  console.log(`  ${brightGreen('Speed:')}      aix -p groq "fix the bug in main.ts"`)
-  console.log()
-  console.log(`  ${dim('Legend:')} ${brightGreen('✓')} = free model  🔧 = supports tools`)
   console.log()
 }
 
-async function runInteractive(provider: Provider, cwd: string, noTools: boolean, verbose: boolean): Promise<void> {
+function printStats(stats: Stats): void {
+  console.log()
+  console.log(`  ${bold('◆ Your aix Stats')}`)
+  console.log()
+  console.log(renderStats(stats))
+  console.log()
+}
+
+function printAchievements(stats: Stats): void {
+  console.log()
+  console.log(`  ${bold('🏆 Achievements')} ${dim(`(${stats.achievements.length}/${ACHIEVEMENTS.length})`)}`)
+  console.log()
+  for (const a of ACHIEVEMENTS) {
+    const unlocked = stats.achievements.includes(a.id)
+    if (a.secret && !unlocked) continue
+    const status = unlocked ? brightGreen('✓') : dim('○')
+    const name = unlocked ? bold(a.name) : dim(a.name)
+    const desc = unlocked ? a.description : dim(a.description)
+    console.log(`  ${status} ${a.emoji} ${name} — ${desc} ${unlocked ? green(`(+${a.xp} XP)`) : dim(`(+${a.xp} XP)`)}`)
+  }
+  console.log()
+}
+
+function printVibes(): void {
+  console.log()
+  console.log(`  ${bold('🎭 Vibe Modes')}`)
+  console.log()
+  for (const v of VIBES) {
+    console.log(`  ${v.emoji}  ${bold(v.id.padEnd(12))} ${v.name.padEnd(14)} — ${dim(v.description)}`)
+  }
+  console.log()
+  console.log(`  ${dim('Switch vibes: /vibe <id> or aix --vibe <id>')}`)
+  console.log()
+}
+
+async function runInteractive(provider: Provider, cwd: string, noTools: boolean, verbose: boolean, vibe: Vibe): Promise<void> {
   const model = resolveModel(provider)
   const apiKey = getApiKey(provider)
   printBanner(provider.name, model, cwd)
 
+  // Show vibe greeting
+  console.log(`  ${vibe.emoji} ${vibe.colors.primary}${vibe.greeting}${'\x1b[0m'}`)
+  console.log()
+
+  // Load and show stats
+  const stats = loadStats()
+  updateStreak(stats)
+  stats.totalSessions++
+  stats.providerUsage[provider.id] = (stats.providerUsage[provider.id] || 0) + 1
+  stats.vibeUsage[vibe.id] = (stats.vibeUsage[vibe.id] || 0) + 1
+  saveStats(stats)
+
+  const level = getLevelForXp(stats.xp)
+  console.log(`  ${level.emoji} ${level.color}Level ${level.level}: ${level.name}${'\x1b[0m'} ${dim(renderXpBar(stats))}`)
+  console.log()
+
   const history: Message[] = []
   let currentProvider = provider
   let currentModel = model
+  let currentVibe = vibe
   let lastUserMessage = ''
   const readline = await import('readline')
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-    prompt: `${bold(cyan('❯'))} `,
+    prompt: `${currentVibe.colors.prompt}${currentVibe.emoji} ❯${'\x1b[0m'} `,
   })
   rl.prompt()
 
@@ -184,7 +237,9 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
       switch (cmd) {
         case '/exit':
         case '/quit':
-          console.log(dim('Goodbye! 👋'))
+          console.log(`  ${currentVibe.emoji} ${currentVibe.colors.primary}${currentVibe.farewell}${'\x1b[0m'}`)
+          // Save stats
+          saveStats(stats)
           rl.close()
           process.exit(0)
         case '/clear':
@@ -216,13 +271,32 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
             if (p) {
               currentProvider = p
               currentModel = resolveModel(p)
+              stats.providerUsage[p.id] = (stats.providerUsage[p.id] || 0) + 1
+              saveStats(stats)
               console.log(successLine(`Provider: ${p.name} │ Model: ${brightCyan(currentModel)}`))
             } else {
-              console.log(errorLine(`Unknown provider: ${arg}. Run /providers to see available options.`))
+              console.log(errorLine(`Unknown provider: ${arg}`))
             }
           } else {
             console.log(infoLine(`Current provider: ${currentProvider.name} │ Model: ${brightCyan(currentModel)}`))
           }
+          rl.prompt()
+          return
+        case '/vibe':
+          if (arg) {
+            const v = getVibe(arg)
+            currentVibe = v
+            stats.vibeUsage[v.id] = (stats.vibeUsage[v.id] || 0) + 1
+            saveStats(stats)
+            rl.setPrompt(`${currentVibe.colors.prompt}${currentVibe.emoji} ❯${'\x1b[0m'} `)
+            console.log(`  ${v.emoji} ${v.colors.primary}${v.greeting}${'\x1b[0m'}`)
+          } else {
+            console.log(infoLine(`Current vibe: ${currentVibe.emoji} ${currentVibe.name}`))
+          }
+          rl.prompt()
+          return
+        case '/vibes':
+          printVibes()
           rl.prompt()
           return
         case '/history':
@@ -247,17 +321,23 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
           console.log('  • diagnose     — Run project diagnostics')
           rl.prompt()
           return
+        case '/stats':
+          printStats(stats)
+          rl.prompt()
+          return
+        case '/achievements':
+          printAchievements(stats)
+          rl.prompt()
+          return
         case '/retry':
           if (!lastUserMessage) {
             console.log(warningLine('No previous message to retry'))
             rl.prompt()
             return
           }
-          // Remove last exchange from history
           if (history.length >= 2) {
             history.splice(-2)
           }
-          // Fall through to process lastUserMessage
           break
         case '/compact':
           if (history.length > 4) {
@@ -278,13 +358,15 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
     }
 
     // Run agent
-    const systemPrompt = buildSystemPrompt(cwd)
+    const systemPrompt = buildSystemPrompt(cwd, currentVibe.systemPromptSuffix || undefined)
     const spinner = new Spinner()
     spinner.start('Thinking...')
 
     let firstChunk = true
     let textBuffer = ''
-    let toolCalls = 0
+    let toolCallsThisTurn = 0
+    let editsThisTurn = 0
+    let bashThisTurn = 0
     const controller = new AbortController()
 
     const result = await runAgent({
@@ -310,7 +392,7 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
               spinner.stop()
               firstChunk = false
             }
-            toolCalls++
+            toolCallsThisTurn++
             console.log(`\n  ${toolBadge(chunk.name)}`)
             spinner.start(`Running ${chunk.name}...`)
             break
@@ -325,6 +407,9 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
                 : chunk.output
               console.log(`  ${status} ${chunk.name}: ${output}`)
             }
+            // Track specific tool usage
+            if (chunk.name === 'edit_file' || chunk.name === 'write_file') editsThisTurn++
+            if (chunk.name === 'bash') bashThisTurn++
             break
           case 'turn_done':
             break
@@ -344,8 +429,38 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
     }
     spinner.stop()
 
+    // Update stats
+    stats.totalMessages++
+    stats.totalToolCalls += toolCallsThisTurn
+    stats.totalFilesEdited += editsThisTurn
+    stats.totalBashCommands += bashThisTurn
+    stats.totalTokensIn += result.inputTokens
+    stats.totalTokensOut += result.outputTokens
+
+    // Award XP
+    const xpGained = 5 + (toolCallsThisTurn * 3) + (editsThisTurn * 5) + (bashThisTurn * 2)
+    const { leveledUp, newLevel, oldLevel } = addXp(stats, xpGained)
+
+    // Check achievements
+    const newAchievements = checkNewAchievements(stats)
+    saveStats(stats)
+
     console.log()
     printTokens(result.inputTokens, result.outputTokens)
+
+    // Show XP gain
+    console.log(`  ${dim(`+${xpGained} XP`)} ${dim(`(${stats.xp} total)`)}`)
+
+    // Show level up
+    if (leveledUp) {
+      console.log(renderLevelUp(oldLevel, newLevel))
+    }
+
+    // Show achievement unlocks
+    for (const achievement of newAchievements) {
+      console.log(renderAchievementUnlock(achievement))
+    }
+
     if (result.toolCallsMade > 0) {
       console.log(`  ${dim(`tools: ${result.toolCallsMade} │ turns: ${result.turns} │ ${(result.elapsed / 1000).toFixed(1)}s`)}`)
     }
@@ -364,28 +479,38 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
   })
 
   rl.on('close', () => {
+    saveStats(stats)
     process.exit(0)
   })
 
-  // Handle Ctrl+C gracefully
   process.on('SIGINT', () => {
     console.log(dim('\nInterrupted'))
     rl.prompt()
   })
 }
 
-async function runOneShot(provider: Provider, cwd: string, userPrompt: string, noTools: boolean, verbose: boolean): Promise<void> {
+async function runOneShot(provider: Provider, cwd: string, userPrompt: string, noTools: boolean, verbose: boolean, vibe: Vibe): Promise<void> {
   const model = resolveModel(provider)
-  const apiKey = getApiKey(provider)
 
-  console.error(`${providerBadge(provider.name, provider.free)} │ ${dim(model)}`)
+  console.error(`${providerBadge(provider.name, provider.free)} │ ${dim(model)} │ ${vibe.emoji} ${vibe.name}`)
 
-  const systemPrompt = buildSystemPrompt(cwd)
+  // Track stats
+  const stats = loadStats()
+  updateStreak(stats)
+  stats.totalSessions++
+  stats.totalMessages++
+  stats.providerUsage[provider.id] = (stats.providerUsage[provider.id] || 0) + 1
+  stats.vibeUsage[vibe.id] = (stats.vibeUsage[vibe.id] || 0) + 1
+
+  const systemPrompt = buildSystemPrompt(cwd, vibe.systemPromptSuffix || undefined)
   const spinner = new Spinner()
   spinner.start('Thinking...')
 
   let firstChunk = true
   let textBuffer = ''
+  let toolCallsThisTurn = 0
+  let editsThisTurn = 0
+  let bashThisTurn = 0
 
   try {
     const result = await runAgent({
@@ -411,10 +536,13 @@ async function runOneShot(provider: Provider, cwd: string, userPrompt: string, n
               spinner.stop()
               firstChunk = false
             }
+            toolCallsThisTurn++
             console.log(`\n${toolBadge(chunk.name)}`)
             break
           case 'tool_result':
             const status = chunk.success ? brightGreen('✓') : red('✗')
+            if (chunk.name === 'edit_file' || chunk.name === 'write_file') editsThisTurn++
+            if (chunk.name === 'bash') bashThisTurn++
             if (verbose) {
               console.log(`  ${status} ${chunk.name}: ${chunk.output}`)
             } else {
@@ -433,14 +561,31 @@ async function runOneShot(provider: Provider, cwd: string, userPrompt: string, n
     }
     spinner.stop()
 
+    // Update stats
+    stats.totalToolCalls += toolCallsThisTurn
+    stats.totalFilesEdited += editsThisTurn
+    stats.totalBashCommands += bashThisTurn
+    stats.totalTokensIn += result.inputTokens
+    stats.totalTokensOut += result.outputTokens
+
+    const xpGained = 5 + (toolCallsThisTurn * 3) + (editsThisTurn * 5) + (bashThisTurn * 2)
+    const { leveledUp, newLevel, oldLevel } = addXp(stats, xpGained)
+    const newAchievements = checkNewAchievements(stats)
+    saveStats(stats)
+
     if (result.error) {
       console.error(errorLine(result.error))
       process.exit(1)
     }
 
     printTokens(result.inputTokens, result.outputTokens)
-    if (result.toolCallsMade > 0) {
-      console.error(`  ${dim(`tools: ${result.toolCallsMade} │ turns: ${result.turns} │ ${(result.elapsed / 1000).toFixed(1)}s`)}`)
+    console.error(`  ${dim(`+${xpGained} XP`)} ${dim(`(${stats.xp} total)`)}`)
+
+    if (leveledUp) {
+      console.error(renderLevelUp(oldLevel, newLevel))
+    }
+    for (const achievement of newAchievements) {
+      console.error(renderAchievementUnlock(achievement))
     }
   } catch (err: any) {
     spinner.stop()
@@ -454,12 +599,16 @@ function main(): void {
 
   let providerFlag: string | undefined
   let modelFlag: string | undefined
+  let vibeFlag: string | undefined
   let noTools = false
   let verbose = false
   let quiet = false
   let oneShotPrompt: string | undefined
   let maxTurns: number | undefined
   let temperature: number | undefined
+  let showStats = false
+  let showLeaderboard = false
+  let resetStats = false
   let positional: string[] = []
 
   for (let i = 0; i < args.length; i++) {
@@ -483,6 +632,9 @@ function main(): void {
       case '-m':
       case '--model':
         modelFlag = args[++i]
+        break
+      case '--vibe':
+        vibeFlag = args[++i]
         break
       case '--no-tools':
         noTools = true
@@ -511,6 +663,15 @@ function main(): void {
           process.exit(1)
         }
         break
+      case '--stats':
+        showStats = true
+        break
+      case '--leaderboard':
+        showLeaderboard = true
+        break
+      case '--reset-stats':
+        resetStats = true
+        break
       default:
         if (arg.startsWith('-')) {
           console.error(errorLine(`Unknown option: ${arg}`))
@@ -520,6 +681,24 @@ function main(): void {
         positional.push(arg)
         break
     }
+  }
+
+  // Handle stats flags
+  if (showStats) {
+    const stats = loadStats()
+    printStats(stats)
+    printAchievements(stats)
+    process.exit(0)
+  }
+
+  if (resetStats) {
+    const { unlinkSync } = require('fs')
+    const { join } = require('path')
+    const { homedir } = require('os')
+    const statsFile = join(homedir(), '.aix', 'stats.json')
+    try { unlinkSync(statsFile) } catch { /* ok */ }
+    console.log(successLine('Stats reset! Fresh start.'))
+    process.exit(0)
   }
 
   // If no exec flag but positional args, treat as one-shot
@@ -541,6 +720,10 @@ function main(): void {
   if (process.env.AIX_NO_TOOLS === '1') {
     noTools = true
   }
+
+  // Resolve vibe
+  const vibeId = vibeFlag || process.env.AIX_VIBE || 'default'
+  const vibe = getVibe(vibeId)
 
   // Resolve provider
   let provider: Provider
@@ -566,9 +749,9 @@ function main(): void {
     console.error(`  ${bold(`export ${provider.apiKeyEnv}=your-key`)}`)
     console.error()
     console.error(`  Or try a completely free provider (no key needed):`)
-    for (const id of FREE_PROVIDER_IDS.slice(0, 5)) {
+    for (const id of FREE_NO_KEY_IDS.slice(0, 5)) {
       const p = getProvider(id)
-      if (p && !p.apiKeyEnv) {
+      if (p) {
         console.error(`  ${bold(`aix -p ${id}`)}  — ${p.name}`)
       }
     }
@@ -579,9 +762,9 @@ function main(): void {
   const cwd = process.cwd()
 
   if (oneShotPrompt) {
-    runOneShot(provider, cwd, oneShotPrompt, noTools, verbose)
+    runOneShot(provider, cwd, oneShotPrompt, noTools, verbose, vibe)
   } else {
-    runInteractive(provider, cwd, noTools, verbose)
+    runInteractive(provider, cwd, noTools, verbose, vibe)
   }
 }
 

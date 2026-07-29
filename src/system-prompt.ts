@@ -1,7 +1,7 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'fs'
 import { resolve, join, extname } from 'path'
 
-export function buildSystemPrompt(cwd: string): string {
+export function buildSystemPrompt(cwd: string, vibeSuffix?: string): string {
   let prompt = `You are aix, an elite AI coding assistant with deep expertise in software engineering. You have access to the following tools:
 
 ## Available Tools
@@ -141,6 +141,11 @@ Parameters: path (optional, default '.'), max_depth (optional, default 3)
   const date = now.toISOString().split('T')[0]
   const dayName = now.toLocaleDateString('en-US', { weekday: 'long' })
   prompt += `\n\n---\n\nCurrent date: ${dayName}, ${date}`
+
+  // Add vibe suffix
+  if (vibeSuffix) {
+    prompt += `\n\n---\n\n${vibeSuffix}`
+  }
 
   return prompt
 }

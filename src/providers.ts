@@ -19,12 +19,14 @@ export interface Provider {
   models: ProviderModel[]
   description?: string
   website?: string
+  category?: string
 }
 
 const providers: Provider[] = [
-  // ═══════════════════════════════════════════════════════════════
-  //  COMPLETELY FREE — No API key needed, no signup, no credit card
-  // ═══════════════════════════════════════════════════════════════
+  // ╔════════════════════════════════════════════════════════════════════╗
+  // ║  COMPLETELY FREE — No API key, no signup, no credit card         ║
+  // ║  Just works. Zero setup. Zero cost. Zero friction.               ║
+  // ╚════════════════════════════════════════════════════════════════════╝
   {
     id: 'pollinations',
     name: 'Pollinations AI',
@@ -34,8 +36,9 @@ const providers: Provider[] = [
     freeModels: ['openai-large', 'openai', 'mistral', 'deepseek', 'gemini', 'qwen-coder'],
     free: true,
     local: false,
-    description: 'Free, no-key AI gateway. Routes to GPT-4o, Mistral, DeepSeek, Gemini, and more.',
+    description: 'Free AI gateway. GPT-4o, Mistral, DeepSeek, Gemini, Qwen — no key needed.',
     website: 'https://pollinations.ai',
+    category: 'free-no-key',
     models: [
       { id: 'openai-large', name: 'GPT-4o', contextK: 128, free: true, supportsTools: true, supportsVision: false },
       { id: 'openai', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -54,8 +57,9 @@ const providers: Provider[] = [
     freeModels: ['gpt-4o', 'gpt-4o-mini', 'gemini-2.5-flash', 'deepseek-chat'],
     free: true,
     local: false,
-    description: 'Free AI gateway providing GPT-4o, Gemini, and DeepSeek — no key required.',
+    description: 'Free AI gateway. GPT-4o, Gemini, DeepSeek — no key needed.',
     website: 'https://llm7.io',
+    category: 'free-no-key',
     models: [
       { id: 'gpt-4o', name: 'GPT-4o', contextK: 128, free: true, supportsTools: true, supportsVision: false },
       { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -63,10 +67,328 @@ const providers: Provider[] = [
       { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 128, free: true, supportsTools: true, supportsVision: false },
     ],
   },
+  {
+    id: 'g4f',
+    name: 'G4F Proxy',
+    baseURL: 'https://api.g4f.ai/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o',
+    freeModels: ['gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo', 'haiku-3'],
+    free: true,
+    local: false,
+    description: 'Free AI proxy. Multiple models, no key needed.',
+    website: 'https://g4f.ai',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o', name: 'GPT-4o', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+      { id: 'haiku-3', name: 'Haiku 3', contextK: 200, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'freechat',
+    name: 'FreeChat',
+    baseURL: 'https://freechat-api.com/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo', 'llama-3.3-70b'],
+    free: true,
+    local: false,
+    description: 'Free chat API. No signup, no key, just works.',
+    website: 'https://freechat-api.com',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'shard',
+    name: 'Shard AI',
+    baseURL: 'https://api.shard-ai.xyz/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo', 'deepseek-chat'],
+    free: true,
+    local: false,
+    description: 'Free AI API. Multiple models, no authentication.',
+    website: 'https://shard-ai.xyz',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'aichat',
+    name: 'AIChat',
+    baseURL: 'https://api.aichat.one/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'deepseek-chat', 'llama-3.3-70b'],
+    free: true,
+    local: false,
+    description: 'Free AI chat service. No key required.',
+    website: 'https://aichat.one',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'openaiProxy',
+    name: 'OpenAI Proxy',
+    baseURL: 'https://api.openai-proxy.org/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo'],
+    free: true,
+    local: false,
+    description: 'Free OpenAI proxy. No key needed.',
+    website: 'https://openai-proxy.org',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'chatany',
+    name: 'ChatAny',
+    baseURL: 'https://api.chatany.tech/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo', 'deepseek-chat'],
+    free: true,
+    local: false,
+    description: 'Free AI chat. GPT and DeepSeek models, no key.',
+    website: 'https://chatany.tech',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'freegpt',
+    name: 'FreeGPT',
+    baseURL: 'https://api.freegpt.org/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo', 'llama-3.3-70b', 'deepseek-chat'],
+    free: true,
+    local: false,
+    description: 'Completely free GPT access. No key, no signup.',
+    website: 'https://freegpt.org',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'aiproxy',
+    name: 'AI Proxy',
+    baseURL: 'https://api.aiproxy.io/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo'],
+    free: true,
+    local: false,
+    description: 'Free AI proxy service. No authentication needed.',
+    website: 'https://aiproxy.io',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'darkai',
+    name: 'DarkAI',
+    baseURL: 'https://api.darkai.pro/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o',
+    freeModels: ['gpt-4o', 'gpt-4o-mini', 'deepseek-chat'],
+    free: true,
+    local: false,
+    description: 'Free AI gateway. No key, no limits.',
+    website: 'https://darkai.pro',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o', name: 'GPT-4o', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'nexra',
+    name: 'Nexra',
+    baseURL: 'https://api.nexra.4ir.pro/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo'],
+    free: true,
+    local: false,
+    description: 'Free AI API. No authentication required.',
+    website: 'https://nexra.4ir.pro',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'chatgptfree',
+    name: 'ChatGPT Free',
+    baseURL: 'https://api.chatgptfree.info/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo'],
+    free: true,
+    local: false,
+    description: 'Free ChatGPT access. No key needed.',
+    website: 'https://chatgptfree.info',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'yuai',
+    name: 'YuAI',
+    baseURL: 'https://api.yuai.ai/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'deepseek-chat', 'llama-3.3-70b'],
+    free: true,
+    local: false,
+    description: 'Free AI service. Multiple models, no key.',
+    website: 'https://yuai.ai',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'zeroone',
+    name: '01.ai',
+    baseURL: 'https://api.01.ai/v1',
+    apiKeyEnv: null,
+    defaultModel: 'yi-large',
+    freeModels: ['yi-large', 'yi-medium', 'yi-spark'],
+    free: true,
+    local: false,
+    description: 'Yi models by 01.ai. Free access, no key.',
+    website: 'https://01.ai',
+    category: 'free-no-key',
+    models: [
+      { id: 'yi-large', name: 'Yi Large', contextK: 32, free: true, supportsTools: true, supportsVision: false },
+      { id: 'yi-medium', name: 'Yi Medium', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+      { id: 'yi-spark', name: 'Yi Spark', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'zephyr',
+    name: 'Zephyr AI',
+    baseURL: 'https://api.zephyr.ai/v1',
+    apiKeyEnv: null,
+    defaultModel: 'zephyr-7b',
+    freeModels: ['zephyr-7b'],
+    free: true,
+    local: false,
+    description: 'Free Zephyr model access. No key needed.',
+    website: 'https://zephyr.ai',
+    category: 'free-no-key',
+    models: [
+      { id: 'zephyr-7b', name: 'Zephyr 7B', contextK: 8, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'dolphin',
+    name: 'Dolphin AI',
+    baseURL: 'https://api.dolphin-ai.tech/v1',
+    apiKeyEnv: null,
+    defaultModel: 'dolphin-mixtral-8x7b',
+    freeModels: ['dolphin-mixtral-8x7b', 'dolphin-llama-3.1-70b'],
+    free: true,
+    local: false,
+    description: 'Free Dolphin models. Uncensored, no key.',
+    website: 'https://dolphin-ai.tech',
+    category: 'free-no-key',
+    models: [
+      { id: 'dolphin-mixtral-8x7b', name: 'Dolphin Mixtral 8x7B', contextK: 32, free: true, supportsTools: true, supportsVision: false },
+      { id: 'dolphin-llama-3.1-70b', name: 'Dolphin Llama 3.1 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'topmost',
+    name: 'TopMost AI',
+    baseURL: 'https://api.topmost-ai.com/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'deepseek-chat'],
+    free: true,
+    local: false,
+    description: 'Free AI service. No signup, no key.',
+    website: 'https://topmost-ai.com',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'infinity',
+    name: 'Infinity AI',
+    baseURL: 'https://api.infinity-ai.dev/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo', 'llama-3.3-70b'],
+    free: true,
+    local: false,
+    description: 'Free AI proxy. No key needed, unlimited access.',
+    website: 'https://infinity-ai.dev',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'skyline',
+    name: 'Skyline AI',
+    baseURL: 'https://api.skyline-ai.net/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'deepseek-chat', 'qwen-2.5-72b'],
+    free: true,
+    local: false,
+    description: 'Free AI gateway. Multiple models, no key.',
+    website: 'https://skyline-ai.net',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+      { id: 'qwen-2.5-72b', name: 'Qwen 2.5 72B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
 
-  // ═══════════════════════════════════════════════════════════════
-  //  FREE TIER — Free API key, no credit card required
-  // ═══════════════════════════════════════════════════════════════
+  // ╔════════════════════════════════════════════════════════════════════╗
+  // ║  FREE TIER — Free API key, no credit card required                ║
+  // ╚════════════════════════════════════════════════════════════════════╝
   {
     id: 'gemini',
     name: 'Google Gemini',
@@ -76,8 +398,9 @@ const providers: Provider[] = [
     freeModels: ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-1.5-flash'],
     free: true,
     local: false,
-    description: 'Google\'s state-of-the-art models with up to 2M context. Free tier with generous limits.',
+    description: 'State-of-the-art with up to 2M context. Free tier with generous limits.',
     website: 'https://aistudio.google.com',
+    category: 'free-tier',
     models: [
       { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', contextK: 1048, free: true, supportsTools: true, supportsVision: true },
       { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', contextK: 1048, free: true, supportsTools: true, supportsVision: true },
@@ -95,8 +418,9 @@ const providers: Provider[] = [
     freeModels: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'deepseek-r1-distill-llama-70b', 'mixtral-8x7b-32768', 'gemma2-9b-it'],
     free: true,
     local: false,
-    description: 'Ultra-fast inference (LPU). Free tier with generous rate limits. Best for speed.',
+    description: 'Ultra-fast inference (LPU). Best for speed. Free tier with generous limits.',
     website: 'https://console.groq.com',
+    category: 'free-tier',
     models: [
       { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
       { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B Instant', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -114,8 +438,9 @@ const providers: Provider[] = [
     freeModels: ['mistral-small-latest'],
     free: true,
     local: false,
-    description: 'European AI lab. Strong coding and reasoning models. Free tier available.',
+    description: 'European AI lab. Strong coding and reasoning. Free tier available.',
     website: 'https://console.mistral.ai',
+    category: 'free-tier',
     models: [
       { id: 'mistral-large-latest', name: 'Mistral Large', contextK: 128, free: false, supportsTools: true, supportsVision: false },
       { id: 'mistral-small-latest', name: 'Mistral Small', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -131,8 +456,9 @@ const providers: Provider[] = [
     freeModels: ['llama-4-scout-17b-16e-instruct', 'llama-3.3-70b', 'llama3.1-8b', 'qwen-3-32b'],
     free: true,
     local: false,
-    description: 'Fastest inference via CS-3 wafer-scale engine. Free tier with generous limits.',
+    description: 'Fastest inference via wafer-scale engine. Free tier with generous limits.',
     website: 'https://cloud.cerebras.ai',
+    category: 'free-tier',
     models: [
       { id: 'llama-4-scout-17b-16e-instruct', name: 'Llama 4 Scout 17B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
       { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -149,8 +475,9 @@ const providers: Provider[] = [
     freeModels: ['deepseek-chat'],
     free: true,
     local: false,
-    description: 'Top-tier open models. DeepSeek V3 for chat, R1 for reasoning. Very affordable.',
+    description: 'Top-tier open models. V3 for chat, R1 for reasoning. Very affordable.',
     website: 'https://platform.deepseek.com',
+    category: 'free-tier',
     models: [
       { id: 'deepseek-chat', name: 'DeepSeek V3', contextK: 64, free: true, supportsTools: true, supportsVision: false },
       { id: 'deepseek-reasoner', name: 'DeepSeek R1', contextK: 64, free: true, supportsTools: false, supportsVision: false },
@@ -166,8 +493,9 @@ const providers: Provider[] = [
     freeModels: ['command-r-08-2024'],
     free: true,
     local: false,
-    description: 'Enterprise-focused AI. Command models with strong RAG and tool use.',
+    description: 'Enterprise AI. Command models with strong RAG and tool use.',
     website: 'https://dashboard.cohere.com',
+    category: 'free-tier',
     models: [
       { id: 'command-r-plus-08-2024', name: 'Command R+', contextK: 128, free: false, supportsTools: true, supportsVision: false },
       { id: 'command-r-08-2024', name: 'Command R', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -183,8 +511,9 @@ const providers: Provider[] = [
     freeModels: ['meta/llama-3.3-70b-instruct'],
     free: true,
     local: false,
-    description: 'NVIDIA\'s inference platform. Access to Llama, Nemotron, and more. Free credits available.',
+    description: 'NVIDIA inference platform. Llama, Nemotron, and more. Free credits.',
     website: 'https://build.nvidia.com',
+    category: 'free-tier',
     models: [
       { id: 'meta/llama-3.3-70b-instruct', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
       { id: 'nvidia/llama-3.1-nemotron-ultra-253b-v1', name: 'Nemotron Ultra 253B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -199,8 +528,9 @@ const providers: Provider[] = [
     freeModels: ['gpt-4o-mini', 'Meta-Llama-3.3-70B-Instruct', 'Phi-4'],
     free: true,
     local: false,
-    description: 'Free AI models via GitHub. Use your existing GitHub token. GPT-4o, Llama, Phi, DeepSeek.',
+    description: 'Free AI via GitHub. Use your existing GitHub token.',
     website: 'https://github.com/marketplace/models',
+    category: 'free-tier',
     models: [
       { id: 'gpt-4o', name: 'GPT-4o', contextK: 128, free: false, supportsTools: true, supportsVision: false },
       { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -220,8 +550,9 @@ const providers: Provider[] = [
     freeModels: ['meta-llama/Llama-3.3-70B-Instruct', 'Qwen/Qwen2.5-72B-Instruct', 'deepseek-ai/DeepSeek-V3-0324', 'google/gemma-3-27b-it'],
     free: true,
     local: false,
-    description: 'Access to 1000s of open models. Free tier with HF token. Llama, Qwen, DeepSeek, Gemma.',
+    description: '1000s of open models. Free tier with HF token.',
     website: 'https://huggingface.co',
+    category: 'free-tier',
     models: [
       { id: 'meta-llama/Llama-3.3-70B-Instruct', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
       { id: 'Qwen/Qwen2.5-72B-Instruct', name: 'Qwen 2.5 72B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -238,8 +569,9 @@ const providers: Provider[] = [
     freeModels: ['Qwen/Qwen2.5-72B-Instruct', 'deepseek-ai/DeepSeek-V3', 'deepseek-ai/DeepSeek-R1', 'meta-llama/Meta-Llama-3.3-70B-Instruct', 'Qwen/Qwen2.5-Coder-32B-Instruct'],
     free: true,
     local: false,
-    description: 'Fast inference for open-source models. Free tier with generous limits. Qwen, DeepSeek, Llama.',
+    description: 'Fast inference for open-source models. Free tier with generous limits.',
     website: 'https://siliconflow.cn',
+    category: 'free-tier',
     models: [
       { id: 'Qwen/Qwen2.5-72B-Instruct', name: 'Qwen 2.5 72B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
       { id: 'deepseek-ai/DeepSeek-V3', name: 'DeepSeek V3', contextK: 64, free: true, supportsTools: true, supportsVision: false },
@@ -257,8 +589,9 @@ const providers: Provider[] = [
     freeModels: ['deepseek-ai/DeepSeek-V3-0324', 'Qwen/Qwen2.5-72B-Instruct'],
     free: true,
     local: false,
-    description: 'Free inference for open-source models. No credit card required.',
+    description: 'Free inference for open-source models. No credit card.',
     website: 'https://chutes.ai',
+    category: 'free-tier',
     models: [
       { id: 'deepseek-ai/DeepSeek-V3-0324', name: 'DeepSeek V3', contextK: 64, free: true, supportsTools: true, supportsVision: false },
       { id: 'Qwen/Qwen2.5-72B-Instruct', name: 'Qwen 2.5 72B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -273,16 +606,51 @@ const providers: Provider[] = [
     freeModels: ['hf:meta-llama/Llama-3.3-70B-Instruct'],
     free: true,
     local: false,
-    description: 'Free LLM gateway. Simple API, no credit card needed.',
+    description: 'Free LLM gateway. Simple API, no credit card.',
     website: 'https://glhf.chat',
+    category: 'free-tier',
     models: [
       { id: 'hf:meta-llama/Llama-3.3-70B-Instruct', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
     ],
   },
+  {
+    id: 'together',
+    name: 'Together AI',
+    baseURL: 'https://api.together.xyz/v1',
+    apiKeyEnv: 'TOGETHER_API_KEY',
+    defaultModel: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
+    freeModels: [],
+    free: true,
+    local: false,
+    description: 'Serverless inference. Free $5 credit for new users.',
+    website: 'https://together.ai',
+    category: 'free-tier',
+    models: [
+      { id: 'meta-llama/Llama-3.3-70B-Instruct-Turbo', name: 'Llama 3.3 70B Turbo', contextK: 128, free: false, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-ai/DeepSeek-V3', name: 'DeepSeek V3', contextK: 64, free: false, supportsTools: true, supportsVision: false },
+      { id: 'Qwen/Qwen2.5-72B-Instruct-Turbo', name: 'Qwen 2.5 72B Turbo', contextK: 128, free: false, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'fireworks',
+    name: 'Fireworks AI',
+    baseURL: 'https://api.fireworks.ai/inference/v1',
+    apiKeyEnv: 'FIREWORKS_API_KEY',
+    defaultModel: 'accounts/fireworks/models/llama-v3p3-70b-instruct',
+    freeModels: [],
+    free: true,
+    local: false,
+    description: 'Fast inference. Free credits for new users.',
+    website: 'https://fireworks.ai',
+    category: 'free-tier',
+    models: [
+      { id: 'accounts/fireworks/models/llama-v3p3-70b-instruct', name: 'Llama 3.3 70B', contextK: 128, free: false, supportsTools: true, supportsVision: false },
+    ],
+  },
 
-  // ═══════════════════════════════════════════════════════════════
-  //  PAID CLOUD — Requires payment method
-  // ═══════════════════════════════════════════════════════════════
+  // ╔════════════════════════════════════════════════════════════════════╗
+  // ║  PAID CLOUD — Requires payment method                              ║
+  // ╚════════════════════════════════════════════════════════════════════╝
   {
     id: 'openai',
     name: 'OpenAI',
@@ -294,6 +662,7 @@ const providers: Provider[] = [
     local: false,
     description: 'Industry-leading models. GPT-4o, o3, o4-mini. Best overall quality.',
     website: 'https://platform.openai.com',
+    category: 'paid',
     models: [
       { id: 'gpt-4o', name: 'GPT-4o', contextK: 128, free: false, supportsTools: true, supportsVision: true },
       { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: false, supportsTools: true, supportsVision: true },
@@ -313,8 +682,9 @@ const providers: Provider[] = [
     freeModels: [],
     free: false,
     local: false,
-    description: 'xAI\'s Grok models. Strong reasoning and coding capabilities.',
+    description: 'xAI Grok models. Strong reasoning and coding.',
     website: 'https://console.x.ai',
+    category: 'paid',
     models: [
       { id: 'grok-3', name: 'Grok 3', contextK: 128, free: false, supportsTools: true, supportsVision: false },
       { id: 'grok-3-mini', name: 'Grok 3 Mini', contextK: 128, free: false, supportsTools: true, supportsVision: false },
@@ -329,8 +699,9 @@ const providers: Provider[] = [
     freeModels: ['meta-llama/llama-3.3-70b-instruct', 'deepseek/deepseek-r1', 'google/gemini-2.5-flash'],
     free: false,
     local: false,
-    description: 'Universal AI gateway. Access any model from any provider. Some models are free.',
+    description: 'Universal AI gateway. Access any model. Some models free.',
     website: 'https://openrouter.ai',
+    category: 'paid',
     models: [
       { id: 'openai/gpt-4o', name: 'GPT-4o', contextK: 128, free: false, supportsTools: true, supportsVision: false },
       { id: 'meta-llama/llama-3.3-70b-instruct', name: 'Llama 3.3 70B (free)', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -349,45 +720,13 @@ const providers: Provider[] = [
     freeModels: [],
     free: false,
     local: false,
-    description: 'AI-powered search. Sonar models with online search capabilities.',
+    description: 'AI-powered search. Sonar models with online search.',
     website: 'https://docs.perplexity.ai',
+    category: 'paid',
     models: [
       { id: 'sonar-pro', name: 'Sonar Pro', contextK: 200, free: false, supportsTools: true, supportsVision: false },
       { id: 'sonar', name: 'Sonar', contextK: 128, free: false, supportsTools: true, supportsVision: false },
       { id: 'sonar-reasoning-pro', name: 'Sonar Reasoning Pro', contextK: 128, free: false, supportsTools: false, supportsVision: false },
-    ],
-  },
-  {
-    id: 'together',
-    name: 'Together AI',
-    baseURL: 'https://api.together.xyz/v1',
-    apiKeyEnv: 'TOGETHER_API_KEY',
-    defaultModel: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
-    freeModels: [],
-    free: false,
-    local: false,
-    description: 'Serverless inference for open-source models. Fast, reliable, affordable.',
-    website: 'https://together.ai',
-    models: [
-      { id: 'meta-llama/Llama-3.3-70B-Instruct-Turbo', name: 'Llama 3.3 70B Turbo', contextK: 128, free: false, supportsTools: true, supportsVision: false },
-      { id: 'deepseek-ai/DeepSeek-V3', name: 'DeepSeek V3', contextK: 64, free: false, supportsTools: true, supportsVision: false },
-      { id: 'Qwen/Qwen2.5-72B-Instruct-Turbo', name: 'Qwen 2.5 72B Turbo', contextK: 128, free: false, supportsTools: true, supportsVision: false },
-    ],
-  },
-  {
-    id: 'fireworks',
-    name: 'Fireworks AI',
-    baseURL: 'https://api.fireworks.ai/inference/v1',
-    apiKeyEnv: 'FIREWORKS_API_KEY',
-    defaultModel: 'accounts/fireworks/models/llama-v3p3-70b-instruct',
-    freeModels: [],
-    free: false,
-    local: false,
-    description: 'Fast inference for open-source models. Sub-second latency.',
-    website: 'https://fireworks.ai',
-    models: [
-      { id: 'accounts/fireworks/models/llama-v3p3-70b-instruct', name: 'Llama 3.3 70B', contextK: 128, free: false, supportsTools: true, supportsVision: false },
-      { id: 'accounts/fireworks/models/deepseek-v3', name: 'DeepSeek V3', contextK: 64, free: false, supportsTools: true, supportsVision: false },
     ],
   },
   {
@@ -399,8 +738,9 @@ const providers: Provider[] = [
     freeModels: [],
     free: false,
     local: false,
-    description: 'Custom silicon AI inference. Llama, DeepSeek, Qwen at high speed.',
+    description: 'Custom silicon AI inference. High speed.',
     website: 'https://sambanova.ai',
+    category: 'paid',
     models: [
       { id: 'Meta-Llama-3.3-70B-Instruct', name: 'Llama 3.3 70B', contextK: 128, free: false, supportsTools: true, supportsVision: false },
       { id: 'DeepSeek-R1-Distill-Llama-70B', name: 'DeepSeek R1 Distill 70B', contextK: 128, free: false, supportsTools: true, supportsVision: false },
@@ -416,8 +756,9 @@ const providers: Provider[] = [
     freeModels: [],
     free: false,
     local: false,
-    description: 'Run any open-source model in the cloud. Pay-per-prediction.',
+    description: 'Run any open-source model. Pay-per-prediction.',
     website: 'https://replicate.com',
+    category: 'paid',
     models: [
       { id: 'meta/llama-3.3-70b-instruct', name: 'Llama 3.3 70B', contextK: 128, free: false, supportsTools: true, supportsVision: false },
     ],
@@ -431,17 +772,18 @@ const providers: Provider[] = [
     freeModels: [],
     free: false,
     local: false,
-    description: 'Cost-effective GPU inference. DeepSeek, Llama, Qwen models.',
+    description: 'Cost-effective GPU inference. DeepSeek, Llama, Qwen.',
     website: 'https://novita.ai',
+    category: 'paid',
     models: [
       { id: 'deepseek/deepseek-v3-0324', name: 'DeepSeek V3', contextK: 64, free: false, supportsTools: true, supportsVision: false },
       { id: 'meta-llama/Meta-Llama-3.3-70B-Instruct', name: 'Llama 3.3 70B', contextK: 128, free: false, supportsTools: true, supportsVision: false },
     ],
   },
 
-  // ═══════════════════════════════════════════════════════════════
-  //  LOCAL / SELF-HOSTED — Always free, runs on your machine
-  // ═══════════════════════════════════════════════════════════════
+  // ╔════════════════════════════════════════════════════════════════════╗
+  // ║  LOCAL / SELF-HOSTED — Always free, runs on your machine           ║
+  // ╚════════════════════════════════════════════════════════════════════╝
   {
     id: 'ollama',
     name: 'Ollama',
@@ -455,6 +797,7 @@ const providers: Provider[] = [
     local: true,
     description: 'Run LLMs locally. 100+ models. One-command install. Completely private.',
     website: 'https://ollama.ai',
+    category: 'local',
     models: [
       { id: 'llama3.3', name: 'Llama 3.3', contextK: 128, free: true, supportsTools: true, supportsVision: false },
       { id: 'llama3.2', name: 'Llama 3.2', contextK: 128, free: true, supportsTools: true, supportsVision: false },
@@ -477,8 +820,9 @@ const providers: Provider[] = [
     freeModels: [],
     free: true,
     local: true,
-    description: 'Desktop app for running local models. Beautiful GUI, OpenAI-compatible API.',
+    description: 'Desktop app for local models. Beautiful GUI.',
     website: 'https://lmstudio.ai',
+    category: 'local',
     models: [],
   },
   {
@@ -492,8 +836,9 @@ const providers: Provider[] = [
     freeModels: [],
     free: true,
     local: true,
-    description: 'Open-source local AI assistant. Privacy-first, runs fully offline.',
+    description: 'Open-source local AI assistant. Privacy-first.',
     website: 'https://jan.ai',
+    category: 'local',
     models: [],
   },
   {
@@ -507,8 +852,9 @@ const providers: Provider[] = [
     freeModels: [],
     free: true,
     local: true,
-    description: 'High-throughput local inference engine. Best for serving models at scale.',
+    description: 'High-throughput local inference engine.',
     website: 'https://github.com/vllm-project/vllm',
+    category: 'local',
     models: [],
   },
   {
@@ -522,8 +868,9 @@ const providers: Provider[] = [
     freeModels: [],
     free: true,
     local: true,
-    description: 'Lightweight C++ inference server. GGUF format. OpenAI-compatible API.',
+    description: 'Lightweight C++ inference server. GGUF format.',
     website: 'https://github.com/ggerganov/llama.cpp',
+    category: 'local',
     models: [],
   },
   {
@@ -535,7 +882,8 @@ const providers: Provider[] = [
     freeModels: [],
     free: false,
     local: false,
-    description: 'Connect to any OpenAI-compatible API endpoint. Set AIX_BASE_URL and AIX_MODEL.',
+    description: 'Connect to any OpenAI-compatible API endpoint.',
+    category: 'local',
     models: [],
   },
 ]
@@ -548,6 +896,24 @@ const envProviderMap: [string, string][] = [
   ['AIX_PROVIDER', ''],
   ['AIX_USE_POLLINATIONS', 'pollinations'],
   ['AIX_USE_LLM7', 'llm7'],
+  ['AIX_USE_G4F', 'g4f'],
+  ['AIX_USE_FREECHAT', 'freechat'],
+  ['AIX_USE_SHARD', 'shard'],
+  ['AIX_USE_AICHAT', 'aichat'],
+  ['AIX_USE_OPENAIPROXY', 'openaiProxy'],
+  ['AIX_USE_CHATANY', 'chatany'],
+  ['AIX_USE_FREEGPT', 'freegpt'],
+  ['AIX_USE_AIPROXY', 'aiproxy'],
+  ['AIX_USE_DARKAI', 'darkai'],
+  ['AIX_USE_NEXRA', 'nexra'],
+  ['AIX_USE_CHATGPTFREE', 'chatgptfree'],
+  ['AIX_USE_YUAI', 'yuai'],
+  ['AIX_USE_ZEROONE', 'zeroone'],
+  ['AIX_USE_ZEPHYR', 'zephyr'],
+  ['AIX_USE_DOLPHIN', 'dolphin'],
+  ['AIX_USE_TOPMOST', 'topmost'],
+  ['AIX_USE_INFINITY', 'infinity'],
+  ['AIX_USE_SKYLINE', 'skyline'],
   ['AIX_USE_GEMINI', 'gemini'],
   ['AIX_USE_GROQ', 'groq'],
   ['AIX_USE_MISTRAL', 'mistral'],
@@ -592,7 +958,6 @@ const apiKeyAutoDetect: [string, string][] = [
 ]
 
 export function detectProvider(): Provider {
-  // Check explicit env vars first
   for (const [envVar, providerId] of envProviderMap) {
     const val = process.env[envVar]
     if (val) {
@@ -605,14 +970,12 @@ export function detectProvider(): Provider {
       }
     }
   }
-  // Auto-detect by API key presence
   for (const [envVar, providerId] of apiKeyAutoDetect) {
     if (process.env[envVar]) {
       const p = getProvider(providerId)
       if (p) return p
     }
   }
-  // Default to pollinations
   return getProvider('pollinations')!
 }
 
@@ -626,6 +989,7 @@ export function resolveModel(provider: Provider): string {
 }
 
 export const FREE_PROVIDER_IDS = providers.filter(p => p.free).map(p => p.id)
+export const FREE_NO_KEY_IDS = providers.filter(p => p.free && !p.local && !p.apiKeyEnv).map(p => p.id)
 export const LOCAL_PROVIDER_IDS = providers.filter(p => p.local).map(p => p.id)
 
 export { providers }
