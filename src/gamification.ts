@@ -171,7 +171,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'session_25', name: 'Marathon Coder', description: '25+ messages in one session', emoji: '🏃', condition: s => s.messagesThisSession >= 25, xp: 75, category: 'special' },
   { id: 'session_50', name: 'Iron Coder', description: '50+ messages in one session', emoji: '🦾', condition: s => s.messagesThisSession >= 50, xp: 200, category: 'special' },
   { id: 'daily_first', name: 'Daily Challenger', description: 'Complete your first daily challenge', emoji: '📅', condition: s => s.dailyChallengeCompleted, xp: 50, category: 'daily' },
-  { id: 'all_tools', name: 'Full Toolkit', description: 'Use all 9 tools in one session', emoji: '🧰', condition: s => s.toolsThisSession >= 9, xp: 50, category: 'special' },
+  { id: 'all_tools', name: 'Full Toolkit', description: 'Use 10+ tools in one session', emoji: '🧰', condition: s => s.toolsThisSession >= 10, xp: 50, category: 'special' },
 
   // ── New Tools ──
   { id: 'web_surfer', name: 'Web Surfer', description: 'Use the web_fetch tool', emoji: '🌐', condition: s => s.totalMessages >= 1, xp: 15, category: 'tools' },
@@ -196,6 +196,30 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   // ── Provider Explorer ──
   { id: 'provider_40', name: 'Provider Deity', description: 'Use 40 different providers', emoji: '🌌', condition: s => Object.keys(s.providerUsage).length >= 40, xp: 750, category: 'provider' },
+
+  // ── Vibe Explorer ──
+  { id: 'vibe_35', name: 'Vibe Sage', description: 'Try 35 different vibes', emoji: '🧙', condition: s => Object.keys(s.vibeUsage).length >= 35, xp: 600, category: 'vibes' },
+  { id: 'vibe_40', name: 'Vibe Ascended', description: 'Try all 40 vibes', emoji: '🌟', condition: s => Object.keys(s.vibeUsage).length >= 40, xp: 1000, category: 'vibes' },
+
+  // ── Provider Mastery ──
+  { id: 'free_explorer', name: 'Free Explorer', description: 'Use all 4 no-key providers', emoji: '🆓', condition: s => ['pollinations','llm7','bazaarlink','ovhcloud'].every(p => (s.providerUsage[p] || 0) > 0), xp: 50, category: 'provider' },
+  { id: 'local_master', name: 'Local Master', description: 'Use 3 different local providers', emoji: '🏠', condition: s => ['ollama','lmstudio','jan','vllm','llamacpp'].filter(p => (s.providerUsage[p] || 0) > 0).length >= 3, xp: 100, category: 'provider' },
+  { id: 'global_coder', name: 'Global Coder', description: 'Use providers from 5+ countries', emoji: '🌍', condition: s => {
+    const regions: Record<string, string[]> = {
+      'US': ['openai','groq','cerebras','nvidia','githubmodels','openrouter','perplexity','fireworks','novita','replicate','xai','airforce'],
+      'EU': ['mistral','ovhcloud','nscale','nebius','cohere','sambanova'],
+      'China': ['deepseek','zhipu','alibabastudio','siliconflow','modelscope'],
+      'Global': ['pollinations','llm7','bazaarlink','huggingface','together','chutes','glhf','opencodezen','kilocode','ai21'],
+      'Local': ['ollama','lmstudio','jan','vllm','llamacpp','custom'],
+    }
+    const usedRegions = new Set<string>()
+    for (const p of Object.keys(s.providerUsage)) {
+      for (const [region, providers] of Object.entries(regions)) {
+        if (providers.includes(p)) usedRegions.add(region)
+      }
+    }
+    return usedRegions.size >= 5
+  }, xp: 150, category: 'provider' },
 
   // ── Secret ──
   { id: 'weekend_warrior', name: 'Weekend Warrior', description: 'Use aix on a weekend', emoji: '🎉', condition: s => s.totalMessages >= 1, xp: 15, secret: true, category: 'secret' },

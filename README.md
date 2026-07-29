@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <strong>40 vibe modes</strong> • <strong>75 achievements</strong> • <strong>15 levels</strong> • <strong>19 tools</strong>
+  <strong>40 vibe modes</strong> • <strong>80 achievements</strong> • <strong>15 levels</strong> • <strong>19 tools</strong>
 </p>
 
 <p align="center">
@@ -20,7 +20,7 @@
 
 - **40 providers** — 4 no-key, 23 free tier, 7 paid, 6 local — all DNS-verified real
 - **40 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, Cyberpunk, and more
-- **75 achievements** — XP, combos, streaks, daily challenges, titles
+- **80 achievements** — XP, combos, streaks, daily challenges, titles
 - **15 levels** — Initiate → Apotheosis
 - **19 built-in tools** — 12 coding + 6 action + code_review + summarize + project_map
 - **Combo system** — Chain messages for XP multipliers up to 2x
