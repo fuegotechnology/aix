@@ -17,6 +17,7 @@ import {
   providerBadge, toolBadge, successLine, errorLine, infoLine, warningLine,
   divider, keyValue,
   Spinner, renderMarkdown, printBanner, printTokens, printTurnInfo, prompt,
+  renderAction,
 } from './ui.js'
 
 function printHelp(): void {
@@ -325,17 +326,25 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
           console.log(dim(sp.slice(0, 500) + '...'))
           rl.prompt()
           return
-        case '/tools':
-          console.log(bold(cyan('Available tools:')))
-          console.log('  • read_file    — Read file contents with line numbers')
-          console.log('  • write_file   — Create or overwrite files')
-          console.log('  • edit_file    — Find and replace text in files')
-          console.log('  • bash         — Run shell commands')
-          console.log('  • list_files   — List files and directories')
-          console.log('  • search_files — Search across files with regex')
-          console.log('  • glob_find    — Find files matching a pattern')
-          console.log('  • tree         — Display directory tree')
-          console.log('  • diagnose     — Run project diagnostics')
+          case '/tools':
+            console.log(bold(cyan('Coding Tools:')))
+            console.log('  • read_file    — Read file contents with line numbers')
+            console.log('  • write_file   — Create or overwrite files')
+            console.log('  • edit_file    — Find and replace text in files')
+            console.log('  • bash         — Run shell commands')
+            console.log('  • list_files   — List files and directories')
+            console.log('  • search_files — Search across files with regex')
+            console.log('  • glob_find    — Find files matching a pattern')
+            console.log('  • tree         — Display directory tree')
+            console.log('  • diagnose     — Run project diagnostics')
+            console.log()
+            console.log(bold(cyan('Action Tools:')))
+            console.log('  • think        — Think through a problem step by step')
+            console.log('  • suggest      — Suggest next steps or improvements')
+            console.log('  • follow_up    — Suggest follow-up questions')
+            console.log('  • plan         — Create a plan before executing')
+            console.log('  • note         — Add important notes or warnings')
+            console.log('  • question     — Ask a clarifying question')
           rl.prompt()
           return
         case '/stats':
@@ -450,18 +459,33 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
             break
           case 'tool_result':
             spinner.stop()
-            const status = chunk.success ? brightGreen('✓') : red('✗')
-            if (verbose) {
-              console.log(`  ${status} ${chunk.name}: ${chunk.output}`)
+            if (chunk.isAction) {
+              // Action tools: render beautifully
+              try {
+                const actionData = JSON.parse(chunk.output)
+                console.log(renderAction(chunk.name, actionData))
+              } catch {
+                console.log(`  ${dim('→')} ${chunk.name}: ${chunk.output.slice(0, 200)}`)
+              }
             } else {
-              const output = chunk.output.length > 200
-                ? chunk.output.slice(0, 200) + dim('...')
-                : chunk.output
-              console.log(`  ${status} ${chunk.name}: ${output}`)
+              // Coding tools: standard rendering
+              const status = chunk.success ? brightGreen('✓') : red('✗')
+              if (verbose) {
+                console.log(`  ${status} ${chunk.name}: ${chunk.output}`)
+              } else {
+                const output = chunk.output.length > 200
+                  ? chunk.output.slice(0, 200) + dim('...')
+                  : chunk.output
+                console.log(`  ${status} ${chunk.name}: ${output}`)
+              }
             }
             // Track specific tool usage
             if (chunk.name === 'edit_file' || chunk.name === 'write_file') editsThisTurn++
             if (chunk.name === 'bash') bashThisTurn++
+            break
+          case 'action':
+            // Render action tools with beautiful formatting
+            console.log(renderAction(chunk.name, chunk.data))
             break
           case 'turn_done':
             break
@@ -613,17 +637,29 @@ async function runOneShot(provider: Provider, cwd: string, userPrompt: string, n
             console.log(`\n${toolBadge(chunk.name)}`)
             break
           case 'tool_result':
-            const status = chunk.success ? brightGreen('✓') : red('✗')
+            if (chunk.isAction) {
+              try {
+                const actionData = JSON.parse(chunk.output)
+                console.log(renderAction(chunk.name, actionData))
+              } catch {
+                console.log(`  ${dim('→')} ${chunk.name}: ${chunk.output.slice(0, 200)}`)
+              }
+            } else {
+              const status = chunk.success ? brightGreen('✓') : red('✗')
+              if (verbose) {
+                console.log(`  ${status} ${chunk.name}: ${chunk.output}`)
+              } else {
+                const output = chunk.output.length > 200
+                  ? chunk.output.slice(0, 200) + dim('...')
+                  : chunk.output
+                console.log(`  ${status} ${chunk.name}: ${output}`)
+              }
+            }
             if (chunk.name === 'edit_file' || chunk.name === 'write_file') editsThisTurn++
             if (chunk.name === 'bash') bashThisTurn++
-            if (verbose) {
-              console.log(`  ${status} ${chunk.name}: ${chunk.output}`)
-            } else {
-              const output = chunk.output.length > 200
-                ? chunk.output.slice(0, 200) + dim('...')
-                : chunk.output
-              console.log(`  ${status} ${chunk.name}: ${output}`)
-            }
+            break
+          case 'action':
+            console.log(renderAction(chunk.name, chunk.data))
             break
         }
       },

@@ -242,6 +242,100 @@ export function printTurnInfo(turns: number, elapsed: number): void {
   console.log(`  ${ANSI.dim}turns: ${turns} • ${elapsed}ms${ANSI.reset}`)
 }
 
+export function renderAction(name: string, data: any): string {
+  const C = {
+    reset: '\x1b[0m', bold: '\x1b[1m', dim: '\x1b[2m', italic: '\x1b[3m',
+    red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m', blue: '\x1b[34m',
+    magenta: '\x1b[35m', cyan: '\x1b[36m', gray: '\x1b[90m',
+    brightRed: '\x1b[91m', brightGreen: '\x1b[92m', brightYellow: '\x1b[93m',
+    brightBlue: '\x1b[94m', brightMagenta: '\x1b[95m', brightCyan: '\x1b[96m',
+  }
+
+  const lines: string[] = []
+
+  switch (name) {
+    case 'think': {
+      const confidence = data.confidence || 'medium'
+      const confColor = confidence === 'high' ? C.green : confidence === 'low' ? C.yellow : C.cyan
+      lines.push(`  ${C.dim}┌─ ${C.brightCyan}💭 Thinking${C.reset} ${C.dim}(${confColor}${confidence} confidence${C.reset}${C.dim})${C.reset}`)
+      const thoughts = (data.thoughts || '').split('\n')
+      for (const line of thoughts) {
+        lines.push(`  ${C.dim}│${C.reset} ${C.dim}${C.italic}${line}${C.reset}`)
+      }
+      lines.push(`  ${C.dim}└─${C.reset}`)
+      break
+    }
+
+    case 'suggest': {
+      const suggestions = data.suggestions || []
+      lines.push(`  ${C.brightGreen}┌─ 💡 Suggestions${C.reset}`)
+      for (let i = 0; i < suggestions.length; i++) {
+        const s = suggestions[i]
+        const priority = s.priority ? ` ${C.dim}[${s.priority}]${C.reset}` : ''
+        lines.push(`  ${C.brightGreen}│${C.reset} ${C.brightGreen}${i + 1}.${C.reset} ${C.bold}${s.title}${C.reset}${priority}`)
+        lines.push(`  ${C.brightGreen}│${C.reset}   ${C.dim}${s.description}${C.reset}`)
+      }
+      lines.push(`  ${C.brightGreen}└─${C.reset}`)
+      break
+    }
+
+    case 'follow_up': {
+      const questions = data.questions || []
+      lines.push(`  ${C.brightMagenta}┌─ 🔮 Follow-ups${C.reset}`)
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i]
+        lines.push(`  ${C.brightMagenta}│${C.reset} ${C.brightMagenta}${i + 1}.${C.reset} ${C.cyan}${q.prompt}${C.reset}`)
+        lines.push(`  ${C.brightMagenta}│${C.reset}   ${C.dim}${q.reason}${C.reset}`)
+      }
+      lines.push(`  ${C.brightMagenta}└─${C.reset}`)
+      break
+    }
+
+    case 'plan': {
+      const steps = data.steps || []
+      lines.push(`  ${C.brightYellow}┌─ 📋 Plan: ${C.bold}${data.goal}${C.reset}`)
+      for (let i = 0; i < steps.length; i++) {
+        const s = steps[i]
+        const tool = s.tool ? ` ${C.dim}(${s.tool})${C.reset}` : ''
+        lines.push(`  ${C.brightYellow}│${C.reset} ${C.brightYellow}${i + 1}.${C.reset} ${s.action}${tool}`)
+        lines.push(`  ${C.brightYellow}│${C.reset}   ${C.dim}${s.reason}${C.reset}`)
+      }
+      lines.push(`  ${C.brightYellow}└─${C.reset}`)
+      break
+    }
+
+    case 'note': {
+      const level = data.level || 'info'
+      const icon = level === 'danger' ? '🚨' : level === 'warning' ? '⚠️' : '📌'
+      const color = level === 'danger' ? C.brightRed : level === 'warning' ? C.brightYellow : C.brightBlue
+      lines.push(`  ${color}${icon} ${data.message}${C.reset}`)
+      break
+    }
+
+    case 'question': {
+      const options = data.options || []
+      lines.push(`  ${C.brightCyan}┌─ ❓ Question${C.reset}`)
+      lines.push(`  ${C.brightCyan}│${C.reset} ${C.bold}${data.question}${C.reset}`)
+      if (options.length > 0) {
+        lines.push(`  ${C.brightCyan}│${C.reset} ${C.dim}Options:${C.reset}`)
+        for (let i = 0; i < options.length; i++) {
+          lines.push(`  ${C.brightCyan}│${C.reset}   ${C.brightCyan}${i + 1}.${C.reset} ${options[i]}`)
+        }
+      }
+      if (data.reason) {
+        lines.push(`  ${C.brightCyan}│${C.reset} ${C.dim}(${data.reason})${C.reset}`)
+      }
+      lines.push(`  ${C.brightCyan}└─${C.reset}`)
+      break
+    }
+
+    default:
+      lines.push(`  ${C.dim}→ ${name}: ${JSON.stringify(data).slice(0, 200)}${C.reset}`)
+  }
+
+  return lines.join('\n')
+}
+
 export function prompt(question: string): Promise<string> {
   const readline = require('readline')
   const rl = readline.createInterface({
