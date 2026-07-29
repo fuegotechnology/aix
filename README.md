@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <strong>36 vibe modes</strong> • <strong>72 achievements</strong> • <strong>15 levels</strong> • <strong>16 tools</strong>
+  <strong>36 vibe modes</strong> • <strong>75 achievements</strong> • <strong>15 levels</strong> • <strong>19 tools</strong>
 </p>
 
 <p align="center">
@@ -20,9 +20,9 @@
 
 - **64 providers** — 33 no-key, 18 free tier, 8 paid, 5 local
 - **36 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, Cyberpunk, and more
-- **72 achievements** — XP, combos, streaks, daily challenges, titles
+- **75 achievements** — XP, combos, streaks, daily challenges, titles
 - **15 levels** — Initiate → Apotheosis
-- **16 built-in tools** — 9 coding + 6 action + 6 new (web_fetch, git_status, env_info, todo, diff_view, memory)
+- **19 built-in tools** — 12 coding + 6 action + code_review + summarize + project_map
 - **Combo system** — Chain messages for XP multipliers up to 2x
 - **Daily challenges** — Fresh challenge every day with bonus XP
 - **18 titles** — Unlock and equip titles like "Hacker", "Vibe Master", "God"
@@ -109,7 +109,7 @@ cat error.log | aix "what's wrong with this?"
 
 ---
 
-## 🛠 16 Built-in Tools
+## 🛠 19 Built-in Tools
 
 ### Coding Tools
 
@@ -130,6 +130,9 @@ cat error.log | aix "what's wrong with this?"
 | `todo` | Manage a session todo list |
 | `diff_view` | Show uncommitted changes |
 | `memory` | Save/recall information across the conversation |
+| `code_review` | Review code for bugs, security issues, and style violations |
+| `summarize` | Summarize a file or directory with key metrics |
+| `project_map` | Generate a map of the project architecture |
 
 ### Action Tools
 
@@ -216,7 +219,7 @@ Unlock and equip titles: `/title <id>`
 | Session Master | 🧘 | Complete 100+ sessions |
 | XP Millionaire | 💰 | Earn 100,000+ XP |
 
-### 72 Achievements
+### 75 Achievements
 
 Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes, Combos, Levels, Daily, Special, Secret
 

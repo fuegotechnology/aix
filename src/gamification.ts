@@ -186,6 +186,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   // ── Vibe Master ──
   { id: 'vibe_10', name: 'Vibe Connoisseur', description: 'Try 10 different vibes', emoji: '🎨', condition: s => Object.keys(s.vibeUsage).length >= 10, xp: 100, category: 'vibes' },
   { id: 'vibe_15', name: 'Vibe Shapeshifter', description: 'Try 15 different vibes', emoji: '🔄', condition: s => Object.keys(s.vibeUsage).length >= 15, xp: 200, category: 'vibes' },
+  { id: 'vibe_20', name: 'Vibe Master', description: 'Try 20 different vibes', emoji: '🎭', condition: s => Object.keys(s.vibeUsage).length >= 20, xp: 300, category: 'vibes' },
+  { id: 'vibe_25', name: 'Vibe Oracle', description: 'Try 25 different vibes', emoji: '🔮', condition: s => Object.keys(s.vibeUsage).length >= 25, xp: 500, category: 'vibes' },
+  { id: 'vibe_30', name: 'Vibe Deity', description: 'Try 30 different vibes', emoji: '✨', condition: s => Object.keys(s.vibeUsage).length >= 30, xp: 750, category: 'vibes' },
 
   // ── Token Milestones ──
   { id: 'hundred_k_tokens', name: '100K Club', description: 'Process 100K+ tokens', emoji: '📊', condition: s => (s.totalTokensIn + s.totalTokensOut) >= 100000, xp: 50, category: 'special' },

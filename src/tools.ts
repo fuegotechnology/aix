@@ -1,6 +1,6 @@
 import { execSync } from 'child_process'
 import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync, readdirSync } from 'fs'
-import { resolve, dirname, basename, relative, join } from 'path'
+import { resolve, dirname, basename, relative, join, extname } from 'path'
 import { glob } from 'glob'
 import type { Tool } from './llm.js'
 
@@ -225,6 +225,49 @@ export const CODING_TOOLS: Tool[] = [
           value: { type: 'string', description: 'The value to save' },
         },
         required: ['action'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'code_review',
+      description: 'Review code for potential issues, bugs, style violations, and improvements. Reads a file and provides structured feedback.',
+      parameters: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: 'Path to the file to review' },
+          focus: { type: 'string', description: 'Focus area: "bugs", "security", "performance", "style", "all" (default: "all")' },
+        },
+        required: ['path'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'summarize',
+      description: 'Summarize the contents of a file or directory. Provides a concise overview of the code structure, purpose, and key functions.',
+      parameters: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: 'Path to the file or directory to summarize' },
+          depth: { type: 'number', description: 'Summary depth: 1 (brief), 2 (moderate), 3 (detailed) (default: 2)' },
+        },
+        required: ['path'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'project_map',
+      description: 'Generate a map of the project showing the architecture, dependencies, and key modules. Useful for understanding a new codebase.',
+      parameters: {
+        type: 'object',
+        properties: {
+          format: { type: 'string', description: 'Output format: "text", "mermaid" (default: "text")' },
+        },
       },
     },
   },
@@ -722,6 +765,279 @@ function memoryManager(args: Record<string, any>, cwd: string): string {
   }
 }
 
+function codeReview(args: Record<string, any>, cwd: string): string {
+  const filePath = resolve(cwd, args.path)
+  if (!existsSync(filePath)) return `Error: file not found: ${filePath}`
+  const stat = statSync(filePath)
+  if (stat.isDirectory()) return `Error: ${filePath} is a directory. Use a file path.`
+  const content = readFileSync(filePath, 'utf-8')
+  const lines = content.split('\n')
+  const ext = extname(filePath)
+  const issues: string[] = []
+
+  // Check for common issues
+  const focus = args.focus || 'all'
+
+  if (focus === 'all' || focus === 'bugs') {
+    // Check for empty catch blocks
+    const emptyCatchRegex = /catch\s*\([^)]*\)\s*\{\s*\}/g
+    let match
+    while ((match = emptyCatchRegex.exec(content)) !== null) {
+      const line = content.substring(0, match.index).split('\n').length
+      issues.push(`🐛 Line ${line}: Empty catch block — errors are silently swallowed`)
+    }
+
+    // Check for TODO/FIXME/HACK comments
+    const todoRegex = /\/\/\s*(TODO|FIXME|HACK|XXX|BUG)[\s:]+(.+)/gi
+    while ((match = todoRegex.exec(content)) !== null) {
+      const line = content.substring(0, match.index).split('\n').length
+      issues.push(`📝 Line ${line}: ${match[1]} — ${match[2].trim()}`)
+    }
+
+    // Check for console.log in production code
+    if (ext === '.ts' || ext === '.js' || ext === '.tsx' || ext === '.jsx') {
+      const consoleRegex = /console\.(log|debug|info|warn)\(/g
+      while ((match = consoleRegex.exec(content)) !== null) {
+        const line = content.substring(0, match.index).split('\n').length
+        issues.push(`⚠️ Line ${line}: ${match[0]} — consider removing for production`)
+      }
+    }
+
+    // Check for any type usage
+    if (ext === '.ts' || ext === '.tsx') {
+      const anyRegex = /:\s*any\b/g
+      while ((match = anyRegex.exec(content)) !== null) {
+        const line = content.substring(0, match.index).split('\n').length
+        issues.push(`🔧 Line ${line}: \`any\` type — consider using a more specific type`)
+      }
+    }
+
+    // Check for very long lines
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].length > 120) {
+        issues.push(`📏 Line ${i + 1}: Line too long (${lines[i].length} chars) — consider breaking up`)
+      }
+    }
+
+    // Check for very long functions
+    let functionStart = -1
+    let functionDepth = 0
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
+      if (line.match(/function\s+\w+|=>\s*\{|const\s+\w+\s*=\s*(async\s+)?\(/)) {
+        if (functionDepth === 0) functionStart = i
+      }
+      functionDepth += (line.match(/\{/g) || []).length
+      functionDepth -= (line.match(/\}/g) || []).length
+      if (functionDepth <= 0 && functionStart >= 0) {
+        if (i - functionStart > 50) {
+          issues.push(`📐 Lines ${functionStart + 1}-${i + 1}: Long function (${i - functionStart + 1} lines) — consider breaking into smaller functions`)
+        }
+        functionStart = -1
+        functionDepth = 0
+      }
+    }
+  }
+
+  if (focus === 'all' || focus === 'security') {
+    // Check for hardcoded secrets
+    const secretRegex = /(password|secret|token|api_key|apikey)\s*[=:]\s*['"][^'"]+['"]/gi
+    let match
+    while ((match = secretRegex.exec(content)) !== null) {
+      const line = content.substring(0, match.index).split('\n').length
+      issues.push(`🔒 Line ${line}: Possible hardcoded secret — use environment variables instead`)
+    }
+
+    // Check for eval usage
+    const evalRegex = /\beval\s*\(/g
+    while ((match = evalRegex.exec(content)) !== null) {
+      const line = content.substring(0, match.index).split('\n').length
+      issues.push(`🚨 Line ${line}: eval() usage — major security risk, avoid if possible`)
+    }
+  }
+
+  if (focus === 'all' || focus === 'performance') {
+    // Check for synchronous operations in async context
+    const syncReadRegex = /readFileSync|writeFileSync|existsSync|readdirSync|statSync/g
+    let match
+    while ((match = syncReadRegex.exec(content)) !== null) {
+      const line = content.substring(0, match.index).split('\n').length
+      issues.push(`⚡ Line ${line}: ${match[0]} — synchronous I/O, consider async version for better performance`)
+    }
+  }
+
+  // Summary
+  const summary = [`📋 Code Review: ${filePath}`, `   ${lines.length} lines | ${ext} | ${issues.length} issues found`, '']
+  if (issues.length === 0) {
+    summary.push('✅ No issues found! Code looks clean.')
+  } else {
+    for (const issue of issues.slice(0, 30)) {
+      summary.push(`   ${issue}`)
+    }
+    if (issues.length > 30) {
+      summary.push(`   ... and ${issues.length - 30} more issues`)
+    }
+  }
+
+  return summary.join('\n')
+}
+
+function summarize(args: Record<string, any>, cwd: string): string {
+  const filePath = resolve(cwd, args.path)
+  const depth = args.depth || 2
+
+  if (!existsSync(filePath)) return `Error: path not found: ${filePath}`
+  const stat = statSync(filePath)
+
+  if (stat.isDirectory()) {
+    // Summarize directory
+    try {
+      const entries = readdirSync(filePath).filter(e => !e.startsWith('.') && e !== 'node_modules' && e !== 'dist')
+      const files = entries.filter(e => !statSync(resolve(filePath, e)).isDirectory())
+      const dirs = entries.filter(e => statSync(resolve(filePath, e)).isDirectory())
+
+      const summary = [`📁 Directory: ${filePath}`, `   ${files.length} files, ${dirs.length} directories`, '']
+
+      if (depth >= 2) {
+        // Group by extension
+        const extGroups: Record<string, string[]> = {}
+        for (const f of files) {
+          const ext = extname(f) || 'no-ext'
+          if (!extGroups[ext]) extGroups[ext] = []
+          extGroups[ext].push(f)
+        }
+        for (const [ext, names] of Object.entries(extGroups).sort((a, b) => b[1].length - a[1].length)) {
+          summary.push(`   ${ext} (${names.length}): ${names.slice(0, 8).join(', ')}${names.length > 8 ? ' ...' : ''}`)
+        }
+        if (dirs.length > 0) {
+          summary.push(`   Subdirectories: ${dirs.join(', ')}`)
+        }
+      }
+
+      return summary.join('\n')
+    } catch (err: any) {
+      return `Error: ${err.message}`
+    }
+  }
+
+  // Summarize file
+  const content = readFileSync(filePath, 'utf-8')
+  const lines = content.split('\n')
+  const ext = extname(filePath)
+  const sizeKB = (stat.size / 1024).toFixed(1)
+
+  const summary = [`📄 File: ${filePath}`, `   ${lines.length} lines | ${sizeKB}KB | ${ext}`, '']
+
+  if (depth >= 2) {
+    // Detect imports/exports
+    const imports = lines.filter(l => l.trim().startsWith('import '))
+    const exports = lines.filter(l => l.trim().startsWith('export '))
+    const functions = lines.filter(l => l.match(/function\s+\w+|const\s+\w+\s*=\s*(async\s+)?\(|=>\s*\{/))
+    const classes = lines.filter(l => l.match(/class\s+\w+/))
+
+    if (imports.length > 0) summary.push(`   📥 ${imports.length} imports`)
+    if (exports.length > 0) summary.push(`   📤 ${exports.length} exports`)
+    if (functions.length > 0) summary.push(`   ⚙️ ${functions.length} functions`)
+    if (classes.length > 0) summary.push(`   🏗️ ${classes.length} classes`)
+  }
+
+  if (depth >= 3) {
+    summary.push('')
+    summary.push('   First 10 lines:')
+    for (let i = 0; i < Math.min(10, lines.length); i++) {
+      summary.push(`   ${i + 1}: ${lines[i]}`)
+    }
+  }
+
+  return summary.join('\n')
+}
+
+function projectMap(args: Record<string, any>, cwd: string): string {
+  const format = args.format || 'text'
+  const parts: string[] = []
+
+  // Detect project type
+  const pkgPath = resolve(cwd, 'package.json')
+  const isNode = existsSync(pkgPath)
+  const isPython = existsSync(resolve(cwd, 'pyproject.toml')) || existsSync(resolve(cwd, 'setup.py'))
+  const isRust = existsSync(resolve(cwd, 'Cargo.toml'))
+  const isGo = existsSync(resolve(cwd, 'go.mod'))
+
+  if (format === 'mermaid') {
+    parts.push('```mermaid')
+    parts.push('graph TD')
+    if (isNode) {
+      try {
+        const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
+        parts.push(`  root["${pkg.name || 'project'}@${pkg.version || '0.0.0'}"]`)
+        // Try to find source directories
+        const srcDir = resolve(cwd, 'src')
+        if (existsSync(srcDir)) {
+          const files = readdirSync(srcDir).filter(f => f.endsWith('.ts') || f.endsWith('.js'))
+          for (const f of files.slice(0, 15)) {
+            parts.push(`  src_${f.replace(/\./g, '_')}["${f}"]`)
+            parts.push(`  root --> src_${f.replace(/\./g, '_')}`)
+          }
+        }
+      } catch { /* skip */ }
+    }
+    parts.push('```')
+    return parts.join('\n')
+  }
+
+  // Text format
+  parts.push('🗺️ Project Map')
+  parts.push('')
+
+  if (isNode) {
+    try {
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
+      parts.push(`📦 ${pkg.name || 'unnamed'}@${pkg.version || '0.0.0'}`)
+      if (pkg.description) parts.push(`   ${pkg.description}`)
+      parts.push('')
+
+      // Source structure
+      const srcDir = resolve(cwd, 'src')
+      if (existsSync(srcDir)) {
+        parts.push('📁 src/')
+        try {
+          const files = readdirSync(srcDir).filter(f => f.endsWith('.ts') || f.endsWith('.js') || f.endsWith('.tsx') || f.endsWith('.jsx'))
+          for (const f of files.sort()) {
+            const fullPath = resolve(srcDir, f)
+            try {
+              const stat = statSync(fullPath)
+              const sizeKB = (stat.size / 1024).toFixed(1)
+              const content = readFileSync(fullPath, 'utf-8')
+              const lineCount = content.split('\n').length
+              // Detect exports
+              const exports = content.match(/export\s+(function|class|const|interface|type|default)\s+\w+/g) || []
+              const exportNames = exports.map(e => e.replace(/export\s+(function|class|const|interface|type|default)\s+/, ''))
+              parts.push(`   ├── ${f} (${lineCount} lines, ${sizeKB}KB)`)
+              if (exportNames.length > 0) {
+                parts.push(`   │   exports: ${exportNames.slice(0, 5).join(', ')}${exportNames.length > 5 ? ' ...' : ''}`)
+              }
+            } catch { /* skip */ }
+          }
+        } catch { /* skip */ }
+      }
+    } catch { /* skip */ }
+  }
+
+  if (isPython) parts.push('🐍 Python project detected')
+  if (isRust) parts.push('🦀 Rust project detected')
+  if (isGo) parts.push('🐹 Go project detected')
+
+  // Config files
+  const configFiles = ['tsconfig.json', '.eslintrc.json', '.prettierrc', 'vite.config.ts', 'next.config.js', 'jest.config.ts', 'docker-compose.yml', 'Dockerfile']
+  const foundConfigs = configFiles.filter(f => existsSync(resolve(cwd, f)))
+  if (foundConfigs.length > 0) {
+    parts.push('')
+    parts.push(`⚙️ Config files: ${foundConfigs.join(', ')}`)
+  }
+
+  return parts.join('\n')
+}
+
 // ── Action tool implementations (return structured data for rendering) ──
 
 function thinkAction(args: Record<string, any>): string {
@@ -781,6 +1097,9 @@ export async function executeTool(
       case 'todo': output = todoManager(args, cwd); break
       case 'diff_view': output = diffView(args, cwd); break
       case 'memory': output = memoryManager(args, cwd); break
+      case 'code_review': output = codeReview(args, cwd); break
+      case 'summarize': output = summarize(args, cwd); break
+      case 'project_map': output = projectMap(args, cwd); break
       default: return { success: false, output: `Unknown tool: ${name}`, isAction: false }
     }
     return { success: true, output, isAction: false }

@@ -66,6 +66,18 @@ Parameters: file (optional — specific file to diff), staged (optional bool, de
 Save or recall important information across the conversation. Use to remember key decisions, architecture notes, or user preferences.
 Parameters: action (required: "save", "recall", "list", "clear"), key (required for save/recall), value (required for save)
 
+### code_review
+Review code for potential issues, bugs, style violations, and improvements. Provides structured feedback with line numbers.
+Parameters: path (required), focus (optional: "bugs", "security", "performance", "style", "all")
+
+### summarize
+Summarize the contents of a file or directory. Provides a concise overview of the code structure, purpose, and key functions.
+Parameters: path (required), depth (optional: 1=brief, 2=moderate, 3=detailed)
+
+### project_map
+Generate a map of the project showing the architecture, dependencies, and key modules. Useful for understanding a new codebase.
+Parameters: format (optional: "text" or "mermaid")
+
 ## Action Tools
 
 These tools let you structure your response with rich formatting. Use them to make your responses more helpful and engaging.
