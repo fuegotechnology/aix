@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>35 AI providers</strong> — <strong>4 completely free</strong> with no API key, no signup, no credit card.
+  <strong>40 AI providers</strong> — <strong>4 completely free</strong> with no API key, no signup, no credit card.
 </p>
 
 <p align="center">
@@ -18,7 +18,7 @@
 
 ## ✨ Features
 
-- **35 providers** — 4 no-key, 18 free tier, 7 paid, 6 local — all DNS-verified real
+- **40 providers** — 4 no-key, 23 free tier, 7 paid, 6 local — all DNS-verified real
 - **36 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, Cyberpunk, and more
 - **75 achievements** — XP, combos, streaks, daily challenges, titles
 - **15 levels** — Initiate → Apotheosis
@@ -236,7 +236,7 @@ Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes
 | `bazaarlink` | BazaarLink | Auto Free | Zero-cost inference with auto:free model |
 | `ovhcloud` | OVHcloud AI Endpoints | Llama 3.3 70B, Mistral Small, Qwen Coder | EU-hosted, 2 RPM anonymous access |
 
-### Free API Key (18 providers — no credit card)
+### Free API Key (23 providers — no credit card)
 
 | ID | Name | Key Env |
 |----|------|---------|
@@ -258,6 +258,11 @@ Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes
 | `kilocode` | Kilo Code | KILO_API_KEY |
 | `zhipu` | Z.ai (Zhipu AI) | ZHIPU_API_KEY |
 | `alibabastudio` | Alibaba Cloud Model Studio | ALIBABA_API_KEY |
+| `airforce` | Api.Airforce | AIRFORCE_API_KEY |
+| `nscale` | Nscale | NSCALE_API_KEY |
+| `nebius` | Nebius AI Studio | NEBIUS_API_KEY |
+| `modelscope` | ModelScope | MODELSCOPE_API_KEY |
+| `ai21` | AI21 Labs | AI21_API_KEY |
 
 ### Paid Cloud (7 providers)
 

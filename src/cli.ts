@@ -142,7 +142,7 @@ ${bold(cyan('FREE PROVIDERS'))} ${brightGreen(`(${freeNoKeyCount} no-key provide
   ${brightGreen('llm7')}            No key — GPT-4o, Gemini, DeepSeek
   ${brightGreen('bazaarlink')}      No key — Auto Free (zero-cost inference)
   ${brightGreen('ovhcloud')}        No key — Llama 3.3 70B, Mistral, Qwen Coder
-  ${dim('... plus 18 free-tier providers and 6 local! Run aix --providers to see all')}
+  ${dim('... plus 23 free-tier providers and 6 local! Run aix --providers to see all')}
 
 ${bold(cyan('EXAMPLES'))}
   ${dim('# Zero setup — completely free')}
