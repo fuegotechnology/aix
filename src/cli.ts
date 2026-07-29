@@ -8,7 +8,8 @@ import type { Vibe } from './vibes.js'
 import {
   loadStats, saveStats, updateStreak, addXp, checkNewAchievements,
   getLevelForXp, renderXpBar, renderStats, renderAchievementUnlock, renderLevelUp,
-  LEVELS, ACHIEVEMENTS,
+  renderCombo, renderDailyChallenge, updateCombo, assignDailyChallenge, updateDailyChallenge,
+  LEVELS, ACHIEVEMENTS, TITLES, DAILY_CHALLENGES,
 } from './gamification.js'
 import type { Stats } from './gamification.js'
 import {
@@ -35,7 +36,7 @@ ${bold(cyan('OPTIONS'))}
   ${bold('--providers')}                  List all providers
   ${bold('-p, --provider <id>')}          Use a specific provider
   ${bold('-m, --model <name>')}           Set model (also via AIX_MODEL env)
-  ${bold('--vibe <id>')}                  Set vibe mode (default, hacker, pirate, wizard, zen, fire, gamer, noir, creative, bro)
+  ${bold('--vibe <id>')}                  Set vibe mode (default, hacker, pirate, wizard, zen, fire, gamer, noir, creative, bro, robot, shakespeare, cowboy, anime, chef, scientist, medieval, surfer, philosopher, rapper)
   ${bold('--no-tools')}                   Disable tool use
   ${bold('-e, --exec <prompt>')}          One-shot mode
   ${bold('--max-turns <n>')}              Max agent turns (default: 20)
@@ -57,6 +58,16 @@ ${bold(cyan('VIBES'))} 🎭
   ${bold('noir')}        🕵️  Noir — dark, gritty detective
   ${bold('creative')}    🎨  Creative — colorful, enthusiastic
   ${bold('bro')}         😎  Bro — casual, chill energy
+  ${bold('robot')}       🤖  Robot — beep boop, precision
+  ${bold('shakespeare')} 🎭  Shakespeare — forsooth, iambic code!
+  ${bold('cowboy')}      🤠  Cowboy — yeehaw, saddle up!
+  ${bold('anime')}       ⚡  Anime — nani?! power up!
+  ${bold('chef')}        👨‍🍳  Chef — let's cook some code!
+  ${bold('scientist')}   🔬  Scientist — empirical, precise
+  ${bold('medieval')}    ⚔️  Medieval — knight of the code
+  ${bold('surfer')}      🏄  Surfer — catch the wave, dude!
+  ${bold('philosopher')} 🤔  Philosopher — deep thoughts
+  ${bold('rapper')}      🎤  Rapper — drop bars, ship code
 
 ${bold(cyan('INTERACTIVE COMMANDS'))}
   ${bold('/exit')}, ${bold('/quit')}             Exit aix
@@ -74,6 +85,8 @@ ${bold(cyan('INTERACTIVE COMMANDS'))}
   ${bold('/compact')}                    Compact conversation history
   ${bold('/stats')}                      Show your stats
   ${bold('/achievements')}              Show achievements
+  ${bold('/daily')}                      Show daily challenge
+  ${bold('/title')}                      Set your title
 
 ${bold(cyan('ENVIRONMENT VARIABLES'))}
   ${bold('AIX_PROVIDER')}                Provider id to use
@@ -199,6 +212,7 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
   // Load and show stats
   const stats = loadStats()
   updateStreak(stats)
+  assignDailyChallenge(stats)
   stats.totalSessions++
   stats.providerUsage[provider.id] = (stats.providerUsage[provider.id] || 0) + 1
   stats.vibeUsage[vibe.id] = (stats.vibeUsage[vibe.id] || 0) + 1
@@ -206,6 +220,8 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
 
   const level = getLevelForXp(stats.xp)
   console.log(`  ${level.emoji} ${level.color}Level ${level.level}: ${level.name}${'\x1b[0m'} ${dim(renderXpBar(stats))}`)
+  const dailyDisplay = renderDailyChallenge(stats)
+  if (dailyDisplay) console.log(dailyDisplay)
   console.log()
 
   const history: Message[] = []
@@ -329,6 +345,41 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
           printAchievements(stats)
           rl.prompt()
           return
+        case '/daily':
+          const daily = renderDailyChallenge(stats)
+          if (daily) {
+            console.log(daily)
+          } else {
+            console.log(infoLine('No daily challenge active'))
+          }
+          rl.prompt()
+          return
+        case '/title':
+          if (arg) {
+            const title = TITLES.find(t => t.id === arg)
+            if (title && stats.unlockedTitles.includes(arg)) {
+              stats.activeTitle = arg
+              saveStats(stats)
+              console.log(successLine(`Title set to ${title.emoji} ${title.name}`))
+            } else {
+              console.log(errorLine(`Unknown or locked title: ${arg}`))
+              console.log(dim('Available titles: ' + stats.unlockedTitles.map(id => {
+                const t = TITLES.find(t => t.id === id)
+                return t ? `${t.emoji} ${t.id}` : id
+              }).join(', ')))
+            }
+          } else {
+            console.log(infoLine('Your titles:'))
+            for (const id of stats.unlockedTitles) {
+              const t = TITLES.find(t => t.id === id)
+              if (t) {
+                const active = stats.activeTitle === id ? brightGreen(' ← active') : ''
+                console.log(`  ${t.emoji} ${bold(t.id.padEnd(14))} ${t.name}${active}`)
+              }
+            }
+          }
+          rl.prompt()
+          return
         case '/retry':
           if (!lastUserMessage) {
             console.log(warningLine('No previous message to retry'))
@@ -431,14 +482,26 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
 
     // Update stats
     stats.totalMessages++
+    stats.messagesThisSession++
     stats.totalToolCalls += toolCallsThisTurn
+    stats.toolsThisSession += toolCallsThisTurn
     stats.totalFilesEdited += editsThisTurn
+    stats.editsThisSession += editsThisTurn
     stats.totalBashCommands += bashThisTurn
     stats.totalTokensIn += result.inputTokens
     stats.totalTokensOut += result.outputTokens
 
-    // Award XP
-    const xpGained = 5 + (toolCallsThisTurn * 3) + (editsThisTurn * 5) + (bashThisTurn * 2)
+    // Combo system
+    const { combo, comboMultiplier, isNewRecord } = updateCombo(stats)
+    updateDailyChallenge(stats, 'message')
+    if (toolCallsThisTurn > 0) updateDailyChallenge(stats, 'tool')
+    if (editsThisTurn > 0) updateDailyChallenge(stats, 'edit')
+    if (bashThisTurn > 0) updateDailyChallenge(stats, 'bash')
+    if (combo >= 5) updateDailyChallenge(stats, 'combo')
+
+    // Award XP (with combo multiplier)
+    const baseXp = 5 + (toolCallsThisTurn * 3) + (editsThisTurn * 5) + (bashThisTurn * 2)
+    const xpGained = Math.round(baseXp * comboMultiplier)
     const { leveledUp, newLevel, oldLevel } = addXp(stats, xpGained)
 
     // Check achievements
@@ -449,7 +512,12 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
     printTokens(result.inputTokens, result.outputTokens)
 
     // Show XP gain
-    console.log(`  ${dim(`+${xpGained} XP`)} ${dim(`(${stats.xp} total)`)}`)
+    console.log(`  ${dim(`+${xpGained} XP`)} ${dim(`(${stats.xp} total)`)}${comboMultiplier > 1 ? ` ${dim(`×${comboMultiplier} combo`)} ` : ''}`)
+
+    // Show combo
+    const comboDisplay = renderCombo(combo, comboMultiplier)
+    if (comboDisplay) console.log(`  ${comboDisplay}`)
+    if (isNewRecord && combo >= 3) console.log(`  ${brightGreen('⚡ NEW COMBO RECORD!')}`)
 
     // Show level up
     if (leveledUp) {
@@ -497,10 +565,14 @@ async function runOneShot(provider: Provider, cwd: string, userPrompt: string, n
   // Track stats
   const stats = loadStats()
   updateStreak(stats)
+  assignDailyChallenge(stats)
   stats.totalSessions++
   stats.totalMessages++
+  stats.messagesThisSession++
   stats.providerUsage[provider.id] = (stats.providerUsage[provider.id] || 0) + 1
   stats.vibeUsage[vibe.id] = (stats.vibeUsage[vibe.id] || 0) + 1
+  updateCombo(stats)
+  updateDailyChallenge(stats, 'message')
 
   const systemPrompt = buildSystemPrompt(cwd, vibe.systemPromptSuffix || undefined)
   const spinner = new Spinner()
@@ -567,6 +639,9 @@ async function runOneShot(provider: Provider, cwd: string, userPrompt: string, n
     stats.totalBashCommands += bashThisTurn
     stats.totalTokensIn += result.inputTokens
     stats.totalTokensOut += result.outputTokens
+    if (toolCallsThisTurn > 0) updateDailyChallenge(stats, 'tool')
+    if (editsThisTurn > 0) updateDailyChallenge(stats, 'edit')
+    if (bashThisTurn > 0) updateDailyChallenge(stats, 'bash')
 
     const xpGained = 5 + (toolCallsThisTurn * 3) + (editsThisTurn * 5) + (bashThisTurn * 2)
     const { leveledUp, newLevel, oldLevel } = addXp(stats, xpGained)

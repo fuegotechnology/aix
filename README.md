@@ -3,51 +3,44 @@
 </p>
 
 <p align="center">
-  Works with <strong>47 AI providers</strong> — <strong>20 completely free</strong> with no API key, no signup, no credit card.
+  <strong>57 AI providers</strong> — <strong>30 completely free</strong> with no API key, no signup, no credit card.
+</p>
+
+<p align="center">
+  <strong>20 vibe modes</strong> • <strong>57 achievements</strong> • <strong>15 levels</strong> • <strong>9 tools</strong>
 </p>
 
 <p align="center">
   <code>npm install -g aix</code>
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/npm/l/aix" alt="MIT License" />
-  <img src="https://img.shields.io/node/v/aix" alt="Node.js >=18" />
-</p>
-
 ---
 
 ## ✨ Features
 
-- **47 providers** — 20 no-key, 14 free tier, 8 paid, 5 local
+- **57 providers** — 30 no-key, 14 free tier, 8 paid, 5 local
+- **20 vibe modes** — Hacker, Pirate, Wizard, Anime, Chef, Rapper, and more
+- **57 achievements** — XP, combos, streaks, daily challenges, titles
+- **15 levels** — Initiate → Apotheosis
+- **Combo system** — Chain messages for XP multipliers up to 2x
+- **Daily challenges** — Fresh challenge every day with bonus XP
+- **Titles** — Unlock and equip titles like "Hacker", "Vibe Master", "God"
 - **9 built-in tools** — Read, write, edit, bash, search, tree, diagnose, glob, list
-- **10 vibe modes** — Hacker, Pirate, Wizard, Zen, Fire, Gamer, Noir, Creative, Bro
-- **Gamification** — XP, levels, achievements, streaks, stats tracking
 - **Streaming** — Real-time streaming with tool call visualization
 - **Multi-turn** — Full conversation history with auto context management
-- **Auto tool use** — AI decides when to use tools
-- **Project awareness** — Auto-detects language, framework, test setup
 - **Zero dependencies** — Only Node.js builtins + glob
-- **Privacy** — Local models for complete privacy
 
 ---
 
 ## 🚀 Quick Start
 
-### Zero Setup (20 Free, No Key Providers!)
+### Zero Setup (30 Free, No Key Providers!)
 
 ```bash
-# Pollinations — works immediately
-aix "explain this codebase"
-
-# LLM7 — also works with no key
-aix -p llm7 "write a hello world in rust"
-
-# G4F — free GPT-4o access
-aix -p g4f "optimize this function"
-
-# DarkAI — free, no limits
-aix -p darkai "fix the bug"
+aix "explain this codebase"           # Pollinations — works immediately
+aix -p llm7 "write hello world"       # LLM7 — also no key
+aix -p darkai "fix the bug"           # DarkAI — no key
+aix -p g4f "optimize this function"   # G4F — no key
 ```
 
 ### With Vibes! 🎭
@@ -55,47 +48,46 @@ aix -p darkai "fix the bug"
 ```bash
 aix --vibe hacker "hack the mainframe"
 aix --vibe pirate "find the treasure in this code"
-aix --vibe wizard "cast a spell on this bug"
-aix --vibe fire "LET'S GOOOO"
-aix --vibe gamer "boss fight: fix this test"
-```
-
-### Free API Key (No Credit Card)
-
-```bash
-export GEMINI_API_KEY=your-key
-aix "explain this code"
+aix --vibe anime "power up this function"
+aix --vibe rapper "drop some bars on this code"
+aix --vibe chef "cook up a solution"
 ```
 
 ---
 
-## 🎭 Vibe Modes
+## 🎭 20 Vibe Modes
 
 | Vibe | Emoji | Description |
 |------|-------|-------------|
-| `default` | 🎯 | Professional — clean, focused coding |
-| `hacker` | 🤘 | Green-on-black, l33t speak, matrix vibes |
-| `pirate` | 🏴‍☠️ | Arrr, matey! Code like a swashbuckler! |
-| `wizard` | 🧙 | Mystical coding wisdom and ancient scrolls |
+| `default` | 🎯 | Professional — clean, focused |
+| `hacker` | 🤘 | Green-on-black, l33t speak |
+| `pirate` | 🏴‍☠️ | Arrr, matey! |
+| `wizard` | 🧙 | Mystical coding wisdom |
 | `zen` | 🧘 | Calm, minimal, peaceful |
-| `fire` | 🔥 | Hyped, energetic, maximum enthusiasm! |
-| `gamer` | 🎮 | XP, quests, boss fights, gaming terms |
-| `noir` | 🕵️ | Dark, gritty detective vibes |
-| `creative` | 🎨 | Colorful, enthusiastic, full of ideas |
-| `bro` | 😎 | Casual, chill, bro energy |
-
-Switch vibes anytime with `/vibe <id>` in interactive mode.
+| `fire` | 🔥 | Hyped, energetic! |
+| `gamer` | 🎮 | XP, quests, boss fights |
+| `noir` | 🕵️ | Dark, gritty detective |
+| `creative` | 🎨 | Colorful, enthusiastic |
+| `bro` | 😎 | Casual, chill energy |
+| `robot` | 🤖 | Beep boop, precision |
+| `shakespeare` | 🎭 | Forsooth! Iambic code! |
+| `cowboy` | 🤠 | Yeehaw, saddle up! |
+| `anime` | ⚡ | Nani?! Power up! |
+| `chef` | 👨‍🍳 | Let's cook some code! |
+| `scientist` | 🔬 | Empirical, precise |
+| `medieval` | ⚔️ | Knight of the code |
+| `surfer` | 🏄 | Catch the wave, dude! |
+| `philosopher` | 🤔 | Deep thoughts |
+| `rapper` | 🎤 | Drop bars, ship code! |
 
 ---
 
 ## 🏆 Gamification
 
-aix tracks your progress with XP, levels, and achievements!
+### 15 Levels
 
-### Levels
-
-| Level | Name | XP Required | Emoji |
-|-------|------|-------------|-------|
+| Level | Name | XP | Emoji |
+|-------|------|----|-------|
 | 1 | Initiate | 0 | 🌱 |
 | 2 | Apprentice | 50 | 📖 |
 | 3 | Coder | 150 | 💻 |
@@ -106,54 +98,60 @@ aix tracks your progress with XP, levels, and achievements!
 | 8 | Grandmaster | 3,500 | 💎 |
 | 9 | Transcendent | 5,500 | 🌟 |
 | 10 | aix Ascended | 10,000 | 🔮 |
+| 11 | Mythic | 15,000 | ⚔️ |
+| 12 | Celestial | 25,000 | ✨ |
+| 13 | Eternal | 50,000 | 🌀 |
+| 14 | Omega | 100,000 | 💠 |
+| 15 | Apotheosis | 200,000 | 🌠 |
 
 ### XP System
 
-| Action | XP |
-|--------|-----|
+| Action | Base XP |
+|--------|---------|
 | Send a message | +5 XP |
 | Use a tool | +3 XP |
 | Edit a file | +5 XP |
 | Run a bash command | +2 XP |
 
-### Achievements (33 total)
+### ⚡ Combo System
 
-- **First Contact** 👋 — Send your first message
-- **Tool Master** ⚙️ — Use 50 tools
-- **Code Sculptor** 🎨 — Edit 50 files
-- **Shell Wizard** 🧙 — Run 50 bash commands
-- **Week Warrior** ⚔️ — 7-day streak
-- **Unstoppable** 🌟 — 100-day streak
-- **Provider Connoisseur** 🎯 — Use 10 different providers
-- **Vibe Chameleon** 🦎 — Try every vibe
-- **Free Spirit** 🆓 — Use only free providers for 50 messages
-- **Million Token Club** 🎰 — Process 1M+ tokens
-- **Night Owl** 🦉 — Use aix after midnight (secret!)
-- ...and 22 more!
+Chain messages within 2 minutes to build combos:
 
-### Stats Commands
+| Combo | Multiplier |
+|-------|-----------|
+| 3x+ | ×1.25 |
+| 5x+ | ×1.5 |
+| 10x+ | ×2.0 |
 
-```bash
-aix --stats          # Show your stats and achievements
-/achievements        # In interactive mode
-/stats               # In interactive mode
-```
+### 📅 Daily Challenges
 
----
+Fresh challenge every day with bonus XP! Examples:
+- Chat Starter — Send 5 messages (+30 XP)
+- Tool Time — Use 5 tools (+40 XP)
+- Combo Time — Hit a 5x combo (+50 XP)
+- Vibe Hopper — Try 2 vibes (+30 XP)
 
-## 📦 Install
+### Titles
 
-```bash
-npm install -g aix
-```
+Unlock and equip titles: `/title <id>`
 
-Requires Node.js 18+.
+| Title | Emoji | How to Unlock |
+|-------|-------|---------------|
+| Free Bird | 🆓 | Use 5+ free providers |
+| Hacker | 🤘 | Run 50+ bash commands |
+| Vibe Master | 🎭 | Try 10+ vibes |
+| Legend | 💎 | Reach level 10 |
+| God | 🔱 | Reach level 15 |
+
+### 57 Achievements
+
+Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes, Combos, Levels, Daily, Special, Secret
 
 ---
 
 ## 🆓 Free Providers
 
-### No API Key Needed (20 providers!)
+### No API Key Needed (30 providers!)
 
 | ID | Name | Top Models |
 |----|------|------------|
@@ -177,45 +175,45 @@ Requires Node.js 18+.
 | `topmost` | TopMost AI | GPT-4o Mini, DeepSeek |
 | `infinity` | Infinity AI | GPT-4o Mini, Llama |
 | `skyline` | Skyline AI | GPT-4o Mini, DeepSeek, Qwen |
+| `oivoodoo` | OiVoodoo AI | GPT-4o Mini, DeepSeek |
+| `luckyai` | Lucky AI | GPT-4o Mini, DeepSeek |
+| `aurora` | Aurora AI | GPT-4o Mini, Llama |
+| `neonai` | NeonAI | GPT-4o Mini, DeepSeek, Qwen |
+| `fluxai` | FluxAI | GPT-4o Mini |
+| `helixai` | HelixAI | DeepSeek, GPT-4o Mini, Llama |
+| `cortexai` | CortexAI | GPT-4o Mini, DeepSeek |
+| `prismai` | PrismAI | GPT-4o Mini, DeepSeek |
+| `quantumai` | QuantumAI | GPT-4o Mini, DeepSeek, Qwen |
+| `eclipseai` | EclipseAI | GPT-4o Mini, Llama |
 
 ### Free API Key (No Credit Card)
 
-| ID | Name | Key Env | Top Models |
-|----|------|---------|------------|
-| `gemini` | Google Gemini | GEMINI_API_KEY | gemini-2.5-pro (1M ctx) |
-| `groq` | Groq | GROQ_API_KEY | llama-3.3-70b, mixtral |
-| `cerebras` | Cerebras | CEREBRAS_API_KEY | llama-4-scout, qwen-3-32b |
-| `deepseek` | DeepSeek | DEEPSEEK_API_KEY | deepseek-chat (V3) |
-| `mistral` | Mistral AI | MISTRAL_API_KEY | mistral-small, codestral |
-| `cohere` | Cohere | COHERE_API_KEY | command-r |
-| `nvidia` | NVIDIA NIM | NVIDIA_API_KEY | llama-3.3-70b, nemotron |
-| `githubmodels` | GitHub Models | GITHUB_TOKEN | gpt-4o-mini, phi-4 |
-| `huggingface` | HuggingFace | HF_TOKEN | llama-3.3-70b, qwen-2.5-72b |
-| `siliconflow` | SiliconFlow | SILICONFLOW_API_KEY | qwen-2.5-72b, deepseek-v3 |
-| `chutes` | Chutes AI | CHUTES_API_KEY | deepseek-v3, qwen-2.5-72b |
-| `glhf` | GLHF | GLHF_API_KEY | llama-3.3-70b |
-| `together` | Together AI | TOGETHER_API_KEY | llama-3.3-70b (free $5 credit) |
-| `fireworks` | Fireworks AI | FIREWORKS_API_KEY | llama-3.3-70b (free credits) |
+| ID | Name | Key Env |
+|----|------|---------|
+| `gemini` | Google Gemini | GEMINI_API_KEY |
+| `groq` | Groq | GROQ_API_KEY |
+| `cerebras` | Cerebras | CEREBRAS_API_KEY |
+| `deepseek` | DeepSeek | DEEPSEEK_API_KEY |
+| `mistral` | Mistral AI | MISTRAL_API_KEY |
+| `cohere` | Cohere | COHERE_API_KEY |
+| `nvidia` | NVIDIA NIM | NVIDIA_API_KEY |
+| `githubmodels` | GitHub Models | GITHUB_TOKEN |
+| `huggingface` | HuggingFace | HF_TOKEN |
+| `siliconflow` | SiliconFlow | SILICONFLOW_API_KEY |
+| `chutes` | Chutes AI | CHUTES_API_KEY |
+| `glhf` | GLHF | GLHF_API_KEY |
+| `together` | Together AI | TOGETHER_API_KEY |
+| `fireworks` | Fireworks AI | FIREWORKS_API_KEY |
 
 ---
 
 ## 🛠 Usage
 
-### Interactive Mode
-
 ```bash
-aix                          # Start interactive
-aix -p gemini                # With Gemini
-aix --vibe hacker            # Hacker mode!
-aix -p pollinations --vibe pirate  # Free + pirate vibes!
-```
-
-### One-Shot Mode
-
-```bash
-aix "explain this codebase"
-aix -p llm7 "write a fibonacci in go"
-aix --vibe wizard -e "cast a spell on this bug"
+aix                                    # Interactive mode
+aix -p pollinations "hello"           # Free, no key
+aix --vibe hacker "explain this"      # Hacker mode!
+aix -p llm7 --vibe anime "fix bug"    # Free + anime vibes!
 ```
 
 ### All Options
@@ -230,11 +228,10 @@ aix --vibe wizard -e "cast a spell on this bug"
 | `--vibe <id>` | Set vibe mode |
 | `--no-tools` | Disable tool use |
 | `-e, --exec <prompt>` | One-shot mode |
-| `--max-turns <n>` | Max agent turns (default: 20) |
-| `--temperature <n>` | Set temperature (0.0 - 2.0) |
+| `--max-turns <n>` | Max agent turns |
+| `--temperature <n>` | Set temperature |
 | `--verbose` | Show detailed tool output |
-| `--quiet` | Minimal output |
-| `--stats` | Show your stats and achievements |
+| `--stats` | Show stats and achievements |
 | `--reset-stats` | Reset all stats |
 
 ### Interactive Commands
@@ -242,94 +239,18 @@ aix --vibe wizard -e "cast a spell on this bug"
 | Command | Description |
 |---------|-------------|
 | `/exit`, `/quit` | Exit aix |
-| `/clear` | Clear conversation history |
-| `/help` | Show help |
-| `/providers` | List providers |
-| `/model <name>` | Switch model |
-| `/provider <id>` | Switch provider |
-| `/vibe <id>` | Switch vibe mode |
+| `/clear` | Clear history |
+| `/vibe <id>` | Switch vibe |
 | `/vibes` | List all vibes |
-| `/stats` | Show your stats |
+| `/provider <id>` | Switch provider |
+| `/model <name>` | Switch model |
+| `/stats` | Show stats |
 | `/achievements` | Show achievements |
-| `/history` | Show message count |
-| `/tools` | List available tools |
+| `/daily` | Show daily challenge |
+| `/title [id]` | Set/view titles |
+| `/tools` | List tools |
 | `/retry` | Retry last message |
 | `/compact` | Compact history |
-| `/context` | Show project context |
-
----
-
-## 🔧 Built-in Tools (9)
-
-| Tool | Description |
-|------|-------------|
-| **read_file** | Read file contents with line numbers |
-| **write_file** | Create or overwrite files |
-| **edit_file** | Find and replace exact text |
-| **bash** | Run shell commands |
-| **list_files** | List files and directories |
-| **search_files** | Search across files with regex |
-| **glob_find** | Find files matching a pattern |
-| **tree** | Display directory tree |
-| **diagnose** | Run project diagnostics |
-
----
-
-## 🌍 All Providers
-
-### Paid
-
-| ID | Name | Key Env |
-|----|------|---------|
-| `openai` | OpenAI | OPENAI_API_KEY |
-| `xai` | xAI (Grok) | XAI_API_KEY |
-| `openrouter` | OpenRouter | OPENROUTER_API_KEY |
-| `perplexity` | Perplexity | PERPLEXITY_API_KEY |
-| `sambanova` | SambaNova | SAMBANOVA_API_KEY |
-| `replicate` | Replicate | REPLICATE_API_TOKEN |
-| `novita` | Novita AI | NOVITA_API_KEY |
-
-### Local / Self-Hosted
-
-| ID | Name | Default Model |
-|----|------|---------------|
-| `ollama` | Ollama | llama3.3 |
-| `lmstudio` | LM Studio | local-model |
-| `jan` | Jan.ai | local-model |
-| `vllm` | vLLM | served-model |
-| `llamacpp` | llama.cpp Server | served-model |
-| `custom` | Custom endpoint | custom-model |
-
----
-
-## 🔑 Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `AIX_PROVIDER` | Provider id to use |
-| `AIX_MODEL` | Model name override |
-| `AIX_VIBE` | Vibe mode (default, hacker, pirate, etc.) |
-| `AIX_BASE_URL` | Custom endpoint base URL |
-| `AIX_API_KEY` | Custom endpoint API key |
-| `AIX_MAX_TURNS` | Max agent turns (default: 20) |
-| `AIX_NO_TOOLS` | Set to "1" to disable tools |
-| `AIX_USE_<PROVIDER>` | Quick-select provider |
-
----
-
-## 🧠 Project Instructions
-
-Create `AIX.md` in your project root:
-
-```markdown
-# AIX.md
-
-- This project uses TypeScript with strict mode
-- Always run `npm test` after making changes
-- Follow the existing code style
-```
-
-Also supports `.aix/instructions.md` and `.cursorrules`.
 
 ---
 

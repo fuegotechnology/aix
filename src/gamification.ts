@@ -21,6 +21,23 @@ export interface Stats {
   providerUsage: Record<string, number>
   vibeUsage: Record<string, number>
   createdAt: string
+  // Combo system
+  combo: number
+  maxCombo: number
+  lastMessageTime: number
+  totalCombos: number
+  // Daily challenges
+  dailyChallenge: string | null
+  dailyChallengeDate: string | null
+  dailyChallengeProgress: number
+  dailyChallengeCompleted: boolean
+  // Titles
+  activeTitle: string | null
+  unlockedTitles: string[]
+  // Sessions
+  messagesThisSession: number
+  toolsThisSession: number
+  editsThisSession: number
 }
 
 export interface Level {
@@ -33,16 +50,21 @@ export interface Level {
 }
 
 export const LEVELS: Level[] = [
-  { level: 1, name: 'Initiate', title: 'Just getting started', xpRequired: 0, emoji: '🌱', color: '\x1b[90m' },
-  { level: 2, name: 'Apprentice', title: 'Learning the ropes', xpRequired: 50, emoji: '📖', color: '\x1b[37m' },
-  { level: 3, name: 'Coder', title: 'Writing code like a pro', xpRequired: 150, emoji: '💻', color: '\x1b[32m' },
-  { level: 4, name: 'Hacker', title: 'Deep in the terminal', xpRequired: 350, emoji: '⚡', color: '\x1b[33m' },
-  { level: 5, name: 'Architect', title: 'Building systems', xpRequired: 700, emoji: '🏗️', color: '\x1b[36m' },
-  { level: 6, name: 'Expert', title: 'Seasoned veteran', xpRequired: 1200, emoji: '🏆', color: '\x1b[35m' },
-  { level: 7, name: 'Master', title: 'Master of code', xpRequired: 2000, emoji: '👑', color: '\x1b[93m' },
-  { level: 8, name: 'Grandmaster', title: 'Legendary status', xpRequired: 3500, emoji: '💎', color: '\x1b[94m' },
-  { level: 9, name: 'Transcendent', title: 'Beyond mortal code', xpRequired: 5500, emoji: '🌟', color: '\x1b[95m' },
-  { level: 10, name: 'aix Ascended', title: 'One with the terminal', xpRequired: 10000, emoji: '🔮', color: '\x1b[96m' },
+  { level: 1,  name: 'Initiate',      title: 'Just getting started',          xpRequired: 0,      emoji: '🌱', color: '\x1b[90m' },
+  { level: 2,  name: 'Apprentice',    title: 'Learning the ropes',            xpRequired: 50,     emoji: '📖', color: '\x1b[37m' },
+  { level: 3,  name: 'Coder',         title: 'Writing code like a pro',       xpRequired: 150,    emoji: '💻', color: '\x1b[32m' },
+  { level: 4,  name: 'Hacker',        title: 'Deep in the terminal',          xpRequired: 350,    emoji: '⚡', color: '\x1b[33m' },
+  { level: 5,  name: 'Architect',     title: 'Building systems',              xpRequired: 700,    emoji: '🏗️', color: '\x1b[36m' },
+  { level: 6,  name: 'Expert',        title: 'Seasoned veteran',              xpRequired: 1200,   emoji: '🏆', color: '\x1b[35m' },
+  { level: 7,  name: 'Master',        title: 'Master of code',                xpRequired: 2000,   emoji: '👑', color: '\x1b[93m' },
+  { level: 8,  name: 'Grandmaster',   title: 'Legendary status',              xpRequired: 3500,   emoji: '💎', color: '\x1b[94m' },
+  { level: 9,  name: 'Transcendent',  title: 'Beyond mortal code',            xpRequired: 5500,   emoji: '🌟', color: '\x1b[95m' },
+  { level: 10, name: 'aix Ascended',  title: 'One with the terminal',         xpRequired: 10000,  emoji: '🔮', color: '\x1b[96m' },
+  { level: 11, name: 'Mythic',        title: 'Code flows through you',        xpRequired: 15000,  emoji: '⚔️', color: '\x1b[91m' },
+  { level: 12, name: 'Celestial',     title: 'The stars are your IDE',        xpRequired: 25000,  emoji: '✨', color: '\x1b[96m' },
+  { level: 13, name: 'Eternal',       title: 'Code transcends time',          xpRequired: 50000,  emoji: '🌀', color: '\x1b[95m' },
+  { level: 14, name: 'Omega',         title: 'The final form of code',        xpRequired: 100000, emoji: '💠', color: '\x1b[94m' },
+  { level: 15, name: 'Apotheosis',    title: 'You ARE the code',              xpRequired: 200000, emoji: '🌠', color: '\x1b[93m' },
 ]
 
 export interface Achievement {
@@ -53,69 +75,154 @@ export interface Achievement {
   condition: (stats: Stats) => boolean
   xp: number
   secret?: boolean
+  title?: string
+  category?: string
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
-  { id: 'first_chat', name: 'First Contact', description: 'Send your first message', emoji: '👋', condition: s => s.totalMessages >= 1, xp: 10 },
-  { id: 'ten_messages', name: 'Getting Warmed Up', description: 'Send 10 messages', emoji: '🔥', condition: s => s.totalMessages >= 10, xp: 25 },
-  { id: 'fifty_messages', name: 'Regular User', description: 'Send 50 messages', emoji: '💬', condition: s => s.totalMessages >= 50, xp: 50 },
-  { id: 'hundred_messages', name: 'Power User', description: 'Send 100 messages', emoji: '💪', condition: s => s.totalMessages >= 100, xp: 100 },
-  { id: 'five_hundred_messages', name: 'aix Addict', description: 'Send 500 messages', emoji: '🤯', condition: s => s.totalMessages >= 500, xp: 250 },
-  { id: 'first_tool', name: 'Tool User', description: 'Use your first tool', emoji: '🔧', condition: s => s.totalToolCalls >= 1, xp: 10 },
-  { id: 'ten_tools', name: 'Tool Enthusiast', description: 'Use 10 tools', emoji: '🛠️', condition: s => s.totalToolCalls >= 10, xp: 25 },
-  { id: 'fifty_tools', name: 'Tool Master', description: 'Use 50 tools', emoji: '⚙️', condition: s => s.totalToolCalls >= 50, xp: 75 },
-  { id: 'two_hundred_tools', name: 'Tool Legend', description: 'Use 200 tools', emoji: '⚡', condition: s => s.totalToolCalls >= 200, xp: 200 },
-  { id: 'first_edit', name: 'First Edit', description: 'Edit your first file', emoji: '✏️', condition: s => s.totalFilesEdited >= 1, xp: 10 },
-  { id: 'ten_edits', name: 'Editor', description: 'Edit 10 files', emoji: '📝', condition: s => s.totalFilesEdited >= 10, xp: 25 },
-  { id: 'fifty_edits', name: 'Code Sculptor', description: 'Edit 50 files', emoji: '🎨', condition: s => s.totalFilesEdited >= 50, xp: 75 },
-  { id: 'first_bash', name: 'Shell Runner', description: 'Run your first bash command', emoji: '🖥️', condition: s => s.totalBashCommands >= 1, xp: 10 },
-  { id: 'ten_bash', name: 'Command Line Pro', description: 'Run 10 bash commands', emoji: '⌨️', condition: s => s.totalBashCommands >= 10, xp: 25 },
-  { id: 'fifty_bash', name: 'Shell Wizard', description: 'Run 50 bash commands', emoji: '🧙', condition: s => s.totalBashCommands >= 50, xp: 75 },
-  { id: 'streak_3', name: 'On a Roll', description: '3-day streak', emoji: '🔥', condition: s => s.streak >= 3, xp: 25 },
-  { id: 'streak_7', name: 'Week Warrior', description: '7-day streak', emoji: '⚔️', condition: s => s.streak >= 7, xp: 75 },
-  { id: 'streak_30', name: 'Monthly Master', description: '30-day streak', emoji: '🏆', condition: s => s.streak >= 30, xp: 300 },
-  { id: 'streak_100', name: 'Unstoppable', description: '100-day streak', emoji: '🌟', condition: s => s.streak >= 100, xp: 1000 },
-  { id: 'provider_3', name: 'Multi-Provider', description: 'Use 3 different providers', emoji: '🌐', condition: s => Object.keys(s.providerUsage).length >= 3, xp: 25 },
-  { id: 'provider_5', name: 'Provider Explorer', description: 'Use 5 different providers', emoji: '🗺️', condition: s => Object.keys(s.providerUsage).length >= 5, xp: 50 },
-  { id: 'provider_10', name: 'Provider Connoisseur', description: 'Use 10 different providers', emoji: '🎯', condition: s => Object.keys(s.providerUsage).length >= 10, xp: 150 },
-  { id: 'vibe_3', name: 'Vibe Switcher', description: 'Try 3 different vibes', emoji: '🎭', condition: s => Object.keys(s.vibeUsage).length >= 3, xp: 25 },
-  { id: 'vibe_5', name: 'Vibe Master', description: 'Try 5 different vibes', emoji: '🌈', condition: s => Object.keys(s.vibeUsage).length >= 5, xp: 50 },
-  { id: 'vibe_all', name: 'Vibe Chameleon', description: 'Try every vibe', emoji: '🦎', condition: s => Object.keys(s.vibeUsage).length >= 10, xp: 150 },
-  { id: 'level_5', name: 'Architect Rising', description: 'Reach level 5', emoji: '🏗️', condition: s => s.level >= 5, xp: 0 },
-  { id: 'level_10', name: 'Ascended', description: 'Reach max level', emoji: '🔮', condition: s => s.level >= 10, xp: 0 },
+  // ── First Steps ──
+  { id: 'first_chat', name: 'First Contact', description: 'Send your first message', emoji: '👋', condition: s => s.totalMessages >= 1, xp: 10, category: 'first' },
+  { id: 'first_tool', name: 'Tool User', description: 'Use your first tool', emoji: '🔧', condition: s => s.totalToolCalls >= 1, xp: 10, category: 'first' },
+  { id: 'first_edit', name: 'First Edit', description: 'Edit your first file', emoji: '✏️', condition: s => s.totalFilesEdited >= 1, xp: 10, category: 'first' },
+  { id: 'first_bash', name: 'Shell Runner', description: 'Run your first bash command', emoji: '🖥️', condition: s => s.totalBashCommands >= 1, xp: 10, category: 'first' },
+  { id: 'first_vibe', name: 'Vibe Check', description: 'Try your first vibe', emoji: '🎭', condition: s => Object.keys(s.vibeUsage).length >= 1, xp: 10, category: 'first' },
+
+  // ── Messages ──
+  { id: 'ten_messages', name: 'Getting Warmed Up', description: 'Send 10 messages', emoji: '🔥', condition: s => s.totalMessages >= 10, xp: 25, category: 'messages' },
+  { id: 'fifty_messages', name: 'Regular User', description: 'Send 50 messages', emoji: '💬', condition: s => s.totalMessages >= 50, xp: 50, category: 'messages' },
+  { id: 'hundred_messages', name: 'Power User', description: 'Send 100 messages', emoji: '💪', condition: s => s.totalMessages >= 100, xp: 100, category: 'messages' },
+  { id: 'five_hundred_messages', name: 'aix Addict', description: 'Send 500 messages', emoji: '🤯', condition: s => s.totalMessages >= 500, xp: 250, category: 'messages' },
+  { id: 'thousand_messages', name: 'aix For Life', description: 'Send 1,000 messages', emoji: '❤️‍🔥', condition: s => s.totalMessages >= 1000, xp: 500, category: 'messages' },
+  { id: 'five_thousand_messages', name: 'Living in the Terminal', description: 'Send 5,000 messages', emoji: '🏠', condition: s => s.totalMessages >= 5000, xp: 1500, category: 'messages' },
+
+  // ── Tools ──
+  { id: 'ten_tools', name: 'Tool Enthusiast', description: 'Use 10 tools', emoji: '🛠️', condition: s => s.totalToolCalls >= 10, xp: 25, category: 'tools' },
+  { id: 'fifty_tools', name: 'Tool Master', description: 'Use 50 tools', emoji: '⚙️', condition: s => s.totalToolCalls >= 50, xp: 75, category: 'tools' },
+  { id: 'two_hundred_tools', name: 'Tool Legend', description: 'Use 200 tools', emoji: '⚡', condition: s => s.totalToolCalls >= 200, xp: 200, category: 'tools' },
+  { id: 'thousand_tools', name: 'Tool God', description: 'Use 1,000 tools', emoji: '🔱', condition: s => s.totalToolCalls >= 1000, xp: 500, category: 'tools' },
+
+  // ── Edits ──
+  { id: 'ten_edits', name: 'Editor', description: 'Edit 10 files', emoji: '📝', condition: s => s.totalFilesEdited >= 10, xp: 25, category: 'edits' },
+  { id: 'fifty_edits', name: 'Code Sculptor', description: 'Edit 50 files', emoji: '🎨', condition: s => s.totalFilesEdited >= 50, xp: 75, category: 'edits' },
+  { id: 'two_hundred_edits', name: 'Code Artisan', description: 'Edit 200 files', emoji: '🏛️', condition: s => s.totalFilesEdited >= 200, xp: 200, category: 'edits' },
+  { id: 'thousand_edits', name: 'Code Architect', description: 'Edit 1,000 files', emoji: '🏔️', condition: s => s.totalFilesEdited >= 1000, xp: 500, category: 'edits' },
+
+  // ── Bash ──
+  { id: 'ten_bash', name: 'Command Line Pro', description: 'Run 10 bash commands', emoji: '⌨️', condition: s => s.totalBashCommands >= 10, xp: 25, category: 'bash' },
+  { id: 'fifty_bash', name: 'Shell Wizard', description: 'Run 50 bash commands', emoji: '🧙', condition: s => s.totalBashCommands >= 50, xp: 75, category: 'bash' },
+  { id: 'two_hundred_bash', name: 'Terminal God', description: 'Run 200 bash commands', emoji: '⚡', condition: s => s.totalBashCommands >= 200, xp: 200, category: 'bash' },
+
+  // ── Streaks ──
+  { id: 'streak_3', name: 'On a Roll', description: '3-day streak', emoji: '🔥', condition: s => s.streak >= 3, xp: 25, category: 'streak' },
+  { id: 'streak_7', name: 'Week Warrior', description: '7-day streak', emoji: '⚔️', condition: s => s.streak >= 7, xp: 75, category: 'streak' },
+  { id: 'streak_14', name: 'Fortnight Force', description: '14-day streak', emoji: '🛡️', condition: s => s.streak >= 14, xp: 150, category: 'streak' },
+  { id: 'streak_30', name: 'Monthly Master', description: '30-day streak', emoji: '🏆', condition: s => s.streak >= 30, xp: 300, category: 'streak' },
+  { id: 'streak_90', name: 'Season Veteran', description: '90-day streak', emoji: '🎖️', condition: s => s.streak >= 90, xp: 750, category: 'streak' },
+  { id: 'streak_100', name: 'Unstoppable', description: '100-day streak', emoji: '🌟', condition: s => s.streak >= 100, xp: 1000, category: 'streak' },
+  { id: 'streak_365', name: 'Year of Code', description: '365-day streak', emoji: '🏅', condition: s => s.streak >= 365, xp: 5000, category: 'streak' },
+
+  // ── Providers ──
+  { id: 'provider_3', name: 'Multi-Provider', description: 'Use 3 different providers', emoji: '🌐', condition: s => Object.keys(s.providerUsage).length >= 3, xp: 25, category: 'provider' },
+  { id: 'provider_5', name: 'Provider Explorer', description: 'Use 5 different providers', emoji: '🗺️', condition: s => Object.keys(s.providerUsage).length >= 5, xp: 50, category: 'provider' },
+  { id: 'provider_10', name: 'Provider Connoisseur', description: 'Use 10 different providers', emoji: '🎯', condition: s => Object.keys(s.providerUsage).length >= 10, xp: 150, category: 'provider' },
+  { id: 'provider_20', name: 'Provider Omnivore', description: 'Use 20 different providers', emoji: '🌍', condition: s => Object.keys(s.providerUsage).length >= 20, xp: 300, category: 'provider' },
+  { id: 'provider_30', name: 'Provider God', description: 'Use 30 different providers', emoji: '🌌', condition: s => Object.keys(s.providerUsage).length >= 30, xp: 500, category: 'provider' },
+
+  // ── Vibes ──
+  { id: 'vibe_3', name: 'Vibe Switcher', description: 'Try 3 different vibes', emoji: '🎭', condition: s => Object.keys(s.vibeUsage).length >= 3, xp: 25, category: 'vibes' },
+  { id: 'vibe_5', name: 'Vibe Master', description: 'Try 5 different vibes', emoji: '🌈', condition: s => Object.keys(s.vibeUsage).length >= 5, xp: 50, category: 'vibes' },
+  { id: 'vibe_all', name: 'Vibe Chameleon', description: 'Try every vibe', emoji: '🦎', condition: s => Object.keys(s.vibeUsage).length >= 20, xp: 200, category: 'vibes' },
+
+  // ── Combos ──
+  { id: 'combo_5', name: 'Combo Starter', description: 'Hit a 5x combo', emoji: '🔥', condition: s => s.maxCombo >= 5, xp: 25, category: 'combo' },
+  { id: 'combo_10', name: 'Combo King', description: 'Hit a 10x combo', emoji: '👑', condition: s => s.maxCombo >= 10, xp: 75, category: 'combo' },
+  { id: 'combo_25', name: 'Combo Legend', description: 'Hit a 25x combo', emoji: '⚡', condition: s => s.maxCombo >= 25, xp: 200, category: 'combo' },
+  { id: 'combo_50', name: 'Combo God', description: 'Hit a 50x combo', emoji: '💎', condition: s => s.maxCombo >= 50, xp: 500, category: 'combo' },
+
+  // ── Levels ──
+  { id: 'level_5', name: 'Architect Rising', description: 'Reach level 5', emoji: '🏗️', condition: s => s.level >= 5, xp: 0, category: 'level' },
+  { id: 'level_10', name: 'Ascended', description: 'Reach level 10', emoji: '🔮', condition: s => s.level >= 10, xp: 0, category: 'level' },
+  { id: 'level_15', name: 'Apotheosis', description: 'Reach max level', emoji: '🌠', condition: s => s.level >= 15, xp: 0, category: 'level' },
+
+  // ── Special ──
   { id: 'free_only', name: 'Free Spirit', description: 'Use only free providers for 50 messages', emoji: '🆓', condition: s => s.totalMessages >= 50 && Object.keys(s.providerUsage).every(p => {
-    const freeProviders = ['pollinations','llm7','ollama','lmstudio','jan','vllm','llamacpp']
-    return freeProviders.includes(p)
-  }), xp: 100 },
-  { id: 'million_tokens', name: 'Million Token Club', description: 'Process 1M+ tokens total', emoji: '🎰', condition: s => (s.totalTokensIn + s.totalTokensOut) >= 1000000, xp: 200 },
-  { id: 'night_owl', name: 'Night Owl', description: 'Use aix after midnight', emoji: '🦉', condition: s => s.totalMessages >= 1, xp: 15, secret: true },
-  { id: 'speed_demon', name: 'Speed Demon', description: 'Send 5 messages in one session', emoji: '💨', condition: s => s.totalMessages >= 5, xp: 15 },
-  { id: 'free_bird', name: 'Free Bird', description: 'Use Pollinations (no key needed)', emoji: '🐦', condition: s => (s.providerUsage['pollinations'] || 0) >= 1, xp: 10 },
-  { id: 'local_hero', name: 'Local Hero', description: 'Use a local provider', emoji: '🏠', condition: s => ['ollama','lmstudio','jan','vllm','llamacpp'].some(p => (s.providerUsage[p] || 0) > 0), xp: 25 },
+    const freeIds = ['pollinations','llm7','g4f','freechat','shard','aichat','openaiProxy','chatany','freegpt','aiproxy','darkai','nexra','chatgptfree','yuai','zeroone','zephyr','dolphin','topmost','infinity','skyline','ollama','lmstudio','jan','vllm','llamacpp']
+    return freeIds.includes(p)
+  }), xp: 100, category: 'special' },
+  { id: 'million_tokens', name: 'Million Token Club', description: 'Process 1M+ tokens', emoji: '🎰', condition: s => (s.totalTokensIn + s.totalTokensOut) >= 1000000, xp: 200, category: 'special' },
+  { id: 'ten_million_tokens', name: 'Ten Million Token Club', description: 'Process 10M+ tokens', emoji: '🚀', condition: s => (s.totalTokensIn + s.totalTokensOut) >= 10000000, xp: 1000, category: 'special' },
+  { id: 'night_owl', name: 'Night Owl', description: 'Use aix after midnight', emoji: '🦉', condition: s => s.totalMessages >= 1, xp: 15, secret: true, category: 'secret' },
+  { id: 'early_bird', name: 'Early Bird', description: 'Use aix before 7am', emoji: '🐦', condition: s => s.totalMessages >= 1, xp: 15, secret: true, category: 'secret' },
+  { id: 'speed_demon', name: 'Speed Demon', description: 'Send 5 messages in one session', emoji: '💨', condition: s => s.messagesThisSession >= 5, xp: 15, category: 'special' },
+  { id: 'free_bird', name: 'Free Bird', description: 'Use Pollinations (no key needed)', emoji: '🐦', condition: s => (s.providerUsage['pollinations'] || 0) >= 1, xp: 10, category: 'special' },
+  { id: 'local_hero', name: 'Local Hero', description: 'Use a local provider', emoji: '🏠', condition: s => ['ollama','lmstudio','jan','vllm','llamacpp'].some(p => (s.providerUsage[p] || 0) > 0), xp: 25, category: 'special' },
+  { id: 'session_10', name: 'Deep Session', description: '10+ messages in one session', emoji: '🏊', condition: s => s.messagesThisSession >= 10, xp: 25, category: 'special' },
+  { id: 'session_25', name: 'Marathon Coder', description: '25+ messages in one session', emoji: '🏃', condition: s => s.messagesThisSession >= 25, xp: 75, category: 'special' },
+  { id: 'session_50', name: 'Iron Coder', description: '50+ messages in one session', emoji: '🦾', condition: s => s.messagesThisSession >= 50, xp: 200, category: 'special' },
+  { id: 'daily_first', name: 'Daily Challenger', description: 'Complete your first daily challenge', emoji: '📅', condition: s => s.dailyChallengeCompleted, xp: 50, category: 'daily' },
+  { id: 'all_tools', name: 'Full Toolkit', description: 'Use all 9 tools in one session', emoji: '🧰', condition: s => s.toolsThisSession >= 9, xp: 50, category: 'special' },
+]
+
+export const TITLES: { id: string; name: string; emoji: string; condition: (s: Stats) => boolean }[] = [
+  { id: 'newbie', name: 'Newbie', emoji: '🌱', condition: () => true },
+  { id: 'free_bird', name: 'Free Bird', emoji: '🆓', condition: s => Object.keys(s.providerUsage).filter(p => !['openai','xai','openrouter','perplexity','sambanova','replicate','novita','custom'].includes(p)).length >= 5 },
+  { id: 'hacker', name: 'Hacker', emoji: '🤘', condition: s => s.totalBashCommands >= 50 },
+  { id: 'architect', name: 'Architect', emoji: '🏗️', condition: s => s.totalFilesEdited >= 50 },
+  { id: 'speedster', name: 'Speedster', emoji: '⚡', condition: s => s.maxCombo >= 10 },
+  { id: 'explorer', name: 'Explorer', emoji: '🗺️', condition: s => Object.keys(s.providerUsage).length >= 10 },
+  { id: 'vibemaster', name: 'Vibe Master', emoji: '🎭', condition: s => Object.keys(s.vibeUsage).length >= 10 },
+  { id: 'streaker', name: 'Streaker', emoji: '🔥', condition: s => s.streak >= 30 },
+  { id: 'legend', name: 'Legend', emoji: '💎', condition: s => s.level >= 10 },
+  { id: 'god', name: 'God', emoji: '🔱', condition: s => s.level >= 15 },
+  { id: 'token_lord', name: 'Token Lord', emoji: '🎰', condition: s => (s.totalTokensIn + s.totalTokensOut) >= 1000000 },
+  { id: 'local_only', name: 'Local Only', emoji: '🏠', condition: s => Object.keys(s.providerUsage).every(p => ['ollama','lmstudio','jan','vllm','llamacpp'].includes(p)) && s.totalMessages >= 10 },
+]
+
+export const DAILY_CHALLENGES: { id: string; name: string; description: string; target: number; xp: number; emoji: string }[] = [
+  { id: 'msg5', name: 'Chat Starter', description: 'Send 5 messages today', target: 5, xp: 30, emoji: '💬' },
+  { id: 'msg10', name: 'Chatterbox', description: 'Send 10 messages today', target: 10, xp: 60, emoji: '🗣️' },
+  { id: 'msg20', name: 'Non-Stop', description: 'Send 20 messages today', target: 20, xp: 120, emoji: '🔥' },
+  { id: 'tools5', name: 'Tool Time', description: 'Use 5 tools today', target: 5, xp: 40, emoji: '🔧' },
+  { id: 'tools10', name: 'Tool Power', description: 'Use 10 tools today', target: 10, xp: 80, emoji: '🛠️' },
+  { id: 'edit3', name: 'Editor', description: 'Edit 3 files today', target: 3, xp: 40, emoji: '✏️' },
+  { id: 'edit5', name: 'Heavy Editor', description: 'Edit 5 files today', target: 5, xp: 80, emoji: '📝' },
+  { id: 'bash3', name: 'Commander', description: 'Run 3 bash commands today', target: 3, xp: 30, emoji: '🖥️' },
+  { id: 'combo5', name: 'Combo Time', description: 'Hit a 5x combo today', target: 5, xp: 50, emoji: '🔥' },
+  { id: 'vibe2', name: 'Vibe Hopper', description: 'Try 2 different vibes today', target: 2, xp: 30, emoji: '🎭' },
+  { id: 'provider2', name: 'Provider Switch', description: 'Use 2 different providers today', target: 2, xp: 30, emoji: '🌐' },
 ]
 
 export function loadStats(): Stats {
   if (!existsSync(STATS_FILE)) {
     return {
-      xp: 0,
-      level: 1,
-      streak: 0,
-      lastUsed: '',
-      totalMessages: 0,
-      totalToolCalls: 0,
-      totalFilesEdited: 0,
-      totalBashCommands: 0,
-      totalTokensIn: 0,
-      totalTokensOut: 0,
-      totalSessions: 0,
-      achievements: [],
-      providerUsage: {},
-      vibeUsage: {},
+      xp: 0, level: 1, streak: 0, lastUsed: '', totalMessages: 0,
+      totalToolCalls: 0, totalFilesEdited: 0, totalBashCommands: 0,
+      totalTokensIn: 0, totalTokensOut: 0, totalSessions: 0,
+      achievements: [], providerUsage: {}, vibeUsage: {},
       createdAt: new Date().toISOString(),
+      combo: 0, maxCombo: 0, lastMessageTime: 0, totalCombos: 0,
+      dailyChallenge: null, dailyChallengeDate: null, dailyChallengeProgress: 0, dailyChallengeCompleted: false,
+      activeTitle: null, unlockedTitles: ['newbie'],
+      messagesThisSession: 0, toolsThisSession: 0, editsThisSession: 0,
     }
   }
   try {
-    return JSON.parse(readFileSync(STATS_FILE, 'utf-8'))
+    const s = JSON.parse(readFileSync(STATS_FILE, 'utf-8'))
+    // Ensure new fields exist
+    s.combo = s.combo || 0
+    s.maxCombo = s.maxCombo || 0
+    s.lastMessageTime = s.lastMessageTime || 0
+    s.totalCombos = s.totalCombos || 0
+    s.dailyChallenge = s.dailyChallenge || null
+    s.dailyChallengeDate = s.dailyChallengeDate || null
+    s.dailyChallengeProgress = s.dailyChallengeProgress || 0
+    s.dailyChallengeCompleted = s.dailyChallengeCompleted || false
+    s.activeTitle = s.activeTitle || null
+    s.unlockedTitles = s.unlockedTitles || ['newbie']
+    s.messagesThisSession = 0
+    s.toolsThisSession = 0
+    s.editsThisSession = 0
+    return s
   } catch {
     return {
       xp: 0, level: 1, streak: 0, lastUsed: '', totalMessages: 0,
@@ -123,6 +230,10 @@ export function loadStats(): Stats {
       totalTokensIn: 0, totalTokensOut: 0, totalSessions: 0,
       achievements: [], providerUsage: {}, vibeUsage: {},
       createdAt: new Date().toISOString(),
+      combo: 0, maxCombo: 0, lastMessageTime: 0, totalCombos: 0,
+      dailyChallenge: null, dailyChallengeDate: null, dailyChallengeProgress: 0, dailyChallengeCompleted: false,
+      activeTitle: null, unlockedTitles: ['newbie'],
+      messagesThisSession: 0, toolsThisSession: 0, editsThisSession: 0,
     }
   }
 }
@@ -135,9 +246,7 @@ export function saveStats(stats: Stats): void {
 export function getLevelForXp(xp: number): Level {
   let result = LEVELS[0]
   for (const level of LEVELS) {
-    if (xp >= level.xpRequired) {
-      result = level
-    }
+    if (xp >= level.xpRequired) result = level
   }
   return result
 }
@@ -161,22 +270,24 @@ export function checkNewAchievements(stats: Stats): Achievement[] {
       newAchievements.push(achievement)
     }
   }
+  // Check titles
+  for (const title of TITLES) {
+    if (!stats.unlockedTitles.includes(title.id) && title.condition(stats)) {
+      stats.unlockedTitles.push(title.id)
+    }
+  }
   return newAchievements
 }
 
 export function updateStreak(stats: Stats): void {
   const today = new Date().toISOString().split('T')[0]
   if (stats.lastUsed === today) return
-
   if (stats.lastUsed) {
     const lastDate = new Date(stats.lastUsed)
     const todayDate = new Date(today)
     const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24))
-    if (diffDays === 1) {
-      stats.streak++
-    } else if (diffDays > 1) {
-      stats.streak = 1
-    }
+    if (diffDays === 1) stats.streak++
+    else if (diffDays > 1) stats.streak = 1
   } else {
     stats.streak = 1
   }
@@ -188,10 +299,52 @@ export function addXp(stats: Stats, amount: number): { leveledUp: boolean; newLe
   stats.xp += amount
   const newLevel = getLevelForXp(stats.xp)
   stats.level = newLevel.level
-  return {
-    leveledUp: newLevel.level > oldLevel.level,
-    newLevel,
-    oldLevel,
+  return { leveledUp: newLevel.level > oldLevel.level, newLevel, oldLevel }
+}
+
+export function updateCombo(stats: Stats): { combo: number; comboMultiplier: number; isNewRecord: boolean } {
+  const now = Date.now()
+  const timeSinceLast = now - stats.lastMessageTime
+  // Combo window: 2 minutes
+  if (timeSinceLast < 120000 && stats.lastMessageTime > 0) {
+    stats.combo++
+    stats.totalCombos++
+  } else {
+    stats.combo = 1
+  }
+  stats.lastMessageTime = now
+  const isNewRecord = stats.combo > stats.maxCombo
+  if (isNewRecord) stats.maxCombo = stats.combo
+  const comboMultiplier = stats.combo >= 10 ? 2.0 : stats.combo >= 5 ? 1.5 : stats.combo >= 3 ? 1.25 : 1.0
+  return { combo: stats.combo, comboMultiplier, isNewRecord }
+}
+
+export function assignDailyChallenge(stats: Stats): void {
+  const today = new Date().toISOString().split('T')[0]
+  if (stats.dailyChallengeDate === today && stats.dailyChallenge) return
+  // Pick a random challenge based on day
+  const dayIndex = new Date().getDate() + new Date().getMonth() * 31
+  const challenge = DAILY_CHALLENGES[dayIndex % DAILY_CHALLENGES.length]
+  stats.dailyChallenge = challenge.id
+  stats.dailyChallengeDate = today
+  stats.dailyChallengeProgress = 0
+  stats.dailyChallengeCompleted = false
+}
+
+export function getDailyChallenge(stats: Stats): { id: string; name: string; description: string; target: number; xp: number; emoji: string; progress: number; completed: boolean } | null {
+  if (!stats.dailyChallenge) return null
+  const challenge = DAILY_CHALLENGES.find(c => c.id === stats.dailyChallenge)
+  if (!challenge) return null
+  return { ...challenge, progress: stats.dailyChallengeProgress, completed: stats.dailyChallengeCompleted }
+}
+
+export function updateDailyChallenge(stats: Stats, type: 'message' | 'tool' | 'edit' | 'bash' | 'combo' | 'vibe' | 'provider'): void {
+  if (stats.dailyChallengeCompleted) return
+  stats.dailyChallengeProgress++
+  const challenge = DAILY_CHALLENGES.find(c => c.id === stats.dailyChallenge)
+  if (challenge && stats.dailyChallengeProgress >= challenge.target) {
+    stats.dailyChallengeCompleted = true
+    stats.xp += challenge.xp
   }
 }
 
@@ -201,32 +354,37 @@ export function renderXpBar(stats: Stats, width: number = 20): string {
   const progress = (stats.xp - current) / (next - current)
   const filled = Math.round(progress * width)
   const empty = width - filled
-  const bar = `${'█'.repeat(filled)}${'░'.repeat(empty)}`
-  return `${bar} ${stats.xp - current}/${xpNeeded} XP`
+  return `${'█'.repeat(filled)}${'░'.repeat(empty)} ${stats.xp - current}/${xpNeeded} XP`
 }
 
 export function renderStats(stats: Stats): string {
   const level = getLevelForXp(stats.xp)
+  const title = stats.activeTitle ? TITLES.find(t => t.id === stats.activeTitle) : null
+  const titleStr = title ? ` ${title.emoji} ${title.name}` : ''
   const lines: string[] = []
-  lines.push(`  ${level.color}${level.emoji} Level ${level.level}: ${level.name}${'\x1b[0m'}`)
+  lines.push(`  ${level.color}${level.emoji} Level ${level.level}: ${level.name}${titleStr}${'\x1b[0m'}`)
   lines.push(`  ${level.color}${level.title}${'\x1b[0m'}`)
   lines.push(`  ${renderXpBar(stats)}`)
   lines.push('')
   lines.push(`  💬 Messages: ${stats.totalMessages}  🔧 Tools: ${stats.totalToolCalls}  ✏️ Edits: ${stats.totalFilesEdited}`)
-  lines.push(`  🖥️ Commands: ${stats.totalBashCommands}  🔥 Streak: ${stats.streak} days`)
+  lines.push(`  🖥️ Commands: ${stats.totalBashCommands}  🔥 Streak: ${stats.streak} days  ⚡ Max Combo: ${stats.maxCombo}x`)
   lines.push(`  🪙 Total XP: ${stats.xp}  🏆 Achievements: ${stats.achievements.length}/${ACHIEVEMENTS.length}`)
+  const totalTokens = stats.totalTokensIn + stats.totalTokensOut
+  if (totalTokens > 0) {
+    lines.push(`  📊 Tokens: ${(totalTokens / 1000).toFixed(0)}K total`)
+  }
   return lines.join('\n')
 }
 
 export function renderAchievementUnlock(achievement: Achievement): string {
   const lines: string[] = []
   lines.push('')
-  lines.push('  ╔══════════════════════════════════════╗')
-  lines.push('  ║  🏆 ACHIEVEMENT UNLOCKED!            ║')
-  lines.push(`  ║  ${achievement.emoji} ${achievement.name.padEnd(30)}║`)
-  lines.push(`  ║  ${achievement.description.padEnd(34)}║`)
-  lines.push(`  ║  +${String(achievement.xp).padEnd(3)} XP${' '.repeat(27)}║`)
-  lines.push('  ╚══════════════════════════════════════╝')
+  lines.push('  ╔══════════════════════════════════════════╗')
+  lines.push('  ║  🏆 ACHIEVEMENT UNLOCKED!                ║')
+  lines.push(`  ║  ${achievement.emoji} ${achievement.name.padEnd(35)}║`)
+  lines.push(`  ║  ${achievement.description.padEnd(39)}║`)
+  lines.push(`  ║  +${String(achievement.xp).padEnd(3)} XP${' '.repeat(31)}║`)
+  lines.push('  ╚══════════════════════════════════════════╝')
   lines.push('')
   return lines.join('\n')
 }
@@ -234,13 +392,36 @@ export function renderAchievementUnlock(achievement: Achievement): string {
 export function renderLevelUp(oldLevel: Level, newLevel: Level): string {
   const lines: string[] = []
   lines.push('')
-  lines.push('  ╔══════════════════════════════════════════╗')
-  lines.push('  ║  ⬆️  LEVEL UP!                           ║')
+  lines.push('  ╔══════════════════════════════════════════════╗')
+  lines.push('  ║  ⬆️  LEVEL UP!                                ║')
   lines.push(`  ║  ${oldLevel.emoji} Lv.${oldLevel.level} ${oldLevel.name}`)
-  lines.push(`  ║  ────────────────►`)
+  lines.push('  ║  ────────────────►')
   lines.push(`  ║  ${newLevel.emoji} Lv.${newLevel.level} ${newLevel.name}`)
   lines.push(`  ║  ${newLevel.title}`)
-  lines.push('  ╚══════════════════════════════════════════╝')
+  lines.push('  ╚══════════════════════════════════════════════╝')
   lines.push('')
   return lines.join('\n')
+}
+
+export function renderCombo(combo: number, multiplier: number): string {
+  if (combo < 3) return ''
+  const C = {
+    reset: '\x1b[0m', bold: '\x1b[1m', yellow: '\x1b[33m', red: '\x1b[91m',
+    brightYellow: '\x1b[93m', brightCyan: '\x1b[96m', brightMagenta: '\x1b[95m',
+  }
+  const comboColor = combo >= 10 ? C.brightMagenta : combo >= 5 ? C.brightYellow : C.yellow
+  const multiplierStr = multiplier > 1 ? ` ${C.brightCyan}×${multiplier}${C.reset}` : ''
+  return `${comboColor}${C.bold} ⚡ ${combo}x COMBO!${C.reset}${multiplierStr}`
+}
+
+export function renderDailyChallenge(stats: Stats): string {
+  const challenge = getDailyChallenge(stats)
+  if (!challenge) return ''
+  const C = { reset: '\x1b[0m', dim: '\x1b[2m', bold: '\x1b[1m', cyan: '\x1b[36m', green: '\x1b[32m', yellow: '\x1b[33m' }
+  const status = challenge.completed ? `${C.green}✓ COMPLETE${C.reset}` : `${challenge.progress}/${challenge.target}`
+  const bar_width = 15
+  const progress = Math.min(challenge.progress / challenge.target, 1)
+  const filled = Math.round(progress * bar_width)
+  const bar = `${'█'.repeat(filled)}${'░'.repeat(bar_width - filled)}`
+  return `  ${C.cyan}📅 Daily:${C.reset} ${challenge.emoji} ${challenge.name} ${C.dim}[${bar}]${C.reset} ${status} ${C.dim}(+${challenge.xp} XP)${C.reset}`
 }
