@@ -131,7 +131,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   // ── Vibes ──
   { id: 'vibe_3', name: 'Vibe Switcher', description: 'Try 3 different vibes', emoji: '🎭', condition: s => Object.keys(s.vibeUsage).length >= 3, xp: 25, category: 'vibes' },
   { id: 'vibe_5', name: 'Vibe Master', description: 'Try 5 different vibes', emoji: '🌈', condition: s => Object.keys(s.vibeUsage).length >= 5, xp: 50, category: 'vibes' },
-  { id: 'vibe_all', name: 'Vibe Chameleon', description: 'Try every vibe', emoji: '🦎', condition: s => Object.keys(s.vibeUsage).length >= 20, xp: 200, category: 'vibes' },
+  { id: 'vibe_all', name: 'Vibe Chameleon', description: 'Try every vibe', emoji: '🦎', condition: s => Object.keys(s.vibeUsage).length >= 21, xp: 200, category: 'vibes' },
 
   // ── Combos ──
   { id: 'combo_5', name: 'Combo Starter', description: 'Hit a 5x combo', emoji: '🔥', condition: s => s.maxCombo >= 5, xp: 25, category: 'combo' },

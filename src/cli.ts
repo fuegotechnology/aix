@@ -36,7 +36,7 @@ ${bold(cyan('OPTIONS'))}
   ${bold('--providers')}                  List all providers
   ${bold('-p, --provider <id>')}          Use a specific provider
   ${bold('-m, --model <name>')}           Set model (also via AIX_MODEL env)
-  ${bold('--vibe <id>')}                  Set vibe mode (default, hacker, pirate, wizard, zen, fire, gamer, noir, creative, bro, robot, shakespeare, cowboy, anime, chef, scientist, medieval, surfer, philosopher, rapper)
+  ${bold('--vibe <id>')}                  Set vibe mode (default, hacker, pirate, wizard, zen, fire, gamer, noir, creative, bro, robot, shakespeare, cowboy, anime, chef, scientist, medieval, surfer, philosopher, rapper, beach)
   ${bold('--no-tools')}                   Disable tool use
   ${bold('-e, --exec <prompt>')}          One-shot mode
   ${bold('--max-turns <n>')}              Max agent turns (default: 20)
@@ -68,6 +68,7 @@ ${bold(cyan('VIBES'))} 🎭
   ${bold('surfer')}      🏄  Surfer — catch the wave, dude!
   ${bold('philosopher')} 🤔  Philosopher — deep thoughts
   ${bold('rapper')}      🎤  Rapper — drop bars, ship code
+  ${bold('beach')}       🏖️  Beach — tropical vibes, code under the palms
 
 ${bold(cyan('INTERACTIVE COMMANDS'))}
   ${bold('/exit')}, ${bold('/quit')}             Exit aix
