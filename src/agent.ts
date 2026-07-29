@@ -15,15 +15,16 @@ export interface AgentOptions {
   noTools?: boolean
   onChunk?: (chunk: AgentChunk) => void
   signal?: AbortSignal
+  verbose?: boolean
 }
 
 export type AgentChunk =
   | { type: 'text'; text: string }
   | { type: 'tool_start'; name: string; id: string }
   | { type: 'tool_result'; name: string; id: string; success: boolean; output: string }
-  | { type: 'turn_done'; inputTokens: number; outputTokens: number }
+  | { type: 'turn_done'; inputTokens: number; outputTokens: number; turns: number }
   | { type: 'error'; error: string }
-  | { type: 'done'; inputTokens: number; outputTokens: number; turns: number }
+  | { type: 'done'; inputTokens: number; outputTokens: number; turns: number; elapsed: number }
 
 export interface AgentResult {
   messages: Message[]
@@ -31,11 +32,13 @@ export interface AgentResult {
   turns: number
   inputTokens: number
   outputTokens: number
+  elapsed: number
   error?: string
+  toolCallsMade: number
 }
 
 export async function runAgent(opts: AgentOptions): Promise<AgentResult> {
-  const { provider, userMessage, history, cwd, systemPrompt, noTools, onChunk, signal } = opts
+  const { provider, userMessage, history, cwd, systemPrompt, noTools, onChunk, signal, verbose } = opts
   const maxTurns = opts.maxTurns ?? 20
 
   const apiKey = getApiKey(provider)
@@ -55,6 +58,8 @@ export async function runAgent(opts: AgentOptions): Promise<AgentResult> {
   let turns = 0
   let totalInputTokens = 0
   let totalOutputTokens = 0
+  let toolCallsMade = 0
+  const startTime = Date.now()
 
   for (let turn = 0; turn < maxTurns; turn++) {
     turns++
@@ -103,7 +108,9 @@ export async function runAgent(opts: AgentOptions): Promise<AgentResult> {
         turns,
         inputTokens: totalInputTokens,
         outputTokens: totalOutputTokens,
+        elapsed: Date.now() - startTime,
         error: errorMsg,
+        toolCallsMade,
       }
     }
 
@@ -125,6 +132,7 @@ export async function runAgent(opts: AgentOptions): Promise<AgentResult> {
       type: 'turn_done',
       inputTokens: turnInputTokens,
       outputTokens: turnOutputTokens,
+      turns,
     })
 
     fullText += text
@@ -136,6 +144,7 @@ export async function runAgent(opts: AgentOptions): Promise<AgentResult> {
 
     // Execute tool calls
     for (const tc of toolCalls) {
+      toolCallsMade++
       let args: Record<string, any>
       try {
         args = JSON.parse(tc.arguments)
@@ -162,11 +171,23 @@ export async function runAgent(opts: AgentOptions): Promise<AgentResult> {
   // Keep history bounded to last 40 messages
   const boundedMessages = messages.length > 40 ? messages.slice(-40) : messages
 
+  const elapsed = Date.now() - startTime
+
+  onChunk?.({
+    type: 'done',
+    inputTokens: totalInputTokens,
+    outputTokens: totalOutputTokens,
+    turns,
+    elapsed,
+  })
+
   return {
     messages: boundedMessages,
     text: fullText,
     turns,
     inputTokens: totalInputTokens,
     outputTokens: totalOutputTokens,
+    elapsed,
+    toolCallsMade,
   }
 }

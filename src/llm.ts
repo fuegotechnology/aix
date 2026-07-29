@@ -68,6 +68,7 @@ export async function* streamChat(
   }
   if (opts.tools && opts.tools.length > 0) {
     body.tools = opts.tools
+    body.tool_choice = 'auto'
   }
   if (opts.maxTokens) {
     body.max_tokens = opts.maxTokens
@@ -98,12 +99,39 @@ export async function* streamChat(
       signal: opts.signal,
     })
   } catch (err: any) {
+    if (err.name === 'AbortError') {
+      throw new Error(`${provider.name}: request aborted`)
+    }
     throw new Error(`${provider.name}: request failed — ${err.message}`)
   }
 
   if (!response.ok) {
     const text = await response.text().catch(() => '')
-    throw new Error(`${provider.name}: API error ${response.status} — ${text.slice(0, 500)}`)
+    let detail = text.slice(0, 500)
+    // Try to parse error for cleaner message
+    try {
+      const parsed = JSON.parse(text)
+      if (parsed.error?.message) {
+        detail = parsed.error.message
+      }
+    } catch { /* use raw */ }
+
+    if (response.status === 401) {
+      throw new Error(`${provider.name}: authentication failed — check your API key (${provider.apiKeyEnv || 'unknown'})`)
+    }
+    if (response.status === 429) {
+      throw new Error(`${provider.name}: rate limit exceeded — wait a moment and try again`)
+    }
+    if (response.status === 402 || response.status === 403) {
+      throw new Error(`${provider.name}: payment required or access denied — ${detail}`)
+    }
+    if (response.status === 404) {
+      throw new Error(`${provider.name}: model "${opts.model}" not found — check the model name or try aix --providers`)
+    }
+    if (response.status === 500 || response.status === 502 || response.status === 503) {
+      throw new Error(`${provider.name}: server error (${response.status}) — the provider may be experiencing issues. Try again in a moment.`)
+    }
+    throw new Error(`${provider.name}: API error ${response.status} — ${detail}`)
   }
 
   if (!response.body) {
@@ -114,6 +142,8 @@ export async function* streamChat(
   const decoder = new TextDecoder()
   let buffer = ''
   const toolCallMap = new Map<number, { id: string; name: string; arguments: string }>()
+  let finalInputTokens: number | undefined
+  let finalOutputTokens: number | undefined
 
   try {
     while (true) {
@@ -137,8 +167,10 @@ export async function* streamChat(
           continue
         }
 
+        // Capture usage
         if (chunk.usage) {
-          // Will emit at the end
+          finalInputTokens = chunk.usage.prompt_tokens
+          finalOutputTokens = chunk.usage.completion_tokens
         }
 
         const choice = chunk.choices?.[0]
@@ -206,8 +238,8 @@ export async function* streamChat(
 
   yield {
     type: 'done',
-    inputTokens: undefined,
-    outputTokens: undefined,
+    inputTokens: finalInputTokens,
+    outputTokens: finalOutputTokens,
   }
 }
 
@@ -228,6 +260,7 @@ export async function chatOnce(
   }
   if (opts.tools && opts.tools.length > 0) {
     body.tools = opts.tools
+    body.tool_choice = 'auto'
   }
   if (opts.maxTokens) {
     body.max_tokens = opts.maxTokens
@@ -257,12 +290,30 @@ export async function chatOnce(
       signal: opts.signal,
     })
   } catch (err: any) {
+    if (err.name === 'AbortError') {
+      throw new Error(`${provider.name}: request aborted`)
+    }
     throw new Error(`${provider.name}: request failed — ${err.message}`)
   }
 
   if (!response.ok) {
     const text = await response.text().catch(() => '')
-    throw new Error(`${provider.name}: API error ${response.status} — ${text.slice(0, 500)}`)
+    let detail = text.slice(0, 500)
+    try {
+      const parsed = JSON.parse(text)
+      if (parsed.error?.message) detail = parsed.error.message
+    } catch { /* use raw */ }
+
+    if (response.status === 401) {
+      throw new Error(`${provider.name}: authentication failed — check your API key (${provider.apiKeyEnv || 'unknown'})`)
+    }
+    if (response.status === 429) {
+      throw new Error(`${provider.name}: rate limit exceeded — wait and try again`)
+    }
+    if (response.status === 404) {
+      throw new Error(`${provider.name}: model "${opts.model}" not found — check the model name or try aix --providers`)
+    }
+    throw new Error(`${provider.name}: API error ${response.status} — ${detail}`)
   }
 
   const data = await response.json() as any
