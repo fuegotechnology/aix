@@ -275,3 +275,63 @@ export function renderSessionSaved(session: SessionData): string {
   const m = session.meta
   return `  ${brightGreen('✓')} Session saved: ${brightCyan(m.name)} ${dim(`(${m.id})`)}`
 }
+
+// ─── Search sessions ───────────────────────────────────────────────
+
+export function searchSessions(query: string): SessionSummary[] {
+  const all = listSessions()
+  if (!query) return all
+  const q = query.toLowerCase()
+  return all.filter(s => {
+    const data = loadSession(s.id)
+    if (!data) return false
+    if (s.name.toLowerCase().includes(q)) return true
+    if (s.id.toLowerCase().includes(q)) return true
+    if (s.provider.toLowerCase().includes(q)) return true
+    if (s.model.toLowerCase().includes(q)) return true
+    if (s.vibe.toLowerCase().includes(q)) return true
+    for (const msg of data.history) {
+      if (typeof msg.content === 'string' && msg.content.toLowerCase().includes(q)) return true
+    }
+    return false
+  })
+}
+
+// ─── Clear all sessions ────────────────────────────────────────────
+
+export function clearAllSessions(): number {
+  const all = listSessions()
+  let deleted = 0
+  for (const s of all) {
+    if (deleteSession(s.id)) deleted++
+  }
+  return deleted
+}
+
+// ─── Export & Import session JSON ──────────────────────────────────
+
+export function exportSessionToFile(id: string, filePath: string): boolean {
+  const data = loadSession(id)
+  if (!data) return false
+  try {
+    writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8')
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function importSessionFromFile(filePath: string): SessionData | null {
+  try {
+    const raw = readFileSync(filePath, 'utf-8')
+    const data = JSON.parse(raw) as SessionData
+    if (!data || !data.meta || !Array.isArray(data.history)) return null
+    if (!data.meta.id || existsSync(sessionPath(data.meta.id))) {
+      data.meta.id = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+    }
+    saveSession(data)
+    return data
+  } catch {
+    return null
+  }
+}

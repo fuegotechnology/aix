@@ -231,6 +231,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'session_resume', name: 'Continuity', description: 'Resume a saved session', emoji: '🔄', condition: s => s.sessionsResumed >= 1, xp: 15, category: 'special' },
   { id: 'session_resume_5', name: 'Persistent', description: 'Resume 5 sessions', emoji: '🔁', condition: s => s.sessionsResumed >= 5, xp: 50, category: 'special' },
   { id: 'session_resume_20', name: 'Never Forget', description: 'Resume 20 sessions', emoji: '🧠', condition: s => s.sessionsResumed >= 20, xp: 150, category: 'special' },
+  { id: 'quest_first', name: 'Quest Adventurer', description: 'Complete your first quest', emoji: '🗺️', condition: s => s.completedQuests.length >= 1, xp: 50, category: 'special' },
+  { id: 'quest_master', name: 'Quest Master', description: 'Complete all 5 quests', emoji: '👑', condition: s => s.completedQuests.length >= 5, xp: 250, category: 'special' },
 ]
 
 export const TITLES: { id: string; name: string; emoji: string; condition: (s: Stats) => boolean }[] = [
@@ -252,6 +254,7 @@ export const TITLES: { id: string; name: string; emoji: string; condition: (s: S
   { id: 'provider_nomad', name: 'Provider Nomad', emoji: '🚀', condition: s => Object.keys(s.providerUsage).length >= 30 },
   { id: 'session_master', name: 'Session Master', emoji: '🧘', condition: s => s.totalSessions >= 100 },
   { id: 'millionaire', name: 'XP Millionaire', emoji: '💰', condition: s => s.xp >= 100000 },
+  { id: 'quest_legend', name: 'Quest Legend', emoji: '🗺️', condition: s => s.completedQuests.length >= 5 },
 ]
 
 export const DAILY_CHALLENGES: { id: string; name: string; description: string; target: number; xp: number; emoji: string }[] = [
@@ -329,6 +332,7 @@ export function loadStats(): Stats {
     s.activeQuests = s.activeQuests || []
     s.completedQuests = s.completedQuests || []
     s.sessionsResumed = s.sessionsResumed || 0
+    s.level = getLevelForXp(s.xp || 0).level
     return s
   } catch {
     return {
@@ -387,6 +391,7 @@ export function checkNewAchievements(stats: Stats): Achievement[] {
       stats.unlockedTitles.push(title.id)
     }
   }
+  stats.level = getLevelForXp(stats.xp).level
   return newAchievements
 }
 
@@ -456,16 +461,19 @@ export function updateDailyChallenge(stats: Stats, type: 'message' | 'tool' | 'e
   if (challenge && stats.dailyChallengeProgress >= challenge.target) {
     stats.dailyChallengeCompleted = true
     stats.xp += challenge.xp
+    stats.level = getLevelForXp(stats.xp).level
   }
 }
 
 export function renderXpBar(stats: Stats, width: number = 20): string {
-  const { current, next, xpNeeded } = getXpForNextLevel(stats.level)
-  if (xpNeeded === 0) return `${'█'.repeat(width)} MAX`
-  const progress = (stats.xp - current) / (next - current)
-  const filled = Math.round(progress * width)
-  const empty = width - filled
-  return `${'█'.repeat(filled)}${'░'.repeat(empty)} ${stats.xp - current}/${xpNeeded} XP`
+  const safeWidth = Math.max(0, width)
+  const levelDef = getLevelForXp(stats.xp)
+  const { current, next, xpNeeded } = getXpForNextLevel(levelDef.level)
+  if (xpNeeded === 0) return `${'█'.repeat(safeWidth)} MAX`
+  const progress = xpNeeded > 0 ? Math.max(0, Math.min(1, (stats.xp - current) / xpNeeded)) : 1
+  const filled = Math.max(0, Math.min(safeWidth, Math.round(progress * safeWidth)))
+  const empty = Math.max(0, safeWidth - filled)
+  return `${'█'.repeat(filled)}${'░'.repeat(empty)} ${Math.max(0, stats.xp - current)}/${xpNeeded} XP`
 }
 
 export function renderStats(stats: Stats): string {
@@ -531,9 +539,10 @@ export function renderDailyChallenge(stats: Stats): string {
   const C = { reset: '\x1b[0m', dim: '\x1b[2m', bold: '\x1b[1m', cyan: '\x1b[36m', green: '\x1b[32m', yellow: '\x1b[33m' }
   const status = challenge.completed ? `${C.green}✓ COMPLETE${C.reset}` : `${challenge.progress}/${challenge.target}`
   const bar_width = 15
-  const progress = Math.min(challenge.progress / challenge.target, 1)
-  const filled = Math.round(progress * bar_width)
-  const bar = `${'█'.repeat(filled)}${'░'.repeat(bar_width - filled)}`
+  const progress = challenge.target > 0 ? Math.max(0, Math.min(1, challenge.progress / challenge.target)) : 1
+  const filled = Math.max(0, Math.min(bar_width, Math.round(progress * bar_width)))
+  const empty = Math.max(0, bar_width - filled)
+  const bar = `${'█'.repeat(filled)}${'░'.repeat(empty)}`
   return `  ${C.cyan}📅 Daily:${C.reset} ${challenge.emoji} ${challenge.name} ${C.dim}[${bar}]${C.reset} ${status} ${C.dim}(+${challenge.xp} XP)${C.reset}`
 }
 
@@ -549,6 +558,51 @@ export function assignWeeklyChallenge(stats: Stats): void {
   stats.weeklyChallengeCompleted = false
 }
 
+export function updateWeeklyChallenge(stats: Stats, type: 'message' | 'tool' | 'edit' | 'vibe' | 'provider' | 'combo' | 'streak'): void {
+  if (stats.weeklyChallengeCompleted || !stats.weeklyChallenge) return
+  const challenge = WEEKLY_CHALLENGES.find(c => c.id === stats.weeklyChallenge)
+  if (!challenge) return
+  let increment = false
+  if (challenge.id === 'w_msg50' && type === 'message') increment = true
+  if (challenge.id === 'w_tools25' && type === 'tool') increment = true
+  if (challenge.id === 'w_edit10' && type === 'edit') increment = true
+  if (challenge.id === 'w_vibe5' && type === 'vibe') stats.weeklyChallengeProgress = Object.keys(stats.vibeUsage).length
+  if (challenge.id === 'w_provider5' && type === 'provider') stats.weeklyChallengeProgress = Object.keys(stats.providerUsage).length
+  if (challenge.id === 'w_combo15' && type === 'combo') stats.weeklyChallengeProgress = Math.max(stats.weeklyChallengeProgress, stats.combo)
+  if (challenge.id === 'w_streak' && type === 'streak') stats.weeklyChallengeProgress = stats.streak
+
+  if (increment) stats.weeklyChallengeProgress++
+  if (stats.weeklyChallengeProgress >= challenge.target) {
+    stats.weeklyChallengeCompleted = true
+    stats.xp += challenge.xp
+    stats.level = getLevelForXp(stats.xp).level
+  }
+}
+
+export function updateQuests(stats: Stats): { id: string; name: string; xp: number; emoji: string }[] {
+  const newlyCompleted: { id: string; name: string; xp: number; emoji: string }[] = []
+  for (const questId of [...stats.activeQuests]) {
+    if (stats.completedQuests.includes(questId)) continue
+    const q = QUESTS.find(quest => quest.id === questId)
+    if (!q) continue
+    let done = false
+    if (q.id === 'q_coder' && stats.totalMessages >= 5 && stats.totalToolCalls >= 3 && stats.totalFilesEdited >= 1) done = true
+    if (q.id === 'q_explorer' && Object.keys(stats.providerUsage).length >= 3 && Object.keys(stats.vibeUsage).length >= 2) done = true
+    if (q.id === 'q_architect' && stats.totalFilesEdited >= 10 && stats.totalBashCommands >= 10 && stats.totalToolCalls >= 20) done = true
+    if (q.id === 'q_master' && stats.maxCombo >= 10 && stats.totalToolCalls >= 50 && stats.totalFilesEdited >= 50) done = true
+    if (q.id === 'q_legend' && stats.level >= 10 && Object.keys(stats.vibeUsage).length >= 15) done = true
+
+    if (done) {
+      stats.completedQuests.push(questId)
+      stats.activeQuests = stats.activeQuests.filter(id => id !== questId)
+      stats.xp += q.xp
+      stats.level = getLevelForXp(stats.xp).level
+      newlyCompleted.push({ id: q.id, name: q.name, xp: q.xp, emoji: q.emoji })
+    }
+  }
+  return newlyCompleted
+}
+
 export function renderWeeklyChallenge(stats: Stats): string {
   if (!stats.weeklyChallenge) return ''
   const challenge = WEEKLY_CHALLENGES.find(c => c.id === stats.weeklyChallenge)
@@ -556,9 +610,10 @@ export function renderWeeklyChallenge(stats: Stats): string {
   const C = { reset: '\x1b[0m', dim: '\x1b[2m', bold: '\x1b[1m', cyan: '\x1b[36m', green: '\x1b[32m', yellow: '\x1b[33m', brightMagenta: '\x1b[95m' }
   const status = stats.weeklyChallengeCompleted ? `${C.green}✓ COMPLETE${C.reset}` : `${stats.weeklyChallengeProgress}/${challenge.target}`
   const bar_width = 15
-  const progress = Math.min(stats.weeklyChallengeProgress / challenge.target, 1)
-  const filled = Math.round(progress * bar_width)
-  const bar = `${'█'.repeat(filled)}${'░'.repeat(bar_width - filled)}`
+  const progress = challenge.target > 0 ? Math.max(0, Math.min(1, stats.weeklyChallengeProgress / challenge.target)) : 1
+  const filled = Math.max(0, Math.min(bar_width, Math.round(progress * bar_width)))
+  const empty = Math.max(0, bar_width - filled)
+  const bar = `${'█'.repeat(filled)}${'░'.repeat(empty)}`
   return `  ${C.brightMagenta}📅 Weekly:${C.reset} ${challenge.emoji} ${challenge.name} ${C.dim}[${bar}]${C.reset} ${status} ${C.dim}(+${challenge.xp} XP)${C.reset}`
 }
 

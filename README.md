@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <strong>40 vibe modes</strong> • <strong>83 achievements</strong> • <strong>15 levels</strong> • <strong>24 tools</strong> • <strong>20 beta providers</strong>
+  <strong>40 vibe modes</strong> • <strong>85 achievements</strong> • <strong>15 levels</strong> • <strong>24 tools</strong> • <strong>20 beta providers</strong>
 </p>
 
 <p align="center">
-  <code>npm install -g aix-ai@2.0.0-beta.1</code>
+  <code>npm install -g aix-ai@2.0.0-beta.3</code>
 </p>
 
 ---
@@ -21,7 +21,7 @@
 - **40 providers** — 4 no-key, 23 free tier, 7 paid, 6 local — all DNS-verified real
 - **20 beta providers** — Community/proxy/scraper endpoints, enable with `--beta`
 - **40 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, Cyberpunk, and more
-- **83 achievements** — XP, combos, streaks, daily challenges, session resume
+- **85 achievements** — XP, combos, streaks, daily & weekly challenges, quests, session resume
 - **15 levels** — Initiate → Apotheosis
 - **24 built-in tools** — 12 coding + 6 action + code_review + summarize + project_map
 - **Combo system** — Chain messages for XP multipliers up to 2x
@@ -224,9 +224,9 @@ Unlock and equip titles: `/title <id>`
 | Session Master | 🧘 | Complete 100+ sessions |
 | XP Millionaire | 💰 | Earn 100,000+ XP |
 
-### 83 Achievements
+### 85 Achievements (19 Titles, Quests & Weekly Challenges)
 
-Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes, Combos, Levels, Daily, Special, Sessions, Secret
+Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes, Combos, Levels, Daily & Weekly, Quests, Special, Sessions, Secret
 
 ---
 
@@ -347,8 +347,12 @@ Sessions are automatically saved so you can continue conversations later.
 | `/resume <id>` | Resume a specific session |
 | `/sessions` | List all saved sessions |
 | `/sessions info` | Show current session info |
+| `/sessions search <query>` | Search sessions by keyword or content |
+| `/sessions export <id> [file]` | Export a session to JSON file |
+| `/sessions import <file>` | Import a session from JSON file |
 | `/sessions delete <id>` | Delete a session |
 | `/sessions rename <id> <name>` | Rename a session |
+| `/sessions clear` | Clear all saved sessions |
 
 ### Auto-Save
 
@@ -463,7 +467,7 @@ node dist/cli.js --vibe vampire "debug this ancient code"
 | `/compact` | Compact history |
 | `/save` | Save current session |
 | `/resume [id]` | Resume a session (last if no id) |
-| `/sessions` | List/manage sessions |
+| `/sessions` | List/manage sessions (search, export, import, delete, rename, clear) |
 | `/fallback` | Switch to another free provider |
 
 ---

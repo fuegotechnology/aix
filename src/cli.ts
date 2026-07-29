@@ -11,7 +11,7 @@ import {
   loadStats, saveStats, updateStreak, addXp, checkNewAchievements,
   getLevelForXp, renderXpBar, renderStats, renderAchievementUnlock, renderLevelUp,
   renderCombo, renderDailyChallenge, updateCombo, assignDailyChallenge, updateDailyChallenge,
-  assignWeeklyChallenge, renderWeeklyChallenge, renderQuests,
+  assignWeeklyChallenge, updateWeeklyChallenge, renderWeeklyChallenge, renderQuests, updateQuests,
   LEVELS, ACHIEVEMENTS, TITLES, DAILY_CHALLENGES, WEEKLY_CHALLENGES, QUESTS,
 } from './gamification.js'
 import type { Stats } from './gamification.js'
@@ -28,7 +28,8 @@ import { activatePowerUp, renderPowerUps, renderMacros, saveExport, POWER_UPS, g
 import {
   createSession, saveSession, loadSession, listSessions, deleteSession, renameSession,
   getLastSession, findSession, renderSessionList, renderSessionInfo, renderSessionResumed,
-  renderSessionSaved, type SessionData, type SessionSummary,
+  renderSessionSaved, searchSessions, clearAllSessions, exportSessionToFile, importSessionFromFile,
+  type SessionData, type SessionSummary,
 } from './session.js'
 
 const AIX_DIR = resolve(homedir(), '.aix')
@@ -133,7 +134,7 @@ ${bold(cyan('INTERACTIVE COMMANDS'))}
   ${bold('/save')}                       Save current session
   ${bold('/load')}                       Load a saved session (deprecated: use /resume)
   ${bold('/resume [id]')}                Resume a session (last if no id)
-  ${bold('/sessions [subcmd]')}          List/manage sessions (delete, rename)
+  ${bold('/sessions [subcmd]')}          List/manage sessions (search, export, import, delete, rename, clear)
   ${bold('/fallback')}                   Switch to a different free provider
   ${bold('/config')}                     View/edit configuration
   ${bold('/health')}                     Check provider health
@@ -281,6 +282,10 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
   stats.totalSessions++
   stats.providerUsage[provider.id] = (stats.providerUsage[provider.id] || 0) + 1
   stats.vibeUsage[vibe.id] = (stats.vibeUsage[vibe.id] || 0) + 1
+  updateWeeklyChallenge(stats, 'vibe')
+  updateWeeklyChallenge(stats, 'provider')
+  updateWeeklyChallenge(stats, 'streak')
+  const initialQuestCompletions = updateQuests(stats)
   saveStats(stats)
 
   const level = getLevelForXp(stats.xp)
@@ -289,6 +294,9 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
   if (dailyDisplay) console.log(dailyDisplay)
   const weeklyDisplay = renderWeeklyChallenge(stats)
   if (weeklyDisplay) console.log(weeklyDisplay)
+  for (const qc of initialQuestCompletions) {
+    console.log(`  ${green(`✓ Quest Completed:`)} ${qc.emoji} ${bold(qc.name)} ${green(`(+${qc.xp} XP)`)}`)
+  }
   console.log()
 
   // ─── Session setup ─────────────────────────────────────────────
@@ -592,9 +600,33 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
             } else {
               console.log(errorLine(`Session not found: ${id}`))
             }
+          } else if (arg.startsWith('search ')) {
+            const query = arg.split(' ').slice(1).join(' ')
+            const found = searchSessions(query)
+            console.log(renderSessionList(found))
+          } else if (arg.startsWith('export ')) {
+            const parts = arg.split(' ')
+            const id = parts[1]
+            const filePath = parts.slice(2).join(' ') || `${id}.session.json`
+            if (exportSessionToFile(id, filePath)) {
+              console.log(successLine(`Session ${id} exported to ${filePath}`))
+            } else {
+              console.log(errorLine(`Failed to export session ${id}`))
+            }
+          } else if (arg.startsWith('import ')) {
+            const filePath = arg.split(' ').slice(1).join(' ')
+            const imported = importSessionFromFile(filePath)
+            if (imported) {
+              console.log(successLine(`Session "${imported.meta.name}" imported (${imported.meta.id})`))
+            } else {
+              console.log(errorLine(`Failed to import session from ${filePath}`))
+            }
+          } else if (arg === 'clear') {
+            const count = clearAllSessions()
+            console.log(successLine(`Cleared ${count} saved sessions`))
           } else {
             console.log(errorLine(`Unknown /sessions subcommand: ${arg}`))
-            console.log(dim('Available: delete <id>, rename <id> <name>, info [id]'))
+            console.log(dim('Available: delete <id>, rename <id> <name>, info [id], search <query>, export <id> [file], import <file>, clear'))
           }
           rl.prompt()
           return
@@ -874,14 +906,19 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
     if (editsThisTurn > 0) updateDailyChallenge(stats, 'edit')
     if (bashThisTurn > 0) updateDailyChallenge(stats, 'bash')
     if (combo >= 5) updateDailyChallenge(stats, 'combo')
+    updateWeeklyChallenge(stats, 'message')
+    if (toolCallsThisTurn > 0) updateWeeklyChallenge(stats, 'tool')
+    if (editsThisTurn > 0) updateWeeklyChallenge(stats, 'edit')
+    if (combo >= 15) updateWeeklyChallenge(stats, 'combo')
 
     // Award XP (with combo multiplier)
     const baseXp = 5 + (toolCallsThisTurn * 3) + (editsThisTurn * 5) + (bashThisTurn * 2)
     const xpGained = Math.round(baseXp * comboMultiplier)
     const { leveledUp, newLevel, oldLevel } = addXp(stats, xpGained)
 
-    // Check achievements
+    // Check achievements & quests
     const newAchievements = checkNewAchievements(stats)
+    const newQuestCompletions = updateQuests(stats)
     saveStats(stats)
 
     console.log()
@@ -903,6 +940,9 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
     // Show achievement unlocks
     for (const achievement of newAchievements) {
       console.log(renderAchievementUnlock(achievement))
+    }
+    for (const qc of newQuestCompletions) {
+      console.log(`  ${green(`✓ Quest Completed:`)} ${qc.emoji} ${bold(qc.name)} ${green(`(+${qc.xp} XP)`)}`)
     }
 
     if (result.toolCallsMade > 0) {
@@ -965,6 +1005,7 @@ async function runOneShot(provider: Provider, cwd: string, userPrompt: string, n
   const stats = loadStats()
   updateStreak(stats)
   assignDailyChallenge(stats)
+  assignWeeklyChallenge(stats)
   stats.totalSessions++
   stats.totalMessages++
   stats.messagesThisSession++
@@ -972,6 +1013,9 @@ async function runOneShot(provider: Provider, cwd: string, userPrompt: string, n
   stats.vibeUsage[vibe.id] = (stats.vibeUsage[vibe.id] || 0) + 1
   updateCombo(stats)
   updateDailyChallenge(stats, 'message')
+  updateWeeklyChallenge(stats, 'message')
+  updateWeeklyChallenge(stats, 'vibe')
+  updateWeeklyChallenge(stats, 'provider')
 
   const systemPrompt = buildSystemPrompt(cwd, vibe.systemPromptSuffix || undefined)
   const spinner = new Spinner()
@@ -1053,10 +1097,13 @@ async function runOneShot(provider: Provider, cwd: string, userPrompt: string, n
     if (toolCallsThisTurn > 0) updateDailyChallenge(stats, 'tool')
     if (editsThisTurn > 0) updateDailyChallenge(stats, 'edit')
     if (bashThisTurn > 0) updateDailyChallenge(stats, 'bash')
+    if (toolCallsThisTurn > 0) updateWeeklyChallenge(stats, 'tool')
+    if (editsThisTurn > 0) updateWeeklyChallenge(stats, 'edit')
 
     const xpGained = 5 + (toolCallsThisTurn * 3) + (editsThisTurn * 5) + (bashThisTurn * 2)
     const { leveledUp, newLevel, oldLevel } = addXp(stats, xpGained)
     const newAchievements = checkNewAchievements(stats)
+    const newQuestCompletions = updateQuests(stats)
     saveStats(stats)
 
     if (result.error) {

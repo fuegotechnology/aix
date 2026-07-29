@@ -1,6 +1,6 @@
 {
   "name": "aix-ai",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.3",
   "description": "aix — AI coding assistant for your terminal. 40 providers, 40 vibes, 24 tools, 80 achievements. Many completely free.",
   "license": "MIT",
   "type": "module",
