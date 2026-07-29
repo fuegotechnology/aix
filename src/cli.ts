@@ -11,7 +11,8 @@ import {
   loadStats, saveStats, updateStreak, addXp, checkNewAchievements,
   getLevelForXp, renderXpBar, renderStats, renderAchievementUnlock, renderLevelUp,
   renderCombo, renderDailyChallenge, updateCombo, assignDailyChallenge, updateDailyChallenge,
-  LEVELS, ACHIEVEMENTS, TITLES, DAILY_CHALLENGES,
+  assignWeeklyChallenge, renderWeeklyChallenge, renderQuests,
+  LEVELS, ACHIEVEMENTS, TITLES, DAILY_CHALLENGES, WEEKLY_CHALLENGES, QUESTS,
 } from './gamification.js'
 import type { Stats } from './gamification.js'
 import {
@@ -21,6 +22,9 @@ import {
   Spinner, renderMarkdown, printBanner, printTokens, printTurnInfo, prompt,
   renderAction,
 } from './ui.js'
+import { loadConfig, saveConfig, renderConfig, type AixConfig } from './config.js'
+import { checkAllNoKeyProviders, renderHealthResults, getBestProvider } from './health.js'
+import { activatePowerUp, renderPowerUps, renderMacros, saveExport, POWER_UPS, getTimeGreeting } from './advanced.js'
 
 const AIX_DIR = resolve(homedir(), '.aix')
 const SESSIONS_DIR = join(AIX_DIR, 'sessions')
@@ -53,6 +57,9 @@ ${bold(cyan('OPTIONS'))}
   ${bold('--leaderboard')}                Show XP leaderboard
   ${bold('--reset-stats')}                Reset all stats
   ${bold('--fallback')}                   Auto-fallback to another free provider on failure
+  ${bold('--health')}                     Check which free providers are working
+  ${bold('--config')}                     View current configuration
+  ${bold('--best')}                       Auto-select the fastest free provider
 
 ${bold(cyan('VIBES'))} 🎭
   ${bold('default')}     🎯  Professional — clean, focused
@@ -108,6 +115,13 @@ ${bold(cyan('INTERACTIVE COMMANDS'))}
   ${bold('/save')}                       Save current session
   ${bold('/load')}                       Load a saved session
   ${bold('/fallback')}                   Switch to a different free provider
+  ${bold('/config')}                     View/edit configuration
+  ${bold('/health')}                     Check provider health
+  ${bold('/powerup')}                    View and activate power-ups
+  ${bold('/export')}                     Export conversation to markdown
+  ${bold('/macro')}                      Manage macros
+  ${bold('/quest')}                      View and manage quests
+  ${bold('/weekly')}                     Show weekly challenge
 
 ${bold(cyan('ENVIRONMENT VARIABLES'))}
   ${bold('AIX_PROVIDER')}                Provider id to use
@@ -228,12 +242,16 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
 
   // Show vibe greeting
   console.log(`  ${vibe.emoji} ${vibe.colors.primary}${vibe.greeting}${'\x1b[0m'}`)
+
+  // Show time-aware greeting
+  console.log(`  ${dim(getTimeGreeting())}`)
   console.log()
 
   // Load and show stats
   const stats = loadStats()
   updateStreak(stats)
   assignDailyChallenge(stats)
+  assignWeeklyChallenge(stats)
   stats.totalSessions++
   stats.providerUsage[provider.id] = (stats.providerUsage[provider.id] || 0) + 1
   stats.vibeUsage[vibe.id] = (stats.vibeUsage[vibe.id] || 0) + 1
@@ -243,6 +261,8 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
   console.log(`  ${level.emoji} ${level.color}Level ${level.level}: ${level.name}${'\x1b[0m'} ${dim(renderXpBar(stats))}`)
   const dailyDisplay = renderDailyChallenge(stats)
   if (dailyDisplay) console.log(dailyDisplay)
+  const weeklyDisplay = renderWeeklyChallenge(stats)
+  if (weeklyDisplay) console.log(weeklyDisplay)
   console.log()
 
   const history: Message[] = []
@@ -486,6 +506,136 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
             console.log(successLine(`Switched to ${fallback.name} │ Model: ${brightCyan(currentModel)}`))
           } else {
             console.log(errorLine('No fallback providers available'))
+          }
+          rl.prompt()
+          return
+        case '/config':
+          const config = loadConfig()
+          if (arg) {
+            const [key, ...valParts] = arg.split(' ')
+            const val = valParts.join(' ')
+            if (!val) {
+              // Show specific key
+              const value = (config as any)[key]
+              console.log(infoLine(`${key}: ${JSON.stringify(value)}`))
+            } else {
+              // Set config value
+              try {
+                const parsed = val === 'true' ? true : val === 'false' ? false : val === 'null' ? null : isNaN(Number(val)) ? val : Number(val)
+                ;(config as any)[key] = parsed
+                saveConfig(config)
+                console.log(successLine(`Set ${key} = ${JSON.stringify(parsed)}`))
+              } catch {
+                console.log(errorLine('Invalid value'))
+              }
+            }
+          } else {
+            console.log(renderConfig(config))
+          }
+          rl.prompt()
+          return
+        case '/health':
+          console.log(dim('Checking provider health...'))
+          checkAllNoKeyProviders(10).then(results => {
+            console.log(renderHealthResults(results))
+            rl.prompt()
+          })
+          return
+        case '/powerup':
+          if (arg) {
+            const result = activatePowerUp(stats, arg)
+            if (result.success) {
+              console.log(successLine(result.message))
+              saveStats(stats)
+            } else {
+              console.log(errorLine(result.message))
+            }
+          } else {
+            console.log(renderPowerUps(stats))
+          }
+          rl.prompt()
+          return
+        case '/export':
+          try {
+            const format = arg === 'json' ? 'json' : 'markdown'
+            const filePath = saveExport(history, format)
+            console.log(successLine(`Conversation exported to ${filePath}`))
+          } catch (err: any) {
+            console.log(errorLine(`Export failed: ${err.message}`))
+          }
+          rl.prompt()
+          return
+        case '/macro':
+          const aixConfig = loadConfig()
+          if (!arg) {
+            console.log(renderMacros(aixConfig.macros || {}))
+          } else if (arg.startsWith('delete ')) {
+            const name = arg.split(' ')[1]
+            if (aixConfig.macros && aixConfig.macros[name]) {
+              delete aixConfig.macros[name]
+              saveConfig(aixConfig)
+              console.log(successLine(`Macro "${name}" deleted`))
+            } else {
+              console.log(errorLine(`Macro "${name}" not found`))
+            }
+          } else if (arg.startsWith('record ')) {
+            const name = arg.split(' ')[1]
+            if (!lastUserMessage) {
+              console.log(warningLine('Send a message first, then record it as a macro'))
+            } else {
+              if (!aixConfig.macros) aixConfig.macros = {}
+              aixConfig.macros[name] = lastUserMessage
+              saveConfig(aixConfig)
+              console.log(successLine(`Macro "${name}" recorded: ${lastUserMessage.slice(0, 60)}`))
+            }
+          } else if (arg.includes(' ')) {
+            // Run macro: /macro <name>
+            const name = arg.split(' ')[0]
+            if (aixConfig.macros && aixConfig.macros[name]) {
+              console.log(infoLine(`Running macro "${name}"...`))
+              // Simulate the user input
+              lastUserMessage = aixConfig.macros[name]
+              // Break out of command handling to run as a regular message
+              break
+            } else {
+              console.log(errorLine(`Macro "${name}" not found`))
+            }
+          } else {
+            if (aixConfig.macros && aixConfig.macros[arg]) {
+              console.log(infoLine(`Macro "${arg}": ${aixConfig.macros[arg]}`))
+            } else {
+              console.log(renderMacros(aixConfig.macros || {}))
+            }
+          }
+          rl.prompt()
+          return
+        case '/quest':
+          console.log(renderQuests(stats))
+          if (arg && arg.startsWith('start ')) {
+            const questId = arg.split(' ')[1]
+            const quest = QUESTS.find(q => q.id === questId)
+            if (!quest) {
+              console.log(errorLine(`Unknown quest: ${questId}`))
+            } else if (stats.completedQuests.includes(questId)) {
+              console.log(infoLine('Quest already completed!'))
+            } else if (stats.level < quest.requiredLevel) {
+              console.log(errorLine(`Requires level ${quest.requiredLevel}. You are level ${stats.level}.`))
+            } else if (stats.activeQuests.includes(questId)) {
+              console.log(infoLine('Quest already active!'))
+            } else {
+              stats.activeQuests.push(questId)
+              saveStats(stats)
+              console.log(successLine(`Quest "${quest.name}" started! ${quest.emoji}`))
+            }
+          }
+          rl.prompt()
+          return
+        case '/weekly':
+          const weeklyDisplay = renderWeeklyChallenge(stats)
+          if (weeklyDisplay) {
+            console.log(weeklyDisplay)
+          } else {
+            console.log(infoLine('No weekly challenge active'))
           }
           rl.prompt()
           return
@@ -824,6 +974,9 @@ function main(): void {
   let showLeaderboard = false
   let resetStats = false
   let useFallback = false
+  let showHealth = false
+  let showConfig = false
+  let useBest = false
   let positional: string[] = []
 
   for (let i = 0; i < args.length; i++) {
@@ -890,6 +1043,15 @@ function main(): void {
       case '--fallback':
         useFallback = true
         break
+      case '--health':
+        showHealth = true
+        break
+      case '--config':
+        showConfig = true
+        break
+      case '--best':
+        useBest = true
+        break
       default:
         if (arg.startsWith('-')) {
           console.error(errorLine(`Unknown option: ${arg}`))
@@ -916,6 +1078,21 @@ function main(): void {
     const statsFile = join(homedir(), '.aix', 'stats.json')
     try { unlinkSync(statsFile) } catch { /* ok */ }
     console.log(successLine('Stats reset! Fresh start.'))
+    process.exit(0)
+  }
+
+  if (showHealth) {
+    console.log(dim('Checking provider health (this may take a moment)...'))
+    checkAllNoKeyProviders(15).then(results => {
+      console.log(renderHealthResults(results))
+      process.exit(0)
+    })
+    return
+  }
+
+  if (showConfig) {
+    const config = loadConfig()
+    console.log(renderConfig(config))
     process.exit(0)
   }
 
@@ -953,6 +1130,14 @@ function main(): void {
       process.exit(1)
     }
     provider = p
+  } else if (useBest) {
+    const best = getBestProvider()
+    if (best) {
+      provider = best
+      console.error(dim(`⚡ Auto-selected fastest provider: ${best.name}`))
+    } else {
+      provider = detectProvider()
+    }
   } else {
     provider = detectProvider()
   }

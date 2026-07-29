@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>66 AI providers</strong> — <strong>39 completely free</strong> with no API key, no signup, no credit card.
+  <strong>64 AI providers</strong> — <strong>33 completely free</strong> with no API key, no signup, no credit card.
 </p>
 
 <p align="center">
@@ -18,7 +18,7 @@
 
 ## ✨ Features
 
-- **66 providers** — 39 no-key, 14 free tier, 8 paid, 5 local
+- **64 providers** — 33 no-key, 18 free tier, 8 paid, 5 local
 - **31 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, and more
 - **72 achievements** — XP, combos, streaks, daily challenges, titles
 - **15 levels** — Initiate → Apotheosis
@@ -37,7 +37,7 @@
 
 ## 🚀 Quick Start
 
-### Zero Setup (39 Free, No Key Providers!)
+### Zero Setup (33 Free, No Key Providers!)
 
 ```bash
 aix "explain this codebase"           # Pollinations — works immediately
@@ -219,7 +219,7 @@ Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes
 
 ## 🆓 Free Providers
 
-### No API Key Needed (39 providers!)
+### No API Key Needed (33 providers!)
 
 | ID | Name | Top Models |
 |----|------|------------|
@@ -253,15 +253,9 @@ Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes
 | `prismai` | PrismAI | GPT-4o Mini, DeepSeek |
 | `quantumai` | QuantumAI | GPT-4o Mini, DeepSeek, Qwen |
 | `eclipseai` | EclipseAI | GPT-4o Mini, Llama |
-| `novaai` | NovaAI | GPT-4o Mini, DeepSeek, Llama |
-| `zenithai` | ZenithAI | GPT-4o Mini, GPT-3.5, Qwen |
-| `pulsarai` | PulsarAI | GPT-4o Mini, DeepSeek |
-| `vertexai` | VertexAI | GPT-4o Mini, Llama, DeepSeek |
-| `cipherai` | CipherAI | GPT-4o Mini, DeepSeek, Qwen |
-| `nexusai` | NexusAI | GPT-4o Mini, Llama |
-| `sparkai` | SparkAI | GPT-4o Mini, DeepSeek |
-| `stellarai` | StellarAI | GPT-4o Mini, Llama, Qwen |
-| `phantomai` | PhantomAI | GPT-4o Mini, DeepSeek, GPT-3.5 |
+| `bazaarlink` | BazaarLink | Auto Free (zero-cost inference) |
+| `cloudflare` | Cloudflare Workers AI | GPT-OSS 120B, Llama 3.3 70B |
+| `ovhcloud` | OVHcloud AI Endpoints | Llama 3.3 70B, Mistral Small, Qwen Coder |
 
 ### Free API Key (No Credit Card)
 
@@ -281,17 +275,65 @@ Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes
 | `glhf` | GLHF | GLHF_API_KEY |
 | `together` | Together AI | TOGETHER_API_KEY |
 | `fireworks` | Fireworks AI | FIREWORKS_API_KEY |
+| `opencodezen` | OpenCode Zen | OPENCODE_ZEN_API_KEY |
+| `kilocode` | Kilo Code | KILO_API_KEY |
+| `zhipu` | Z.ai (Zhipu AI) | ZHIPU_API_KEY |
+| `alibabastudio` | Alibaba Cloud Model Studio | ALIBABA_API_KEY |
 
 ---
 
 ## 🛠 Usage
 
+### How to Use aix
+
+**1. Install & Run (no setup needed!)**
 ```bash
-aix                                    # Interactive mode
-aix -p pollinations "hello"           # Free, no key
-aix --vibe hacker "explain this"      # Hacker mode!
-aix -p llm7 --vibe vampire "debug"    # Free + vampire vibes!
-echo "what is this?" | aix            # Pipe input
+# Clone and build
+git clone https://github.com/fuegotechnology/aix.git
+cd aix
+npm install
+node scripts/bundle.mjs
+
+# Run directly — it just works with free providers
+node dist/cli.js "explain this codebase"
+```
+
+**2. Interactive Mode**
+```bash
+node dist/cli.js                    # Start interactive chat
+> hello, how are you?              # Type messages
+> /vibe hacker                     # Switch to hacker mode
+> /providers                       # See all available providers
+> /stats                           # Check your XP and level
+> /exit                            # Quit
+```
+
+**3. One-shot Mode**
+```bash
+node dist/cli.js "write a hello world in Python"
+node dist/cli.js -e "explain this function"
+```
+
+**4. Pipe Input**
+```bash
+echo "explain this function" | node dist/cli.js
+cat error.log | node dist/cli.js "what's wrong with this?"
+```
+
+**5. Choose a Provider**
+```bash
+node dist/cli.js -p pollinations "hello"      # Free, no key
+node dist/cli.js -p llm7 "write a function"   # Free, no key
+node dist/cli.js -p groq "debug this"         # Needs GROQ_API_KEY
+node dist/cli.js -p gemini "analyze this"     # Needs GEMINI_API_KEY
+node dist/cli.js -p ollama "local model"      # Needs Ollama running locally
+```
+
+**6. With Vibes!**
+```bash
+node dist/cli.js --vibe hacker "hack the mainframe"
+node dist/cli.js --vibe pirate "find the treasure in this code"
+node dist/cli.js --vibe vampire "debug this ancient code"
 ```
 
 ### All Options

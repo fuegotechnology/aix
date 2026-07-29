@@ -38,6 +38,17 @@ export interface Stats {
   messagesThisSession: number
   toolsThisSession: number
   editsThisSession: number
+  // Power-ups
+  powerUpActive: string | null
+  powerUpExpires: number
+  // Weekly challenges
+  weeklyChallenge: string | null
+  weeklyChallengeDate: string | null
+  weeklyChallengeProgress: number
+  weeklyChallengeCompleted: boolean
+  // Quests
+  activeQuests: string[]
+  completedQuests: string[]
 }
 
 export interface Level {
@@ -146,7 +157,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   // ── Special ──
   { id: 'free_only', name: 'Free Spirit', description: 'Use only free providers for 50 messages', emoji: '🆓', condition: s => s.totalMessages >= 50 && Object.keys(s.providerUsage).every(p => {
-    const freeIds = ['pollinations','llm7','g4f','freechat','shard','aichat','openaiProxy','chatany','freegpt','aiproxy','darkai','nexra','chatgptfree','yuai','zeroone','zephyr','dolphin','topmost','infinity','skyline','ollama','lmstudio','jan','vllm','llamacpp']
+    const freeIds = ['pollinations','llm7','g4f','freechat','shard','aichat','openaiProxy','chatany','freegpt','aiproxy','darkai','nexra','chatgptfree','yuai','zeroone','zephyr','dolphin','topmost','infinity','skyline','oivoodoo','luckyai','aurora','neonai','fluxai','helixai','cortexai','prismai','quantumai','eclipseai','bazaarlink','cloudflare','ovhcloud','ollama','lmstudio','jan','vllm','llamacpp']
     return freeIds.includes(p)
   }), xp: 100, category: 'special' },
   { id: 'million_tokens', name: 'Million Token Club', description: 'Process 1M+ tokens', emoji: '🎰', condition: s => (s.totalTokensIn + s.totalTokensOut) >= 1000000, xp: 200, category: 'special' },
@@ -225,6 +236,24 @@ export const DAILY_CHALLENGES: { id: string; name: string; description: string; 
   { id: 'provider2', name: 'Provider Switch', description: 'Use 2 different providers today', target: 2, xp: 30, emoji: '🌐' },
 ]
 
+export const WEEKLY_CHALLENGES: { id: string; name: string; description: string; target: number; xp: number; emoji: string }[] = [
+  { id: 'w_msg50', name: 'Weekly Chatter', description: 'Send 50 messages this week', target: 50, xp: 200, emoji: '💬' },
+  { id: 'w_tools25', name: 'Tool Warrior', description: 'Use 25 tools this week', target: 25, xp: 150, emoji: '🔧' },
+  { id: 'w_edit10', name: 'Editor Elite', description: 'Edit 10 files this week', target: 10, xp: 150, emoji: '✏️' },
+  { id: 'w_vibe5', name: 'Vibe Explorer', description: 'Try 5 different vibes this week', target: 5, xp: 100, emoji: '🎭' },
+  { id: 'w_provider5', name: 'Provider Hopper', description: 'Use 5 different providers this week', target: 5, xp: 100, emoji: '🌐' },
+  { id: 'w_combo15', name: 'Combo Master', description: 'Hit a 15x combo this week', target: 15, xp: 200, emoji: '⚡' },
+  { id: 'w_streak', name: 'Streak Keeper', description: 'Maintain a 7-day streak', target: 7, xp: 300, emoji: '🔥' },
+]
+
+export const QUESTS: { id: string; name: string; description: string; steps: { description: string; target: number }[]; xp: number; emoji: string; requiredLevel: number }[] = [
+  { id: 'q_coder', name: 'Coder Journey', description: 'Complete the coder initiation', steps: [{ description: 'Send 5 messages', target: 5 }, { description: 'Use 3 tools', target: 3 }, { description: 'Edit 1 file', target: 1 }], xp: 100, emoji: '🗺️', requiredLevel: 1 },
+  { id: 'q_explorer', name: 'Provider Explorer', description: 'Explore the provider ecosystem', steps: [{ description: 'Use 3 different providers', target: 3 }, { description: 'Try 2 different vibes', target: 2 }], xp: 150, emoji: '🧭', requiredLevel: 2 },
+  { id: 'q_architect', name: 'Code Architect', description: 'Build your coding foundation', steps: [{ description: 'Edit 10 files', target: 10 }, { description: 'Run 10 bash commands', target: 10 }, { description: 'Use 20 tools', target: 20 }], xp: 300, emoji: '🏗️', requiredLevel: 4 },
+  { id: 'q_master', name: 'Mastery Quest', description: 'Achieve coding mastery', steps: [{ description: 'Hit 10x combo', target: 10 }, { description: 'Use 50 tools', target: 50 }, { description: 'Edit 50 files', target: 50 }], xp: 500, emoji: '👑', requiredLevel: 6 },
+  { id: 'q_legend', name: 'Legend Quest', description: 'Become a legend', steps: [{ description: 'Reach level 10', target: 10 }, { description: 'Complete 5 daily challenges', target: 5 }, { description: 'Try 15 vibes', target: 15 }], xp: 1000, emoji: '💎', requiredLevel: 8 },
+]
+
 export function loadStats(): Stats {
   if (!existsSync(STATS_FILE)) {
     return {
@@ -237,6 +266,9 @@ export function loadStats(): Stats {
       dailyChallenge: null, dailyChallengeDate: null, dailyChallengeProgress: 0, dailyChallengeCompleted: false,
       activeTitle: null, unlockedTitles: ['newbie'],
       messagesThisSession: 0, toolsThisSession: 0, editsThisSession: 0,
+      powerUpActive: null, powerUpExpires: 0,
+      weeklyChallenge: null, weeklyChallengeDate: null, weeklyChallengeProgress: 0, weeklyChallengeCompleted: false,
+      activeQuests: [], completedQuests: [],
     }
   }
   try {
@@ -255,6 +287,14 @@ export function loadStats(): Stats {
     s.messagesThisSession = 0
     s.toolsThisSession = 0
     s.editsThisSession = 0
+    s.powerUpActive = s.powerUpActive || null
+    s.powerUpExpires = s.powerUpExpires || 0
+    s.weeklyChallenge = s.weeklyChallenge || null
+    s.weeklyChallengeDate = s.weeklyChallengeDate || null
+    s.weeklyChallengeProgress = s.weeklyChallengeProgress || 0
+    s.weeklyChallengeCompleted = s.weeklyChallengeCompleted || false
+    s.activeQuests = s.activeQuests || []
+    s.completedQuests = s.completedQuests || []
     return s
   } catch {
     return {
@@ -267,6 +307,9 @@ export function loadStats(): Stats {
       dailyChallenge: null, dailyChallengeDate: null, dailyChallengeProgress: 0, dailyChallengeCompleted: false,
       activeTitle: null, unlockedTitles: ['newbie'],
       messagesThisSession: 0, toolsThisSession: 0, editsThisSession: 0,
+      powerUpActive: null, powerUpExpires: 0,
+      weeklyChallenge: null, weeklyChallengeDate: null, weeklyChallengeProgress: 0, weeklyChallengeCompleted: false,
+      activeQuests: [], completedQuests: [],
     }
   }
 }
@@ -457,4 +500,49 @@ export function renderDailyChallenge(stats: Stats): string {
   const filled = Math.round(progress * bar_width)
   const bar = `${'█'.repeat(filled)}${'░'.repeat(bar_width - filled)}`
   return `  ${C.cyan}📅 Daily:${C.reset} ${challenge.emoji} ${challenge.name} ${C.dim}[${bar}]${C.reset} ${status} ${C.dim}(+${challenge.xp} XP)${C.reset}`
+}
+
+export function assignWeeklyChallenge(stats: Stats): void {
+  const now = new Date()
+  const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay()).toISOString().split('T')[0]
+  if (stats.weeklyChallengeDate === weekStart && stats.weeklyChallenge) return
+  const weekIndex = Math.floor(now.getTime() / (7 * 24 * 60 * 60 * 1000))
+  const challenge = WEEKLY_CHALLENGES[weekIndex % WEEKLY_CHALLENGES.length]
+  stats.weeklyChallenge = challenge.id
+  stats.weeklyChallengeDate = weekStart
+  stats.weeklyChallengeProgress = 0
+  stats.weeklyChallengeCompleted = false
+}
+
+export function renderWeeklyChallenge(stats: Stats): string {
+  if (!stats.weeklyChallenge) return ''
+  const challenge = WEEKLY_CHALLENGES.find(c => c.id === stats.weeklyChallenge)
+  if (!challenge) return ''
+  const C = { reset: '\x1b[0m', dim: '\x1b[2m', bold: '\x1b[1m', cyan: '\x1b[36m', green: '\x1b[32m', yellow: '\x1b[33m', brightMagenta: '\x1b[95m' }
+  const status = stats.weeklyChallengeCompleted ? `${C.green}✓ COMPLETE${C.reset}` : `${stats.weeklyChallengeProgress}/${challenge.target}`
+  const bar_width = 15
+  const progress = Math.min(stats.weeklyChallengeProgress / challenge.target, 1)
+  const filled = Math.round(progress * bar_width)
+  const bar = `${'█'.repeat(filled)}${'░'.repeat(bar_width - filled)}`
+  return `  ${C.brightMagenta}📅 Weekly:${C.reset} ${challenge.emoji} ${challenge.name} ${C.dim}[${bar}]${C.reset} ${status} ${C.dim}(+${challenge.xp} XP)${C.reset}`
+}
+
+export function renderQuests(stats: Stats): string {
+  const C = { reset: '\x1b[0m', dim: '\x1b[2m', bold: '\x1b[1m', cyan: '\x1b[36m', green: '\x1b[32m', yellow: '\x1b[33m', brightYellow: '\x1b[93m', brightCyan: '\x1b[96m' }
+  const lines: string[] = []
+  lines.push('')
+  lines.push(`  ${C.bold}${C.brightYellow}🗺️ Quests${C.reset}`)
+  lines.push('')
+  for (const q of QUESTS) {
+    const completed = stats.completedQuests.includes(q.id)
+    const available = !completed && q.requiredLevel <= stats.level
+    const status = completed ? `${C.green}✓ DONE${C.reset}` : available ? `${C.brightCyan}Available${C.reset}` : `${C.dim}🔒 Lv.${q.requiredLevel}${C.reset}`
+    lines.push(`  ${status} ${q.emoji} ${C.bold}${q.name}${C.reset} — ${q.description}`)
+    lines.push(`  ${C.dim}  Reward: +${q.xp} XP${C.reset}`)
+    if (available && !completed) {
+      const stepLines = q.steps.map((s, i) => `  ${C.dim}  ${i + 1}. ${s.description}${C.reset}`)
+      lines.push(...stepLines)
+    }
+  }
+  return lines.join('\n')
 }
