@@ -206,7 +206,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
 export const TITLES: { id: string; name: string; emoji: string; condition: (s: Stats) => boolean }[] = [
   { id: 'newbie', name: 'Newbie', emoji: '🌱', condition: () => true },
-  { id: 'free_bird', name: 'Free Bird', emoji: '🆓', condition: s => Object.keys(s.providerUsage).filter(p => !['openai','xai','openrouter','perplexity','sambanova','replicate','novita','custom'].includes(p)).length >= 5 },
+  { id: 'free_bird', name: 'Free Bird', emoji: '🆓', condition: s => Object.keys(s.providerUsage).filter(p => !['openai','xai','perplexity','replicate','novita'].includes(p)).length >= 5 },
   { id: 'hacker', name: 'Hacker', emoji: '🤘', condition: s => s.totalBashCommands >= 50 },
   { id: 'architect', name: 'Architect', emoji: '🏗️', condition: s => s.totalFilesEdited >= 50 },
   { id: 'speedster', name: 'Speedster', emoji: '⚡', condition: s => s.maxCombo >= 10 },
