@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <strong>40 vibe modes</strong> • <strong>80 achievements</strong> • <strong>15 levels</strong> • <strong>19 tools</strong>
+  <strong>40 vibe modes</strong> • <strong>80 achievements</strong> • <strong>15 levels</strong> • <strong>24 tools</strong>
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@
 - **40 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, Cyberpunk, and more
 - **80 achievements** — XP, combos, streaks, daily challenges, titles
 - **15 levels** — Initiate → Apotheosis
-- **19 built-in tools** — 12 coding + 6 action + code_review + summarize + project_map
+- **24 built-in tools** — 12 coding + 6 action + code_review + summarize + project_map
 - **Combo system** — Chain messages for XP multipliers up to 2x
 - **Daily challenges** — Fresh challenge every day with bonus XP
 - **18 titles** — Unlock and equip titles like "Hacker", "Vibe Master", "God"
@@ -113,7 +113,7 @@ cat error.log | aix "what's wrong with this?"
 
 ---
 
-## 🛠 19 Built-in Tools
+## 🛠 24 Built-in Tools
 
 ### Coding Tools
 
