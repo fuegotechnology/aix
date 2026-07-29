@@ -131,7 +131,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   // ── Vibes ──
   { id: 'vibe_3', name: 'Vibe Switcher', description: 'Try 3 different vibes', emoji: '🎭', condition: s => Object.keys(s.vibeUsage).length >= 3, xp: 25, category: 'vibes' },
   { id: 'vibe_5', name: 'Vibe Master', description: 'Try 5 different vibes', emoji: '🌈', condition: s => Object.keys(s.vibeUsage).length >= 5, xp: 50, category: 'vibes' },
-  { id: 'vibe_all', name: 'Vibe Chameleon', description: 'Try every vibe', emoji: '🦎', condition: s => Object.keys(s.vibeUsage).length >= 21, xp: 200, category: 'vibes' },
+  { id: 'vibe_all', name: 'Vibe Chameleon', description: 'Try every vibe', emoji: '🦎', condition: s => Object.keys(s.vibeUsage).length >= 31, xp: 200, category: 'vibes' },
 
   // ── Combos ──
   { id: 'combo_5', name: 'Combo Starter', description: 'Hit a 5x combo', emoji: '🔥', condition: s => s.maxCombo >= 5, xp: 25, category: 'combo' },
@@ -161,6 +161,33 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'session_50', name: 'Iron Coder', description: '50+ messages in one session', emoji: '🦾', condition: s => s.messagesThisSession >= 50, xp: 200, category: 'special' },
   { id: 'daily_first', name: 'Daily Challenger', description: 'Complete your first daily challenge', emoji: '📅', condition: s => s.dailyChallengeCompleted, xp: 50, category: 'daily' },
   { id: 'all_tools', name: 'Full Toolkit', description: 'Use all 9 tools in one session', emoji: '🧰', condition: s => s.toolsThisSession >= 9, xp: 50, category: 'special' },
+
+  // ── New Tools ──
+  { id: 'web_surfer', name: 'Web Surfer', description: 'Use the web_fetch tool', emoji: '🌐', condition: s => s.totalMessages >= 1, xp: 15, category: 'tools' },
+  { id: 'git_master', name: 'Git Master', description: 'Use the git_status tool', emoji: '🔀', condition: s => s.totalMessages >= 1, xp: 15, category: 'tools' },
+  { id: 'todo_organizer', name: 'Task Organizer', description: 'Use the todo tool', emoji: '📋', condition: s => s.totalMessages >= 1, xp: 15, category: 'tools' },
+  { id: 'memory_keeper', name: 'Memory Keeper', description: 'Use the memory tool', emoji: '🧠', condition: s => s.totalMessages >= 1, xp: 15, category: 'tools' },
+
+  // ── Session ──
+  { id: 'session_100', name: 'Unstoppable Force', description: '100+ messages in one session', emoji: '🌋', condition: s => s.messagesThisSession >= 100, xp: 500, category: 'special' },
+  { id: 'session_200', name: 'Transcendence', description: '200+ messages in one session', emoji: '🧬', condition: s => s.messagesThisSession >= 200, xp: 1000, category: 'special' },
+
+  // ── Vibe Master ──
+  { id: 'vibe_10', name: 'Vibe Connoisseur', description: 'Try 10 different vibes', emoji: '🎨', condition: s => Object.keys(s.vibeUsage).length >= 10, xp: 100, category: 'vibes' },
+  { id: 'vibe_15', name: 'Vibe Shapeshifter', description: 'Try 15 different vibes', emoji: '🔄', condition: s => Object.keys(s.vibeUsage).length >= 15, xp: 200, category: 'vibes' },
+
+  // ── Token Milestones ──
+  { id: 'hundred_k_tokens', name: '100K Club', description: 'Process 100K+ tokens', emoji: '📊', condition: s => (s.totalTokensIn + s.totalTokensOut) >= 100000, xp: 50, category: 'special' },
+  { id: 'five_million_tokens', name: '5M Club', description: 'Process 5M+ tokens', emoji: '📈', condition: s => (s.totalTokensIn + s.totalTokensOut) >= 5000000, xp: 500, category: 'special' },
+
+  // ── Provider Explorer ──
+  { id: 'provider_40', name: 'Provider Deity', description: 'Use 40 different providers', emoji: '🌌', condition: s => Object.keys(s.providerUsage).length >= 40, xp: 750, category: 'provider' },
+
+  // ── Secret ──
+  { id: 'weekend_warrior', name: 'Weekend Warrior', description: 'Use aix on a weekend', emoji: '🎉', condition: s => s.totalMessages >= 1, xp: 15, secret: true, category: 'secret' },
+  { id: 'midnight_coder', name: 'Midnight Coder', description: 'Code between midnight and 3am', emoji: '🌙', condition: s => s.totalMessages >= 1, xp: 25, secret: true, category: 'secret' },
+  { id: 'fifty_sessions', name: 'Session Veteran', description: 'Complete 50 sessions', emoji: '🎖️', condition: s => s.totalSessions >= 50, xp: 100, category: 'special' },
+  { id: 'hundred_sessions', name: 'Session Legend', description: 'Complete 100 sessions', emoji: '🏅', condition: s => s.totalSessions >= 100, xp: 250, category: 'special' },
 ]
 
 export const TITLES: { id: string; name: string; emoji: string; condition: (s: Stats) => boolean }[] = [
@@ -176,6 +203,12 @@ export const TITLES: { id: string; name: string; emoji: string; condition: (s: S
   { id: 'god', name: 'God', emoji: '🔱', condition: s => s.level >= 15 },
   { id: 'token_lord', name: 'Token Lord', emoji: '🎰', condition: s => (s.totalTokensIn + s.totalTokensOut) >= 1000000 },
   { id: 'local_only', name: 'Local Only', emoji: '🏠', condition: s => Object.keys(s.providerUsage).every(p => ['ollama','lmstudio','jan','vllm','llamacpp'].includes(p)) && s.totalMessages >= 10 },
+  { id: 'vampire', name: 'Night Coder', emoji: '🧛', condition: s => s.totalSessions >= 20 },
+  { id: 'combo_queen', name: 'Combo Queen', emoji: '👑', condition: s => s.maxCombo >= 25 },
+  { id: 'vibe_chameleon', name: 'Vibe Chameleon', emoji: '🦎', condition: s => Object.keys(s.vibeUsage).length >= 15 },
+  { id: 'provider_nomad', name: 'Provider Nomad', emoji: '🚀', condition: s => Object.keys(s.providerUsage).length >= 30 },
+  { id: 'session_master', name: 'Session Master', emoji: '🧘', condition: s => s.totalSessions >= 100 },
+  { id: 'millionaire', name: 'XP Millionaire', emoji: '💰', condition: s => s.xp >= 100000 },
 ]
 
 export const DAILY_CHALLENGES: { id: string; name: string; description: string; target: number; xp: number; emoji: string }[] = [

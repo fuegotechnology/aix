@@ -143,6 +143,91 @@ export const CODING_TOOLS: Tool[] = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'web_fetch',
+      description: 'Fetch the content of a URL. Returns the text content of the page. Useful for reading documentation, APIs, or web pages.',
+      parameters: {
+        type: 'object',
+        properties: {
+          url: { type: 'string', description: 'The URL to fetch' },
+          method: { type: 'string', description: 'HTTP method (default: GET)' },
+        },
+        required: ['url'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'git_status',
+      description: 'Show the git status of the project, including current branch, staged/unstaged changes, and recent commits.',
+      parameters: {
+        type: 'object',
+        properties: {
+          detailed: { type: 'boolean', description: 'Show detailed diff stats (default: false)' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'env_info',
+      description: 'Show environment information: Node.js version, npm version, OS, shell, and available tools.',
+      parameters: {
+        type: 'object',
+        properties: {},
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'todo',
+      description: 'Manage a todo list for the current session. Add, list, complete, or remove tasks.',
+      parameters: {
+        type: 'object',
+        properties: {
+          action: { type: 'string', description: 'What to do: "add", "list", "complete", "remove"', enum: ['add', 'list', 'complete', 'remove'] },
+          task: { type: 'string', description: 'The task description (for add) or task ID (for complete/remove)' },
+          priority: { type: 'string', description: 'Priority: "high", "medium", "low" (default: "medium")', enum: ['high', 'medium', 'low'] },
+        },
+        required: ['action'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'diff_view',
+      description: 'Show a diff of uncommitted changes in the git repository. Shows what has been modified but not yet committed.',
+      parameters: {
+        type: 'object',
+        properties: {
+          file: { type: 'string', description: 'Specific file to diff (default: all files)' },
+          staged: { type: 'boolean', description: 'Show staged changes instead of unstaged (default: false)' },
+        },
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'memory',
+      description: 'Save or recall important information across the conversation. Use to remember key decisions, architecture notes, or user preferences.',
+      parameters: {
+        type: 'object',
+        properties: {
+          action: { type: 'string', description: 'What to do: "save", "recall", "list", "clear"', enum: ['save', 'recall', 'list', 'clear'] },
+          key: { type: 'string', description: 'The memory key (for save/recall)' },
+          value: { type: 'string', description: 'The value to save' },
+        },
+        required: ['action'],
+      },
+    },
+  },
 ]
 
 // ── Action tools (structured thinking & suggestions) ──
@@ -471,6 +556,172 @@ function diagnose(args: Record<string, any>, cwd: string): string {
   return results.join('\n')
 }
 
+function webFetch(args: Record<string, any>, cwd: string): string {
+  const url = args.url
+  try {
+    const result = execSync(`curl -sL -w "\\n%{http_code}" --max-time 15 "${url}"`, { cwd, timeout: 20000, encoding: 'utf-8', maxBuffer: 5 * 1024 * 1024 })
+    const lines = result.split('\n')
+    const statusCode = parseInt(lines.pop() || '0', 10)
+    const body = lines.join('\n')
+    if (statusCode >= 400) return `Error: HTTP ${statusCode} fetching ${url}`
+    // Truncate very large responses
+    if (body.length > 50000) return `${url} (HTTP ${statusCode}, ${body.length} bytes, truncated)\n${body.slice(0, 50000)}\n... (truncated)`
+    return `${url} (HTTP ${statusCode}, ${body.length} bytes)\n${body}`
+  } catch (err: any) {
+    return `Error fetching ${url}: ${err.message}`
+  }
+}
+
+function gitStatus(args: Record<string, any>, cwd: string): string {
+  if (!existsSync(resolve(cwd, '.git'))) return 'Not a git repository'
+  const results: string[] = []
+  try {
+    const branch = execSync('git rev-parse --abbrev-ref HEAD', { cwd, encoding: 'utf-8' }).trim()
+    results.push(`Branch: ${branch}`)
+    const status = execSync('git status --porcelain', { cwd, encoding: 'utf-8' }).trim()
+    if (!status) {
+      results.push('Working tree clean')
+    } else {
+      const lines = status.split('\n')
+      const staged = lines.filter(l => l[0] !== ' ' && l[0] !== '?').length
+      const modified = lines.filter(l => l[0] === ' ' || l[1] === 'M').length
+      const untracked = lines.filter(l => l[0] === '?').length
+      results.push(`${staged} staged, ${modified} modified, ${untracked} untracked`)
+      if (args.detailed) {
+        results.push('')
+        for (const line of lines.slice(0, 30)) {
+          results.push(`  ${line}`)
+        }
+        if (lines.length > 30) results.push(`  ... and ${lines.length - 30} more`)
+      }
+    }
+    const log = execSync('git log --oneline -5', { cwd, encoding: 'utf-8' }).trim()
+    results.push('')
+    results.push('Recent commits:')
+    for (const line of log.split('\n')) {
+      results.push(`  ${line}`)
+    }
+  } catch (err: any) {
+    results.push(`Error: ${err.message}`)
+  }
+  return results.join('\n')
+}
+
+function envInfo(args: Record<string, any>, cwd: string): string {
+  const results: string[] = []
+  try { results.push(`Node.js: ${process.version}`) } catch { /* skip */ }
+  try {
+    const npmVer = execSync('npm --version', { cwd, encoding: 'utf-8', timeout: 5000 }).trim()
+    results.push(`npm: ${npmVer}`)
+  } catch { /* skip */ }
+  try {
+    const pnpmVer = execSync('pnpm --version', { cwd, encoding: 'utf-8', timeout: 5000 }).trim()
+    results.push(`pnpm: ${pnpmVer}`)
+  } catch { /* skip */ }
+  try {
+    const yarnVer = execSync('yarn --version', { cwd, encoding: 'utf-8', timeout: 5000 }).trim()
+    results.push(`yarn: ${yarnVer}`)
+  } catch { /* skip */ }
+  try {
+    const gitVer = execSync('git --version', { cwd, encoding: 'utf-8', timeout: 5000 }).trim()
+    results.push(gitVer)
+  } catch { /* skip */ }
+  results.push(`OS: ${process.platform} ${process.arch}`)
+  results.push(`Shell: ${process.env.SHELL || process.env.COMSPEC || 'unknown'}`)
+  results.push(`CWD: ${cwd}`)
+  results.push(`Home: ${process.env.HOME || process.env.USERPROFILE || 'unknown'}`)
+  return results.join('\n')
+}
+
+// In-memory session todo list
+const sessionTodos: Array<{ id: number; task: string; priority: string; completed: boolean }> = []
+let todoNextId = 1
+
+function todoManager(args: Record<string, any>, cwd: string): string {
+  const action = args.action
+  switch (action) {
+    case 'add': {
+      if (!args.task) return 'Error: task description required'
+      const priority = args.priority || 'medium'
+      sessionTodos.push({ id: todoNextId++, task: args.task, priority, completed: false })
+      return `Added task #${todoNextId - 1}: ${args.task} [${priority}]`
+    }
+    case 'list': {
+      if (sessionTodos.length === 0) return 'No tasks in the session todo list'
+      const lines = sessionTodos.map(t => {
+        const status = t.completed ? '✓' : '○'
+        const prio = t.priority === 'high' ? '🔴' : t.priority === 'low' ? '🟢' : '🟡'
+        return `  ${status} #${t.id} ${prio} ${t.task}`
+      })
+      return `Session Todo List (${sessionTodos.filter(t => t.completed).length}/${sessionTodos.length} done)\n${lines.join('\n')}`
+    }
+    case 'complete': {
+      const id = parseInt(args.task, 10)
+      if (isNaN(id)) return 'Error: task ID required'
+      const task = sessionTodos.find(t => t.id === id)
+      if (!task) return `Error: task #${id} not found`
+      task.completed = true
+      return `Completed task #${id}: ${task.task}`
+    }
+    case 'remove': {
+      const rid = parseInt(args.task, 10)
+      if (isNaN(rid)) return 'Error: task ID required'
+      const idx = sessionTodos.findIndex(t => t.id === rid)
+      if (idx === -1) return `Error: task #${rid} not found`
+      const removed = sessionTodos.splice(idx, 1)[0]
+      return `Removed task #${rid}: ${removed.task}`
+    }
+    default:
+      return `Error: unknown action "${action}". Use: add, list, complete, remove`
+  }
+}
+
+function diffView(args: Record<string, any>, cwd: string): string {
+  if (!existsSync(resolve(cwd, '.git'))) return 'Not a git repository'
+  try {
+    const fileArg = args.file ? ` -- "${args.file}"` : ''
+    const stagedArg = args.staged ? '--cached' : ''
+    const diff = execSync(`git diff ${stagedArg}${fileArg}`, { cwd, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 })
+    if (!diff.trim()) return 'No changes to show'
+    if (diff.length > 30000) return diff.slice(0, 30000) + '\n... (truncated, use file parameter to see specific files)'
+    return diff
+  } catch (err: any) {
+    return `Error: ${err.message}`
+  }
+}
+
+// In-memory session memory store
+const sessionMemory: Record<string, string> = {}
+
+function memoryManager(args: Record<string, any>, cwd: string): string {
+  const action = args.action
+  switch (action) {
+    case 'save': {
+      if (!args.key || !args.value) return 'Error: key and value required'
+      sessionMemory[args.key] = args.value
+      return `Saved: ${args.key} = ${args.value.slice(0, 100)}${args.value.length > 100 ? '...' : ''}`
+    }
+    case 'recall': {
+      if (!args.key) return 'Error: key required'
+      const val = sessionMemory[args.key]
+      if (!val) return `No memory found for key: ${args.key}`
+      return `${args.key} = ${val}`
+    }
+    case 'list': {
+      const keys = Object.keys(sessionMemory)
+      if (keys.length === 0) return 'No memories stored'
+      return `Session Memories (${keys.length}):\n${keys.map(k => `  ${k}: ${sessionMemory[k].slice(0, 80)}${sessionMemory[k].length > 80 ? '...' : ''}`).join('\n')}`
+    }
+    case 'clear': {
+      const count = Object.keys(sessionMemory).length
+      for (const k of Object.keys(sessionMemory)) delete sessionMemory[k]
+      return `Cleared ${count} memories`
+    }
+    default:
+      return `Error: unknown action "${action}". Use: save, recall, list, clear`
+  }
+}
+
 // ── Action tool implementations (return structured data for rendering) ──
 
 function thinkAction(args: Record<string, any>): string {
@@ -524,6 +775,12 @@ export async function executeTool(
       case 'glob_find': output = await globFind(args, cwd); break
       case 'tree': output = tree(args, cwd); break
       case 'diagnose': output = diagnose(args, cwd); break
+      case 'web_fetch': output = webFetch(args, cwd); break
+      case 'git_status': output = gitStatus(args, cwd); break
+      case 'env_info': output = envInfo(args, cwd); break
+      case 'todo': output = todoManager(args, cwd); break
+      case 'diff_view': output = diffView(args, cwd); break
+      case 'memory': output = memoryManager(args, cwd); break
       default: return { success: false, output: `Unknown tool: ${name}`, isAction: false }
     }
     return { success: true, output, isAction: false }

@@ -217,11 +217,16 @@ export function renderMarkdown(text: string): string {
 
 export function printBanner(provider: string, model: string, cwd: string): void {
   const version = process.env.AIX_VERSION || '1.0.0'
-  const cols = Math.min(process.stdout.columns || 80, 72)
 
   console.log()
-  console.log(`  ${ANSI.bgCyan}${ANSI.bold}${ANSI.bgBlack} ◆ aix v${version} ${ANSI.reset}`)
-  console.log(`  ${ANSI.dim}  AI coding assistant for your terminal${ANSI.reset}`)
+  console.log(`  ${ANSI.brightCyan}${ANSI.bold}     ___    _${ANSI.reset}`)
+  console.log(`  ${ANSI.brightCyan}${ANSI.bold}    /   |  (_)__  ____ _${ANSI.reset}`)
+  console.log(`  ${ANSI.brightCyan}${ANSI.bold}   / /| | / / _ \\/ __ \`${ANSI.reset}`)
+  console.log(`  ${ANSI.brightCyan}${ANSI.bold}  / ___ |/ /  __/ /_/ /${ANSI.reset}`)
+  console.log(`  ${ANSI.brightCyan}${ANSI.bold} /_/  |_/_/\\___/\\__, /${ANSI.reset}`)
+  console.log(`  ${ANSI.brightCyan}${ANSI.bold}               /____/ ${ANSI.dim}v${version}${ANSI.reset}`)
+  console.log()
+  console.log(`  ${ANSI.dim}AI coding assistant for your terminal${ANSI.reset}`)
   console.log()
   console.log(`  ${keyValue('Provider', `${ANSI.cyan}${provider}${ANSI.reset}`)}`)
   console.log(`  ${keyValue('Model',   `${ANSI.brightCyan}${model}${ANSI.reset}`)}`)

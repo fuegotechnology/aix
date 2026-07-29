@@ -1,5 +1,7 @@
-import { resolve } from 'path'
-import { providers, getProvider, detectProvider, getApiKey, resolveModel, FREE_PROVIDER_IDS, FREE_NO_KEY_IDS } from './providers.js'
+import { resolve, join } from 'path'
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs'
+import { homedir } from 'os'
+import { providers, getProvider, detectProvider, getApiKey, resolveModel, FREE_PROVIDER_IDS, FREE_NO_KEY_IDS, getFallbackProvider } from './providers.js'
 import type { Provider } from './providers.js'
 import { runAgent, type AgentChunk, type Message } from './agent.js'
 import { buildSystemPrompt } from './system-prompt.js'
@@ -20,6 +22,9 @@ import {
   renderAction,
 } from './ui.js'
 
+const AIX_DIR = resolve(homedir(), '.aix')
+const SESSIONS_DIR = join(AIX_DIR, 'sessions')
+
 function printHelp(): void {
   const version = process.env.AIX_VERSION || '1.0.0'
   const freeNoKeyCount = FREE_NO_KEY_IDS.length
@@ -37,7 +42,7 @@ ${bold(cyan('OPTIONS'))}
   ${bold('--providers')}                  List all providers
   ${bold('-p, --provider <id>')}          Use a specific provider
   ${bold('-m, --model <name>')}           Set model (also via AIX_MODEL env)
-  ${bold('--vibe <id>')}                  Set vibe mode (default, hacker, pirate, wizard, zen, fire, gamer, noir, creative, bro, robot, shakespeare, cowboy, anime, chef, scientist, medieval, surfer, philosopher, rapper, beach)
+  ${bold('--vibe <id>')}                  Set vibe mode (default, hacker, pirate, wizard, zen, fire, gamer, noir, creative, bro, robot, shakespeare, cowboy, anime, chef, scientist, medieval, surfer, philosopher, rapper, beach, vampire, alien, yoda, mobster, disco, synthwave, goth, memelord, kawaii, retro)
   ${bold('--no-tools')}                   Disable tool use
   ${bold('-e, --exec <prompt>')}          One-shot mode
   ${bold('--max-turns <n>')}              Max agent turns (default: 20)
@@ -47,6 +52,7 @@ ${bold(cyan('OPTIONS'))}
   ${bold('--stats')}                      Show your stats and achievements
   ${bold('--leaderboard')}                Show XP leaderboard
   ${bold('--reset-stats')}                Reset all stats
+  ${bold('--fallback')}                   Auto-fallback to another free provider on failure
 
 ${bold(cyan('VIBES'))} 🎭
   ${bold('default')}     🎯  Professional — clean, focused
@@ -70,6 +76,16 @@ ${bold(cyan('VIBES'))} 🎭
   ${bold('philosopher')} 🤔  Philosopher — deep thoughts
   ${bold('rapper')}      🎤  Rapper — drop bars, ship code
   ${bold('beach')}       🏖️  Beach — tropical vibes, code under the palms
+  ${bold('vampire')}     🧛  Vampire — dark, ancient, eternally debugging
+  ${bold('alien')}       👽  Alien — take me to your codebase!
+  ${bold('yoda')}        🟢  Yoda — code, you must. Wise, you will become.
+  ${bold('mobster')}     🤵  Mobster — an offer you can't refuse
+  ${bold('disco')}       🪩  Disco — stayin' alive in code!
+  ${bold('synthwave')}   🌆  Synthwave — neon lights, retro futures
+  ${bold('goth')}        🖤  Goth — dark, moody, beautiful code
+  ${bold('memelord')}    🐸  Meme Lord — much code, very wow
+  ${bold('kawaii')}      🌸  Kawaii — super cute, pastel, adorable code!
+  ${bold('retro')}       👾  Retro — 8-bit, pixel art, old school
 
 ${bold(cyan('INTERACTIVE COMMANDS'))}
   ${bold('/exit')}, ${bold('/quit')}             Exit aix
@@ -89,6 +105,9 @@ ${bold(cyan('INTERACTIVE COMMANDS'))}
   ${bold('/achievements')}              Show achievements
   ${bold('/daily')}                      Show daily challenge
   ${bold('/title')}                      Set your title
+  ${bold('/save')}                       Save current session
+  ${bold('/load')}                       Load a saved session
+  ${bold('/fallback')}                   Switch to a different free provider
 
 ${bold(cyan('ENVIRONMENT VARIABLES'))}
   ${bold('AIX_PROVIDER')}                Provider id to use
@@ -337,6 +356,12 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
             console.log('  • glob_find    — Find files matching a pattern')
             console.log('  • tree         — Display directory tree')
             console.log('  • diagnose     — Run project diagnostics')
+            console.log('  • web_fetch    — Fetch content from a URL')
+            console.log('  • git_status   — Show git status and recent commits')
+            console.log('  • env_info     — Show environment information')
+            console.log('  • todo         — Manage a session todo list')
+            console.log('  • diff_view    — Show uncommitted changes')
+            console.log('  • memory       — Save/recall information across the conversation')
             console.log()
             console.log(bold(cyan('Action Tools:')))
             console.log('  • think        — Think through a problem step by step')
@@ -387,6 +412,80 @@ async function runInteractive(provider: Provider, cwd: string, noTools: boolean,
                 console.log(`  ${t.emoji} ${bold(t.id.padEnd(14))} ${t.name}${active}`)
               }
             }
+          }
+          rl.prompt()
+          return
+        case '/save':
+          try {
+            mkdirSync(SESSIONS_DIR, { recursive: true })
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+            const saveFile = join(SESSIONS_DIR, `session-${timestamp}.json`)
+            const saveData = {
+              savedAt: new Date().toISOString(),
+              provider: currentProvider.id,
+              model: currentModel,
+              vibe: currentVibe.id,
+              history,
+              messages: history.length,
+            }
+            writeFileSync(saveFile, JSON.stringify(saveData, null, 2), 'utf-8')
+            console.log(successLine(`Session saved to ${saveFile}`))
+          } catch (err: any) {
+            console.log(errorLine(`Failed to save session: ${err.message}`))
+          }
+          rl.prompt()
+          return
+        case '/load':
+          try {
+            if (!existsSync(SESSIONS_DIR)) {
+              console.log(infoLine('No saved sessions found'))
+              rl.prompt()
+              return
+            }
+            const { readdirSync } = await import('fs')
+            const files = readdirSync(SESSIONS_DIR).filter(f => f.endsWith('.json')).sort().reverse()
+            if (files.length === 0) {
+              console.log(infoLine('No saved sessions found'))
+              rl.prompt()
+              return
+            }
+            const loadFile = arg ? join(SESSIONS_DIR, arg) : join(SESSIONS_DIR, files[0])
+            if (!existsSync(loadFile)) {
+              console.log(errorLine(`Session file not found: ${loadFile}`))
+              rl.prompt()
+              return
+            }
+            const data = JSON.parse(readFileSync(loadFile, 'utf-8'))
+            if (data.history) {
+              history.length = 0
+              history.push(...data.history)
+            }
+            if (data.provider) {
+              const p = getProvider(data.provider)
+              if (p) currentProvider = p
+            }
+            if (data.model) currentModel = data.model
+            if (data.vibe) {
+              const v = getVibe(data.vibe)
+              currentVibe = v
+              rl.setPrompt(`${currentVibe.colors.prompt}${currentVibe.emoji} ❯${'\x1b[0m'} `)
+            }
+            console.log(successLine(`Session loaded from ${loadFile} (${history.length} messages)`))
+          } catch (err: any) {
+            console.log(errorLine(`Failed to load session: ${err.message}`))
+          }
+          rl.prompt()
+          return
+        case '/fallback':
+          const fallback = getFallbackProvider([currentProvider.id])
+          if (fallback) {
+            currentProvider = fallback
+            currentModel = resolveModel(fallback)
+            stats.providerUsage[fallback.id] = (stats.providerUsage[fallback.id] || 0) + 1
+            saveStats(stats)
+            console.log(successLine(`Switched to ${fallback.name} │ Model: ${brightCyan(currentModel)}`))
+          } else {
+            console.log(errorLine('No fallback providers available'))
           }
           rl.prompt()
           return
@@ -707,6 +806,9 @@ async function runOneShot(provider: Provider, cwd: string, userPrompt: string, n
 }
 
 function main(): void {
+  // Check for piped input
+  const hasPipedInput = !process.stdin.isTTY
+
   const args = process.argv.slice(2)
 
   let providerFlag: string | undefined
@@ -721,6 +823,7 @@ function main(): void {
   let showStats = false
   let showLeaderboard = false
   let resetStats = false
+  let useFallback = false
   let positional: string[] = []
 
   for (let i = 0; i < args.length; i++) {
@@ -783,6 +886,9 @@ function main(): void {
         break
       case '--reset-stats':
         resetStats = true
+        break
+      case '--fallback':
+        useFallback = true
         break
       default:
         if (arg.startsWith('-')) {
@@ -872,6 +978,25 @@ function main(): void {
   }
 
   const cwd = process.cwd()
+
+  // Handle piped input
+  if (hasPipedInput && !oneShotPrompt) {
+    let pipedData = ''
+    process.stdin.setEncoding('utf-8')
+    process.stdin.on('data', (chunk: string) => { pipedData += chunk })
+    process.stdin.on('end', () => {
+      const pipedPrompt = pipedData.trim()
+      if (pipedPrompt) {
+        oneShotPrompt = pipedPrompt
+      }
+      if (oneShotPrompt) {
+        runOneShot(provider, cwd, oneShotPrompt, noTools, verbose, vibe)
+      } else {
+        process.exit(0)
+      }
+    })
+    return
+  }
 
   if (oneShotPrompt) {
     runOneShot(provider, cwd, oneShotPrompt, noTools, verbose, vibe)

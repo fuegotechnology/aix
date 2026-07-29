@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <strong>57 AI providers</strong> — <strong>30 completely free</strong> with no API key, no signup, no credit card.
+  <strong>66 AI providers</strong> — <strong>39 completely free</strong> with no API key, no signup, no credit card.
 </p>
 
 <p align="center">
-  <strong>20 vibe modes</strong> • <strong>57 achievements</strong> • <strong>15 levels</strong> • <strong>9 tools</strong>
+  <strong>31 vibe modes</strong> • <strong>72 achievements</strong> • <strong>15 levels</strong> • <strong>16 tools</strong>
 </p>
 
 <p align="center">
@@ -18,14 +18,17 @@
 
 ## ✨ Features
 
-- **57 providers** — 30 no-key, 14 free tier, 8 paid, 5 local
-- **20 vibe modes** — Hacker, Pirate, Wizard, Anime, Chef, Rapper, and more
-- **57 achievements** — XP, combos, streaks, daily challenges, titles
+- **66 providers** — 39 no-key, 14 free tier, 8 paid, 5 local
+- **31 vibe modes** — Hacker, Pirate, Wizard, Anime, Vampire, Yoda, Disco, and more
+- **72 achievements** — XP, combos, streaks, daily challenges, titles
 - **15 levels** — Initiate → Apotheosis
+- **16 built-in tools** — 9 coding + 6 action + 6 new (web_fetch, git_status, env_info, todo, diff_view, memory)
 - **Combo system** — Chain messages for XP multipliers up to 2x
 - **Daily challenges** — Fresh challenge every day with bonus XP
-- **Titles** — Unlock and equip titles like "Hacker", "Vibe Master", "God"
-- **9 built-in tools** — Read, write, edit, bash, search, tree, diagnose, glob, list
+- **18 titles** — Unlock and equip titles like "Hacker", "Vibe Master", "God"
+- **Session save/load** — Save and resume conversations
+- **Smart fallback** — Auto-switch to another free provider if one fails
+- **Pipe support** — Pipe input from stdin: `echo "hello" | aix`
 - **Streaming** — Real-time streaming with tool call visualization
 - **Multi-turn** — Full conversation history with auto context management
 - **Zero dependencies** — Only Node.js builtins + glob
@@ -34,7 +37,7 @@
 
 ## 🚀 Quick Start
 
-### Zero Setup (30 Free, No Key Providers!)
+### Zero Setup (39 Free, No Key Providers!)
 
 ```bash
 aix "explain this codebase"           # Pollinations — works immediately
@@ -48,14 +51,22 @@ aix -p g4f "optimize this function"   # G4F — no key
 ```bash
 aix --vibe hacker "hack the mainframe"
 aix --vibe pirate "find the treasure in this code"
-aix --vibe anime "power up this function"
-aix --vibe rapper "drop some bars on this code"
-aix --vibe chef "cook up a solution"
+aix --vibe vampire "debug this ancient code"
+aix --vibe yoda "code, I must"
+aix --vibe disco "stayin alive in code"
+aix --vibe kawaii "make this code adorable"
+```
+
+### Pipe Support
+
+```bash
+echo "explain this function" | aix
+cat error.log | aix "what's wrong with this?"
 ```
 
 ---
 
-## 🎭 20 Vibe Modes
+## 🎭 31 Vibe Modes
 
 | Vibe | Emoji | Description |
 |------|-------|-------------|
@@ -79,6 +90,52 @@ aix --vibe chef "cook up a solution"
 | `surfer` | 🏄 | Catch the wave, dude! |
 | `philosopher` | 🤔 | Deep thoughts |
 | `rapper` | 🎤 | Drop bars, ship code! |
+| `beach` | 🏖️ | Tropical vibes, code under the palms |
+| `vampire` | 🧛 | Dark, ancient, eternally debugging |
+| `alien` | 👽 | Take me to your codebase! |
+| `yoda` | 🟢 | Code, you must. Wise, you will become. |
+| `mobster` | 🤵 | An offer you can't refuse |
+| `disco` | 🪩 | Stayin' alive in code! |
+| `synthwave` | 🌆 | Neon lights, retro futures |
+| `goth` | 🖤 | Dark, moody, beautiful code |
+| `memelord` | 🐸 | Much code, very wow |
+| `kawaii` | 🌸 | Super cute, pastel, adorable code! |
+| `retro` | 👾 | 8-bit, pixel art, old school |
+
+---
+
+## 🛠 16 Built-in Tools
+
+### Coding Tools
+
+| Tool | Description |
+|------|-------------|
+| `read_file` | Read file contents with line numbers |
+| `write_file` | Create or overwrite files |
+| `edit_file` | Find and replace text in files |
+| `bash` | Run shell commands |
+| `list_files` | List files and directories |
+| `search_files` | Search across files with regex |
+| `glob_find` | Find files matching a pattern |
+| `tree` | Display directory tree |
+| `diagnose` | Run project diagnostics |
+| `web_fetch` | Fetch content from a URL |
+| `git_status` | Show git status and recent commits |
+| `env_info` | Show environment information |
+| `todo` | Manage a session todo list |
+| `diff_view` | Show uncommitted changes |
+| `memory` | Save/recall information across the conversation |
+
+### Action Tools
+
+| Tool | Description |
+|------|-------------|
+| `think` | Think through a problem step by step |
+| `suggest` | Suggest next steps or improvements |
+| `follow_up` | Suggest follow-up questions |
+| `plan` | Create a plan before executing |
+| `note` | Add important notes or warnings |
+| `question` | Ask a clarifying question |
 
 ---
 
@@ -131,19 +188,30 @@ Fresh challenge every day with bonus XP! Examples:
 - Combo Time — Hit a 5x combo (+50 XP)
 - Vibe Hopper — Try 2 vibes (+30 XP)
 
-### Titles
+### 18 Titles
 
 Unlock and equip titles: `/title <id>`
 
 | Title | Emoji | How to Unlock |
 |-------|-------|---------------|
+| Newbie | 🌱 | Default |
 | Free Bird | 🆓 | Use 5+ free providers |
 | Hacker | 🤘 | Run 50+ bash commands |
+| Architect | 🏗️ | Edit 50+ files |
+| Speedster | ⚡ | Hit 10x combo |
+| Explorer | 🗺️ | Use 10+ providers |
 | Vibe Master | 🎭 | Try 10+ vibes |
+| Streaker | 🔥 | 30-day streak |
 | Legend | 💎 | Reach level 10 |
 | God | 🔱 | Reach level 15 |
+| Night Coder | 🧛 | Complete 20+ sessions |
+| Combo Queen | 👑 | Hit 25x combo |
+| Vibe Chameleon | 🦎 | Try 15+ vibes |
+| Provider Nomad | 🚀 | Use 30+ providers |
+| Session Master | 🧘 | Complete 100+ sessions |
+| XP Millionaire | 💰 | Earn 100,000+ XP |
 
-### 57 Achievements
+### 72 Achievements
 
 Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes, Combos, Levels, Daily, Special, Secret
 
@@ -151,7 +219,7 @@ Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes
 
 ## 🆓 Free Providers
 
-### No API Key Needed (30 providers!)
+### No API Key Needed (39 providers!)
 
 | ID | Name | Top Models |
 |----|------|------------|
@@ -185,6 +253,15 @@ Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes
 | `prismai` | PrismAI | GPT-4o Mini, DeepSeek |
 | `quantumai` | QuantumAI | GPT-4o Mini, DeepSeek, Qwen |
 | `eclipseai` | EclipseAI | GPT-4o Mini, Llama |
+| `novaai` | NovaAI | GPT-4o Mini, DeepSeek, Llama |
+| `zenithai` | ZenithAI | GPT-4o Mini, GPT-3.5, Qwen |
+| `pulsarai` | PulsarAI | GPT-4o Mini, DeepSeek |
+| `vertexai` | VertexAI | GPT-4o Mini, Llama, DeepSeek |
+| `cipherai` | CipherAI | GPT-4o Mini, DeepSeek, Qwen |
+| `nexusai` | NexusAI | GPT-4o Mini, Llama |
+| `sparkai` | SparkAI | GPT-4o Mini, DeepSeek |
+| `stellarai` | StellarAI | GPT-4o Mini, Llama, Qwen |
+| `phantomai` | PhantomAI | GPT-4o Mini, DeepSeek, GPT-3.5 |
 
 ### Free API Key (No Credit Card)
 
@@ -213,7 +290,8 @@ Categories: First Steps, Messages, Tools, Edits, Bash, Streaks, Providers, Vibes
 aix                                    # Interactive mode
 aix -p pollinations "hello"           # Free, no key
 aix --vibe hacker "explain this"      # Hacker mode!
-aix -p llm7 --vibe anime "fix bug"    # Free + anime vibes!
+aix -p llm7 --vibe vampire "debug"    # Free + vampire vibes!
+echo "what is this?" | aix            # Pipe input
 ```
 
 ### All Options
@@ -233,6 +311,7 @@ aix -p llm7 --vibe anime "fix bug"    # Free + anime vibes!
 | `--verbose` | Show detailed tool output |
 | `--stats` | Show stats and achievements |
 | `--reset-stats` | Reset all stats |
+| `--fallback` | Auto-fallback to another free provider on failure |
 
 ### Interactive Commands
 
@@ -251,6 +330,9 @@ aix -p llm7 --vibe anime "fix bug"    # Free + anime vibes!
 | `/tools` | List tools |
 | `/retry` | Retry last message |
 | `/compact` | Compact history |
+| `/save` | Save current session |
+| `/load` | Load a saved session |
+| `/fallback` | Switch to another free provider |
 
 ---
 

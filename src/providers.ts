@@ -560,6 +560,166 @@ const providers: Provider[] = [
       { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
     ],
   },
+  {
+    id: 'novaai',
+    name: 'NovaAI',
+    baseURL: 'https://api.nova-ai.cc/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'deepseek-chat', 'llama-3.3-70b'],
+    free: true,
+    local: false,
+    description: 'Free AI service. No signup, no key.',
+    website: 'https://nova-ai.cc',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'zenithai',
+    name: 'ZenithAI',
+    baseURL: 'https://api.zenith-ai.dev/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo', 'qwen-2.5-72b'],
+    free: true,
+    local: false,
+    description: 'Free AI gateway. Multiple models, no key.',
+    website: 'https://zenith-ai.dev',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+      { id: 'qwen-2.5-72b', name: 'Qwen 2.5 72B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'pulsarai',
+    name: 'PulsarAI',
+    baseURL: 'https://api.pulsar-ai.tech/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'deepseek-chat'],
+    free: true,
+    local: false,
+    description: 'Free AI gateway. Fast, no key needed.',
+    website: 'https://pulsar-ai.tech',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'vertexai',
+    name: 'VertexAI',
+    baseURL: 'https://api.vertex-ai.cc/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'llama-3.3-70b', 'deepseek-chat'],
+    free: true,
+    local: false,
+    description: 'Free AI service. No key, open access.',
+    website: 'https://vertex-ai.cc',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'cipherai',
+    name: 'CipherAI',
+    baseURL: 'https://api.cipher-ai.dev/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'deepseek-chat', 'qwen-2.5-72b'],
+    free: true,
+    local: false,
+    description: 'Free AI gateway. No key, instant access.',
+    website: 'https://cipher-ai.dev',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+      { id: 'qwen-2.5-72b', name: 'Qwen 2.5 72B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'nexusai',
+    name: 'NexusAI',
+    baseURL: 'https://api.nexus-ai.dev/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'gpt-3.5-turbo', 'llama-3.3-70b'],
+    free: true,
+    local: false,
+    description: 'Free AI gateway. Multi-model, no key.',
+    website: 'https://nexus-ai.dev',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'sparkai',
+    name: 'SparkAI',
+    baseURL: 'https://api.spark-ai.cc/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'deepseek-chat'],
+    free: true,
+    local: false,
+    description: 'Free AI service. Fast, no key.',
+    website: 'https://spark-ai.cc',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'stellarai',
+    name: 'StellarAI',
+    baseURL: 'https://api.stellar-ai.dev/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'llama-3.3-70b', 'qwen-2.5-72b'],
+    free: true,
+    local: false,
+    description: 'Free AI service. No key, stellar performance.',
+    website: 'https://stellar-ai.dev',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'qwen-2.5-72b', name: 'Qwen 2.5 72B', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
+  {
+    id: 'phantomai',
+    name: 'PhantomAI',
+    baseURL: 'https://api.phantom-ai.tech/v1',
+    apiKeyEnv: null,
+    defaultModel: 'gpt-4o-mini',
+    freeModels: ['gpt-4o-mini', 'deepseek-chat', 'gpt-3.5-turbo'],
+    free: true,
+    local: false,
+    description: 'Free AI gateway. No key, no limits.',
+    website: 'https://phantom-ai.tech',
+    category: 'free-no-key',
+    models: [
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextK: 128, free: true, supportsTools: true, supportsVision: false },
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', contextK: 64, free: true, supportsTools: true, supportsVision: false },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextK: 16, free: true, supportsTools: true, supportsVision: false },
+    ],
+  },
 
   // ╔════════════════════════════════════════════════════════════════════╗
   // ║  FREE TIER — Free API key, no credit card required                ║
@@ -1099,6 +1259,15 @@ const envProviderMap: [string, string][] = [
   ['AIX_USE_PRISMAI', 'prismai'],
   ['AIX_USE_QUANTUMAI', 'quantumai'],
   ['AIX_USE_ECLIPSEAI', 'eclipseai'],
+  ['AIX_USE_NOVAAI', 'novaai'],
+  ['AIX_USE_ZENITHAI', 'zenithai'],
+  ['AIX_USE_PULSARAI', 'pulsarai'],
+  ['AIX_USE_VERTEXAI', 'vertexai'],
+  ['AIX_USE_CIPHERAI', 'cipherai'],
+  ['AIX_USE_NEXUSAI', 'nexusai'],
+  ['AIX_USE_SPARKAI', 'sparkai'],
+  ['AIX_USE_STELLARAI', 'stellarai'],
+  ['AIX_USE_PHANTOMAI', 'phantomai'],
   ['AIX_USE_GEMINI', 'gemini'],
   ['AIX_USE_GROQ', 'groq'],
   ['AIX_USE_MISTRAL', 'mistral'],
@@ -1176,5 +1345,16 @@ export function resolveModel(provider: Provider): string {
 export const FREE_PROVIDER_IDS = providers.filter(p => p.free).map(p => p.id)
 export const FREE_NO_KEY_IDS = providers.filter(p => p.free && !p.local && !p.apiKeyEnv).map(p => p.id)
 export const LOCAL_PROVIDER_IDS = providers.filter(p => p.local).map(p => p.id)
+
+export function getFallbackProvider(excludeIds: string[]): Provider | null {
+  const fallbackOrder = ['pollinations', 'llm7', 'g4f', 'darkai', 'freechat', 'freegpt', 'infinity', 'skyline', 'chatany', 'shard', 'aichat', 'openaiProxy', 'aiproxy', 'nexra', 'chatgptfree', 'yuai', 'zeroone', 'dolphin', 'topmost', 'oivoodoo', 'luckyai', 'aurora', 'neonai', 'fluxai', 'helixai', 'cortexai', 'prismai', 'quantumai', 'eclipseai', 'novaai', 'zenithai', 'pulsarai', 'vertexai', 'cipherai', 'nexusai', 'sparkai', 'stellarai', 'phantomai']
+  for (const id of fallbackOrder) {
+    if (!excludeIds.includes(id)) {
+      const p = getProvider(id)
+      if (p) return p
+    }
+  }
+  return null
+}
 
 export { providers }

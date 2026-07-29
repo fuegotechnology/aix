@@ -42,6 +42,30 @@ Parameters: path (optional, default '.'), max_depth (optional, default 3)
 Run diagnostic checks on the project. Checks for common issues like missing dependencies, TypeScript errors, lint problems, and test failures.
 Parameters: checks (optional: "all", "deps", "types", "lint", "tests")
 
+### web_fetch
+Fetch the content of a URL. Returns the text content of the page. Useful for reading documentation, APIs, or web pages.
+Parameters: url (required), method (optional, default: GET)
+
+### git_status
+Show the git status of the project, including current branch, staged/unstaged changes, and recent commits.
+Parameters: detailed (optional bool, default: false)
+
+### env_info
+Show environment information: Node.js version, npm version, OS, shell, and available tools.
+Parameters: none
+
+### todo
+Manage a session todo list. Add, list, complete, or remove tasks to track your progress.
+Parameters: action (required: "add", "list", "complete", "remove"), task (required for add/complete/remove), priority (optional: "high", "medium", "low")
+
+### diff_view
+Show a diff of uncommitted changes in the git repository. Useful for reviewing what has changed.
+Parameters: file (optional — specific file to diff), staged (optional bool, default: false)
+
+### memory
+Save or recall important information across the conversation. Use to remember key decisions, architecture notes, or user preferences.
+Parameters: action (required: "save", "recall", "list", "clear"), key (required for save/recall), value (required for save)
+
 ## Action Tools
 
 These tools let you structure your response with rich formatting. Use them to make your responses more helpful and engaging.
